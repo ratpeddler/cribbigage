@@ -61,7 +61,7 @@ export function deal(deck: number[], players = 2, handSize = 6, dealerExtra = 0,
     }
 
     // Do the cut (Can't take first or last card)
-    const cutPoint = ((Math.random() * (shuffled.length - 2)) + 1);
+    const cutPoint = Math.floor((Math.random() * (shuffled.length - 2)) + 1);
     const cut = shuffled[cutPoint];
 
     // Return the player hands, the initial crib and the remaining deck (This will need to be cut)
