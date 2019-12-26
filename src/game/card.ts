@@ -39,7 +39,7 @@ function parseValue(card: Card): Value {
         case 12:
             return "King";
         default:
-            if (rawValue > 1 && rawValue <= 10) {
+            if (rawValue >= 1 && rawValue <= 10) {
                 return rawValue + 1 as Value;
             }
 
