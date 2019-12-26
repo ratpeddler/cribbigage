@@ -1,22 +1,33 @@
-export function createDeck() {
+import { Card } from "./card";
+
+// These are semantically the same, but nice for clarity about the expected size 
+// NOTE: No size is enforced other than through checkDeck
+export type Deck = Card[];
+export type Hand = Card[];
+
+export function createDeck() : Deck{
     // Create a deck of cards 1-53
     const deck: number[] = [];
     for (let i = 0; i < 52; i++) {
         deck[i] = i;
     }
 
+    // Sanity check that we are not missing any cards
     checkDeck(deck);
-
     return deck;
 }
 
 export function checkDeck(deck: number[]) {
-    if (deck.length != 52) {
+    // Check length
+    if (deck.length !== 52) {
         throw "Deck does not have 53 cards!";
     }
+
+    // TODO: Check for duplicates
+    //let cardCount: {[card: number]: number} = {};
 }
 
-export function shuffleDeck(deck: number[]) {
+export function shuffleDeck(deck: number[]): Deck {
     const shuffle = deck.map(card => ({ card, random: Math.random() }));
     const newDeck = [...shuffle].sort((a, b) => {
         if (a.random > b.random) {
@@ -31,12 +42,13 @@ export function shuffleDeck(deck: number[]) {
     return newDeck.map(wrapper => wrapper.card);
 }
 
-export function deal(deck: number[], players = 2, handSize = 6, dealerExtra = 0, cribExtra = 0) {
+export function deal(deck: number[], players = 2, handSize = 6, dealerExtra = 0, cribExtra = 0, cutCount = 1) {
     const shuffled = shuffleDeck(deck);
     checkDeck(shuffled);
 
-    const hands: number[][] = [];
-    const crib: number[] = [];
+    const hands: Hand[] = [];
+    const crib: Hand = [];
+    const cut: Hand = [];
 
     // Deal hands
     for (let i = 0; i < handSize; i++) {
@@ -61,49 +73,11 @@ export function deal(deck: number[], players = 2, handSize = 6, dealerExtra = 0,
     }
 
     // Do the cut (Can't take first or last card)
-    const cutPoint = Math.floor((Math.random() * (shuffled.length - 2)) + 1);
-    const cut = shuffled[cutPoint];
+    for (let i = 0; i < cutCount; i++) {
+        const cutPoint = Math.floor((Math.random() * (shuffled.length - 2)) + 1);
+        cut.push(shuffled[cutPoint]);
+    }
 
     // Return the player hands, the initial crib and the remaining deck (This will need to be cut)
     return { hands, crib, cut };
-}
-
-export function parseCard(card: number) {
-    return { value: parseValue(card), suit: parseSuit(card) };
-}
-
-function parseValue(card: number) {
-    // Card is 1-53
-    const rawValue = card % 13;
-    switch (rawValue) {
-        case 0:
-            return "Ace";
-        case 10:
-            return "Jack";
-        case 11:
-            return "Queen";
-        case 12:
-            return "King";
-        default:
-            return rawValue + 1;
-    }
-}
-
-export type Suit = "Clubs" | "Diamonds" | "Hearts" | "Spades";
-
-function parseSuit(card: number): Suit {
-    // Card is 0-52
-    const rawSuit = Math.floor(card / 13);
-    switch (rawSuit) {
-        case 0:
-            return "Clubs";
-        case 1:
-            return "Diamonds";
-        case 2:
-            return "Hearts";
-        case 3:
-            return "Spades";
-        default:
-            throw `Invalid suit! Suit: ${rawSuit}, Card: ${card}`;
-    }
 }
