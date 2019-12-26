@@ -1,5 +1,5 @@
 import React from "react";
-import { parseCard } from "../game/deal";
+import { parseCard } from "../game/card";
 
 export const Hand: React.FC<{ cards: number[], maxKeep?: number }> = props => {
     const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
