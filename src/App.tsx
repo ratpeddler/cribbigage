@@ -5,7 +5,7 @@ import { deal, createDeck } from './game/deal';
 import { scoreHand } from './game/score';
 
 const players = 2; // Number of players
-const handSize = 4; // Dealt hand size to each player
+const handSize = 5; // Dealt hand size to each player
 const dealerExtra = 0; // For 3 hand
 const cribExtra = 0; // For CribBIGage
 const discardUntil = 4;
@@ -33,7 +33,7 @@ const App: React.FC = () => {
       {!!score.pairs && <div>pairs: {score.pairs}</div>}
       {!!score.knobs && <div>knobs: {score.knobs}</div>}
       {!!score.runs && <div>runs: {score.runs}</div>}
-      {!!score.flush && <div>knobs: {score.flush}</div>}
+      {!!score.flush && <div>flush: {score.flush}</div>}
     </div>
   );
 }

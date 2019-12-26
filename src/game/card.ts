@@ -31,7 +31,7 @@ function getCountFromValue(value: Value): number {
  *  NOTE: Use @see parseCard for the named rank values
  *  */
 export function parseNumericalValue(card: Card){
-    return card % 13 + 1;
+    return (card % 13) + 1;
 }
 
 // AKA the card's Rank Value
@@ -49,7 +49,7 @@ function parseValue(card: Card): Value {
             return "King";
         default:
             if (rawValue >= 2 && rawValue <= 10) {
-                return rawValue + 1 as Value;
+                return rawValue as Value;
             }
 
             throw `Card had invalid numerical value! ${rawValue}`;

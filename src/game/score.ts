@@ -5,6 +5,10 @@ const SCORE_FIFTEEN = 2;
 const SCORE_PAIR = 2;
 const SCORE_KNOBS = 1;
 const SCORE_FLUSH_PER_CARD = 1;
+const SCORE_RUN_PER_CARD = 1;
+
+/** Min number of cards for a run to score */
+const MINIMUM_RUN_LENGTH = 3;
 
 /**
  * Scores a normal hand
@@ -104,43 +108,62 @@ function scoreFlush(hand: Hand, cut: Hand, isCrib: boolean) {
     return 0;
 }
 
+function scoreRunInner(run: number[]) {
+    if (run.length >= MINIMUM_RUN_LENGTH) {
+        // Get a total count of all multiples of the run
+        let multiples = 1;
+        run.forEach(r => multiples *= r);
+        return (multiples * run.length) * SCORE_RUN_PER_CARD;
+    }
+
+    console.log("Run was too short to count. length", run.length);
+    return 0;
+}
+
 function scoreRuns(hand: Hand) {
-    const cards = [...hand];
+    let cards = [...hand];
     let score = 0;
 
     // sort the hand by raw numerical value. This is by rank and ignores suit.
-    cards.map(parseNumericalValue).sort((a, b) => a - b);
+    cards = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    console.log("Sorted cards for run", cards);
 
     // Look for contiguous sections
     let run: number[] = [];
     let lastNum = -1;
-    cards.forEach(card => {
+    for (let card of cards) {
+        console.log("last card", lastNum);
+        console.log("current card", card);
+        console.log("current run", run);
         if (lastNum != card && lastNum != card - 1) {
+            console.log("not in run anymore")
             // Not in a run anymore
             // score the existing run and re initialize
             if (run && run.length > 0) {
-                // Get a total count of all multiples of the run
-                let multiples = 1;
-                run.forEach(r => multiples *= r);
-                score += multiples * run.length;
+                score += scoreRunInner(run);
             }
 
             // init
             lastNum = card;
-            run = [];
+            run = [1];
+
+            // We should skip the rest of actions
+            continue;
         }
 
         if (lastNum == card) {
+            console.log("cards were same, adding to double/triple");
             run[0]++;
         }
         else if (lastNum == card - 1) {
+            console.log("card was next in run, adding new entry to run")
             lastNum = card;
             run.unshift(1); // add to the existing run
         }
-    })
+    }
 
-    // Factor in double/triple runs?
-
+    // Score whatever part of the run is remaining
+    score += scoreRunInner(run);
     return score;
 }
 
@@ -165,6 +188,7 @@ function scoreKnobs(hand: Hand, cut: Hand) {
     let score = 0;
     for (let card of hand) {
         const currentCard = parseCard(card);
+
         if (currentCard.value == "Jack") {
             for (let cutCard of cut) {
                 const otherCard = parseCard(cutCard);
