@@ -26,25 +26,38 @@ function getCountFromValue(value: Value): number {
     return value;
 }
 
+/**
+ *  Get the raw numberical value 1 (ACE) to 13 (KING)
+ *  NOTE: Use @see parseCard for the named rank values
+ *  */
+export function parseNumericalValue(card: Card){
+    return card % 13 + 1;
+}
+
+// AKA the card's Rank Value
 function parseValue(card: Card): Value {
     // Card is 1-53
-    const rawValue = card % 13;
+    const rawValue = parseNumericalValue(card);
     switch (rawValue) {
-        case 0:
+        case 1:
             return "Ace";
-        case 10:
-            return "Jack";
         case 11:
-            return "Queen";
+            return "Jack";
         case 12:
+            return "Queen";
+        case 13:
             return "King";
         default:
-            if (rawValue >= 1 && rawValue <= 10) {
+            if (rawValue >= 2 && rawValue <= 10) {
                 return rawValue + 1 as Value;
             }
 
-            throw `Card had invalid raw value! ${rawValue}`;
+            throw `Card had invalid numerical value! ${rawValue}`;
     }
+}
+
+export function sameSuit(a: Card, b:Card){
+    return parseSuit(a) == parseSuit(b);
 }
 
 function parseSuit(card: Card): Suit {

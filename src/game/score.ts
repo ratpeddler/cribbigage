@@ -1,9 +1,10 @@
-import { parseCard } from "./card";
+import { parseCard, parseNumericalValue, Suit } from "./card";
 import { Hand } from "./deal";
 
 const SCORE_FIFTEEN = 2;
 const SCORE_PAIR = 2;
 const SCORE_KNOBS = 1;
+const SCORE_FLUSH_PER_CARD = 1;
 
 /**
  * Scores a normal hand
@@ -16,14 +17,10 @@ export function scoreHand(hand: Hand, cut: Hand, isCrib = false) {
     const cards = [...hand, ...cut];
 
     const fifteen = scoreFifteens(cards);
+    const runs = scoreRuns(cards);
     const pairs = scorePairs(cards);
+    const flush = scoreFlush(hand, cut, isCrib);
     const knobs = scoreKnobs(hand, cut);
-
-    // TODO: Runs
-    const runs = 0;
-
-    // TODO: Flushs
-    const flush = 0;
 
     return {
         score: fifteen + pairs + knobs + runs + flush,
@@ -40,7 +37,7 @@ function scoreFifteens(hand: Hand) {
     // This could easily be N^2... For <10 cards that is still relatively trivial
     let score = 0;
 
-    // All possible sums of the cards (This should be close. Best to add unit tests...)
+    // All possible sums of the cards
     const sums = allAdditions(hand.map(h => parseCard(h).count));
 
     // Get only the ones that equal 15 and add them to the score
@@ -49,6 +46,7 @@ function scoreFifteens(hand: Hand) {
     return score;
 }
 
+// This should be basically right, but best to add some unit tests.
 export function allAdditions(countValues: number[]): number[] {
     if (countValues && countValues.length) {
         if (countValues.length == 1) {
@@ -63,6 +61,88 @@ export function allAdditions(countValues: number[]): number[] {
     return [];
 }
 
+function hasFlush(hand: Hand, suit?: Suit) {
+    if (hand && hand.length) {
+        // If suit isn't provided check the first card
+        suit = suit || parseCard(hand[0]).suit;
+        for (let card of hand) {
+            if (parseCard(card).suit != suit) {
+                // no flush unless the full hand is the same suit
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    throw "Can't check for flush in empty hand";
+}
+
+function scoreFlush(hand: Hand, cut: Hand, isCrib: boolean) {
+    let handHasFlush = hasFlush(hand);
+    let cutHasFlush = hasFlush(cut, parseCard(hand[0]).suit);
+
+    if (isCrib) {
+        // in the crib you need all cards to be the same suit, hand & cut
+        if (handHasFlush && cutHasFlush) {
+            return (hand.length + cut.length) * SCORE_FLUSH_PER_CARD;
+        }
+
+        return 0;
+    }
+    else {
+        // In normal hand, only the hand has to have a flush, cut is just bonus
+        if (handHasFlush) {
+            if (cutHasFlush) {
+                return (hand.length + cut.length) * SCORE_FLUSH_PER_CARD;
+            }
+
+            return hand.length * SCORE_FLUSH_PER_CARD;
+        }
+    }
+
+    return 0;
+}
+
+function scoreRuns(hand: Hand) {
+    const cards = [...hand];
+    let score = 0;
+
+    // sort the hand by raw numerical value. This is by rank and ignores suit.
+    cards.map(parseNumericalValue).sort((a, b) => a - b);
+
+    // Look for contiguous sections
+    let run: number[] = [];
+    let lastNum = -1;
+    cards.forEach(card => {
+        if (lastNum != card && lastNum != card - 1) {
+            // Not in a run anymore
+            // score the existing run and re initialize
+            if (run && run.length > 0) {
+                // Get a total count of all multiples of the run
+                let multiples = 1;
+                run.forEach(r => multiples *= r);
+                score += multiples * run.length;
+            }
+
+            // init
+            lastNum = card;
+            run = [];
+        }
+
+        if (lastNum == card) {
+            run[0]++;
+        }
+        else if (lastNum == card - 1) {
+            lastNum = card;
+            run.unshift(1); // add to the existing run
+        }
+    })
+
+    // Factor in double/triple runs?
+
+    return score;
+}
 
 function scorePairs(hand: Hand) {
     const cards = [...hand];
