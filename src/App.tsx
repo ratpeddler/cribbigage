@@ -1,24 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { ScoreBoard } from './components/scoreboard';
+import { Hand } from './components/hand';
+import { deal, createDeck } from './game/deal';
 
 const App: React.FC = () => {
+  const [scores, setScores] = React.useState([0, 0]);
+  const { hands, crib, cut } = deal(createDeck());
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ScoreBoard scores={scores} />
+      {hands.map((cards, index) => <Hand cards={cards} key={index} />)}
     </div>
   );
 }
