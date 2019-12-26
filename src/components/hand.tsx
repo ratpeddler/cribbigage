@@ -1,7 +1,8 @@
 import React from "react";
 import { parseCard } from "../game/card";
+import { HandScore } from "./handScore";
 
-export const Hand: React.FC<{ cards: number[], maxKeep?: number }> = props => {
+export const Hand: React.FC<{ cards: number[], maxKeep?: number, cut?: number[] }> = props => {
     const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
 
     return <div style={{ display: "flex", flexDirection: "row" }}>
@@ -18,6 +19,9 @@ export const Hand: React.FC<{ cards: number[], maxKeep?: number }> = props => {
                 setKeepCards(newthrow);
             }
         }} />)}
+
+        {/* Show the score for the currently selected cards only */}
+        <HandScore hand={props.cards.filter((card, index) => keepCards[index])} cut={props.cut} />
     </div>;
 }
 

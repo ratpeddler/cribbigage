@@ -14,7 +14,6 @@ const App: React.FC = () => {
   const [scores] = React.useState([0, 0]);
   const { hands, crib, cut } = deal(createDeck(), players, handSize, dealerExtra, cribExtra);
 
-  const score = scoreHand(hands[0], cut);
 
   return (
     <div>
@@ -25,15 +24,8 @@ const App: React.FC = () => {
       Cut!
       <Hand cards={cut} />
 
-      {hands.map((cards, index) => index == 0 && <Hand cards={cards} key={index} maxKeep={discardUntil} />)}
+      {hands.map((cards, index) => <Hand cards={cards} key={index} maxKeep={discardUntil} cut={cut} />)}
 
-      {/* Display the scores for now while finishing scoring */}
-      {!!score.score && <div>SCORE: {score.score}</div>}
-      {!!score.fifteen && <div>fifteen: {score.fifteen}</div>}
-      {!!score.pairs && <div>pairs: {score.pairs}</div>}
-      {!!score.knobs && <div>knobs: {score.knobs}</div>}
-      {!!score.runs && <div>runs: {score.runs}</div>}
-      {!!score.flush && <div>flush: {score.flush}</div>}
     </div>
   );
 }
