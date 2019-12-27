@@ -36,12 +36,18 @@ export const Play: GameComponent = props => {
                 maxKeep={1}
                 keepCards={keepCard}
                 setKeepCards={newKeptCards => {
-                    // ENFORCE play rules
-                    if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
-                        setKeepCard(newKeptCards);
+                    let card = ExtractKeptCard(newKeptCards);
+                    if (card) {
+                        // ENFORCE play rules
+                        if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
+                            setKeepCard(newKeptCards);
+                        }
+                        else {
+                            console.log("cant play that!");
+                        }
                     }
                     else {
-                        console.log("cant play that!");
+                        setKeepCard(newKeptCards);
                     }
                 }}
             />
@@ -71,8 +77,8 @@ export const Play: GameComponent = props => {
                 setKeepCard({});
 
                 // Update played cards
-                props.setGameState({
-                    ...props.game,
+                setGameState({
+                    ...game,
                     playedCards: newPlayedCards
                 }, false);
 
@@ -90,8 +96,8 @@ export const Play: GameComponent = props => {
             let newPrevious = [...previousPlayedCards, ...playedCards];
 
             // Update played cards
-            props.setGameState({
-                ...props.game,
+            setGameState({
+                ...game,
                 previousPlayedCards: newPrevious,
                 playedCards: []
             }, false);

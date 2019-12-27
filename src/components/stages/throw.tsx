@@ -4,16 +4,18 @@ import { HandAndScore } from "../hand";
 import { Button } from "../button";
 
 export const Throw: GameComponent = props => {
-    const mustKeep = 4; // TODO Get this from game state
+    const { game } = props;
+    const { rules } = game;
+    const { keepSize } = rules;
     const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
-    const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length != mustKeep;
+    const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length != keepSize;
 
     // TODO: This should either let you pick all hands or just your own
     return <div>
-        Select which cards you will keep in your hand. (You must keep {mustKeep})
+        Select which cards you will keep in your hand. (You must keep {keepSize})
 
         Your hand:
-        {props.game.players.map((p, index) => index == 0 && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={mustKeep} keepCards={keepCards} setKeepCards={setKeepCards} />)}
+        {props.game.players.map((p, index) => index == 0 && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={keepSize} keepCards={keepCards} setKeepCards={setKeepCards} />)}
 
         <Button
             disabled={disabled}
@@ -25,7 +27,7 @@ export const Throw: GameComponent = props => {
                         hand: p.hand.filter((c, ci) => {
                             if (pi > 0) {
                                 // This is a local hack for now:
-                                return ci < mustKeep;
+                                return ci < keepSize;
                             }
 
                             return keepCards[c];
@@ -34,7 +36,7 @@ export const Throw: GameComponent = props => {
                     crib: props.game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
                         if (pi > 0) {
                             // This is a local hack for now:
-                            return ci >= mustKeep;
+                            return ci >= keepSize;
                         }
 
                         return !keepCards[c];
