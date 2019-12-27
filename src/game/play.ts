@@ -1,6 +1,6 @@
-import { GameState } from "./turns";
-import { deal, Hand } from "./deal";
+import { Hand } from "./deal";
 import { Card, parseCard } from "./card";
+import { GameState } from "./game";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;

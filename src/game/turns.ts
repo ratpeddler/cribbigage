@@ -1,6 +1,10 @@
 import { Deck, Hand, createDeck } from "./deal";
+import { GameState } from "./game";
+import { GameRules } from "./rules";
 
 export type Stage = "Deal" | "Throw" | "Cut" | "Play" | "Score" | "Crib";
+
+export type NonGameStages = "ChooseGameMode" | "GameOver";
 
 export const StageOrder: Readonly<Stage[]> = ["Deal", "Throw", "Cut", "Play", "Score", "Crib"];
 
@@ -15,42 +19,12 @@ export interface PlayerState extends PlayerInfo {
     hand: Hand;
 }
 
-export interface GameState {
-    // List of the players (current dealer is always LAST)
-    players: PlayerState[];
-
-    // Current turn number
-    turnNumber: number;
-
-    // Current Stage
-    stage: Stage;
-
-    // Current Crib
-    crib?: Hand;
-
-    // Current Cut
-    cut?: Hand;
-
-    // Current played cards
-    playedCards?: Hand;
-
-    // Cards from previous plays (sets of 31)
-    previousPlayedCards?: Hand;
-}
-
-export function initGameState(players: PlayerInfo[]): GameState {
-    return {
-        turnNumber: 0,
-        players: players.map(player => ({ ...player, score: 0, hand: [] })),
-        stage: "Deal",
-        crib: [],
-        cut: [],
-        playedCards: [],
-    }
-}
-
 export function AdvanceGameState(game: GameState): GameState {
-    const currentStage = StageOrder.indexOf(game.stage);
+    const currentStage = StageOrder.indexOf(game.stage as Stage);
+    if (currentStage < 0) {
+        throw `Cant use advance game stage from non-game loop stage: ${game.stage}`;
+    }
+
     const newStage = (currentStage + + 1) % StageOrder.length;
     const stage = StageOrder[newStage];
 

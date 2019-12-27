@@ -1,11 +1,12 @@
 import React from "react";
-import { GameState, AdvanceGameState } from "../game/turns";
 import { Deal } from "./stages/deal";
 import { Throw } from "./stages/throw";
 import { Cut } from "./stages/cut";
 import { Play } from "./stages/play";
 import { Crib } from "./stages/crib";
 import { ScoreStage } from "./stages/scoreStage";
+import { GameState } from "../game/game";
+import { ChooseGameMode } from "./stages/chooseGameMode";
 
 export interface GameComponentProps {
     game: GameState,
@@ -16,6 +17,8 @@ export type GameComponent = React.FC<GameComponentProps>;
 
 export const Game: GameComponent = props => {
     switch (props.game.stage) {
+        case "ChooseGameMode":
+            return <ChooseGameMode {...props} />;
         case "Deal":
             return <Deal {...props} />;
         case "Throw":
