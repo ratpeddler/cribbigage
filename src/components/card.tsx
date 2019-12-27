@@ -16,7 +16,7 @@ export const Card: React.FC<{ card: number, index: number, throw?: boolean, onCl
             margin,
             border: props.throw ? "5px solid transparent" : "5px solid lightblue",
             borderRadius: 10,
-            cursor: onclick ? "pointer" : undefined,
+            cursor: props.onClick ? "pointer" : undefined,
         }}
         onClick={props.onClick}
     >
