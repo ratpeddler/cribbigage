@@ -1,4 +1,4 @@
-import { Deck, Hand } from "./deal";
+import { Deck, Hand, createDeck } from "./deal";
 
 export type Stage = "Deal" | "Throw" | "Cut" | "Play" | "Score" | "Crib";
 
@@ -18,14 +18,27 @@ export interface GameState {
     deck: Deck;
 
     // Current Hands
-    hands: Hand[];
+    hands?: Hand[];
 
     // Current Crib
-    crib: Hand;
+    crib?: Hand;
 
     // Current Cut
-    cut: Hand;
+    cut?: Hand;
 
     // Current played cards
-    playedCards: Hand[];
+    playedCards?: Hand[];
+}
+
+export function initGameState(players: number): GameState{
+    return {
+        turnNumber: 0,
+        score: new Array(players).map(x => (0)),
+        stage: "Deal",
+        deck: createDeck(),
+        hands: [],
+        crib: [],
+        cut: [],
+        playedCards: [],
+    }
 }
