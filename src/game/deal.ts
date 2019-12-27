@@ -1,11 +1,25 @@
 import { Card } from "./card";
+import { GameState } from "./turns";
+
+
+export function RunDeal(game: GameState): GameState {
+    const { players } = game;
+    const { hands, crib, cut } = deal(players.length);
+
+    return {
+        ...game,
+        players: players.map((player, i) => ({ ...player, hand: hands[i] })),
+        crib,
+        cut,
+    };
+}
 
 // These are semantically the same, but nice for clarity about the expected size 
 // NOTE: No size is enforced other than through checkDeck
 export type Deck = Card[];
 export type Hand = Card[];
 
-export function createDeck() : Deck{
+export function createDeck(): Deck {
     // Create a deck of cards 1-53
     const deck: number[] = [];
     for (let i = 0; i < 52; i++) {
@@ -42,8 +56,8 @@ export function shuffleDeck(deck: number[]): Deck {
     return newDeck.map(wrapper => wrapper.card);
 }
 
-export function deal(deck: number[], players = 2, handSize = 6, dealerExtra = 0, cribExtra = 0, cutCount = 1) {
-    const shuffled = shuffleDeck(deck);
+export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cribExtra = 0, cutCount = 1) {
+    const shuffled = shuffleDeck(deck && deck.length ? deck : createDeck());
     checkDeck(shuffled);
 
     const hands: Hand[] = [];

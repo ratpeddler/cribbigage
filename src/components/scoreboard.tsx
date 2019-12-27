@@ -1,13 +1,15 @@
 import React from "react";
+import { PlayerState } from "../game/turns";
 
-export const ScoreBoard: React.FC<{scores: number[]}> = props => {
+export const ScoreBoard: React.FC<{ players: PlayerState[] }> = props => {
     return <div>
-        {props.scores.map((score, i) => <Score score={score} player={i} key={i} />)}
+        {props.players.map((p, i) => <Score score={p.score} player={p.name} key={i} hasCrib={i == props.players.length - 1} />)}
     </div>;
 }
 
-export const Score: React.FC<{score: number, player: number}> = props => {
+export const Score: React.FC<{ score: number, player: string, hasCrib?: boolean }> = props => {
     return <div>
-        {`Player ${props.player}: ${props.score}`}
+        {`${props.player}: ${props.score}`}
+        {props.hasCrib ? " (CRIB)" : null}
     </div>;
 }
