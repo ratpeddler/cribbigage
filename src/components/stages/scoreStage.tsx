@@ -11,7 +11,7 @@ export const ScoreStage: GameComponent = props => {
         <Hand cards={props.game.cut!} />
 
         Scores:
-        {props.game.players.map(p => <div>
+        {props.game.players.map(p => <div key={p.name}>
             <div>{p.name}:</div>
             <HandScore key={p.name} hand={p.hand} cut={props.game.cut} />
             <Hand cards={p.hand} />

@@ -12,6 +12,10 @@ interface SelectableHandProps {
     showScore?: boolean;
 }
 
+export function ExtractKeptCard(keepCard: KeepCard): number {
+    return parseInt(Object.keys(keepCard).filter((card, index) => !!keepCard[card as any])[0]);
+}
+
 export const HandAndScore: React.FC<SelectableHandProps> = props => {
     const onClick = React.useMemo<((newCard: number) => void) | undefined>(() => props.keepCards && props.setKeepCards
         ? card => {

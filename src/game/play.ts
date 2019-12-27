@@ -25,7 +25,8 @@ export function sumCards(cards: Hand) {
     return sum;
 }
 
-function canPlay(playedCards: Hand, newCard: Card) {
+export function canPlay(playedCards: Hand | undefined, newCard: Card) {
+    if (!playedCards || playedCards.length == 0) { return true; }
     const currentCount = sumCards(playedCards);
     return currentCount + parseCard(newCard).count <= MAX_PLAY_COUNT;
 }
