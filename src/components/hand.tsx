@@ -47,12 +47,14 @@ interface HandProps {
     maxKeep?: number,
     keepCards?: KeepCard,
     onClick?: (card: number) => void,
+    stacked?: boolean,
 }
 
 export const Hand: React.FC<HandProps> = props => {
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
             {props.cards.map((card, i) => <Card
+                stacked={props.stacked}
                 card={card}
                 index={i}
                 key={i}

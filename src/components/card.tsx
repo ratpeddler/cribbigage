@@ -2,8 +2,8 @@
 import React from "react";
 import { parseCard, parseNumericalValue } from "../game/card";
 
-export const Card: React.FC<{ card: number, index: number, selected?: boolean, onClick?: () => void }> = props => {
-    const { card, selected, onClick } = props;
+export const Card: React.FC<{ card: number, index: number, selected?: boolean, onClick?: () => void, stacked?: boolean }> = props => {
+    const { card, selected, onClick, stacked } = props;
     const { value, suit } = parseCard(card);
     const raw = parseNumericalValue(card);
 
@@ -15,6 +15,7 @@ export const Card: React.FC<{ card: number, index: number, selected?: boolean, o
         style={{
             position: "relative",
             margin,
+            marginLeft: stacked ? -50 : margin,
             border: selected ? "5px solid lightblue" : "5px solid transparent",
             borderRadius: 10,
             cursor: onClick ? "pointer" : undefined,
@@ -30,7 +31,7 @@ export const Card: React.FC<{ card: number, index: number, selected?: boolean, o
             color: suit == "Diamonds" || suit == "Hearts" ? "red" : "black",
             alignItems: "center",
             textAlign: "center",
-            minWidth: width,
+            minWidth: stacked ? 0 : width,
             minHeight: height,
             padding: margin
         }}

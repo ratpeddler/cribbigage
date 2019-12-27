@@ -2,16 +2,18 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll } from "../../game/play";
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
 
     const { game, setGameState } = props;
-    const { players, previousPlayedCards, playedCards, cut } = game;
+    const { players, previousPlayedCards = [], playedCards = [], cut } = game;
 
     console.log(keepCard);
+
+    const cantPlay = cantPlayAtAll(playedCards, players[0].hand);
 
     return <div>
         Play cards!
@@ -20,14 +22,14 @@ export const Play: GameComponent = props => {
         <Hand cards={cut!} />
 
         Previous Played cards:
-        {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} />}
+        {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
 
         Played cards:
         {playedCards && <Hand cards={playedCards} keepCards={{}} />}
 
         Your Hand:
         {players.map((p, index) => {
-            const remainingCards = p.hand.filter(c => playedCards!.indexOf(c) < 0);
+            const remainingCards = p.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
             return index == 0 && <HandAndScore
                 cards={remainingCards}
                 key={index}
@@ -48,19 +50,39 @@ export const Play: GameComponent = props => {
         Current count: {playedCards && sumCards(playedCards)}
         SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
 
+        <Button disabled={!cantPlay} onClick={() => {
+            // TODO have the other person play if they can
+
+            // Reset the current selection
+            setKeepCard({});
+
+            // Add the new played cards to the previously played stack
+            let newPrevious = [...previousPlayedCards, ...playedCards];
+
+            // Update played cards
+            props.setGameState({
+                ...props.game,
+                previousPlayedCards: newPrevious,
+                playedCards: []
+            }, false);
+        }}>
+            Pass
+        </Button>
         <Button
             disabled={disabled}
             onClick={() => {
-                
+
                 let playedCard = ExtractKeptCard(keepCard);
-                let newPlayedCards = [...playedCards || []];
+                let newPlayedCards = [...playedCards];
                 newPlayedCards.push(playedCard);
 
-                // TODO: this is only the current player...
-                let score = scorePlay(playedCards || [], playedCard);
+                // TODO: Add score to the players
+                let score = scorePlay(playedCards, playedCard);
 
                 // TODO: Play the other player's card
-                // Enforce 31
+                // Enforce 31 (done)
+                // Reset on GO
+                // Allow pass only when unable to play
                 // Display 31 and previous cards
 
                 // Reset the current selection

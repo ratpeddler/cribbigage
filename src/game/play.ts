@@ -31,6 +31,16 @@ export function canPlay(playedCards: Hand | undefined, newCard: Card) {
     return currentCount + parseCard(newCard).count <= MAX_PLAY_COUNT;
 }
 
+export function cantPlayAtAll(playedCards: Hand | undefined, hand: Hand) {
+    for (let card of hand) {
+        if (canPlay(playedCards, card)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function scorePlay(playedCards: Hand, newCard: Card): number {
     let score = 0;
     const currentCount = sumCards(playedCards);
