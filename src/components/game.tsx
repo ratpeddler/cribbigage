@@ -2,7 +2,7 @@ import React from "react";
 import { GameState } from "../game/turns";
 import { Deal } from "./stages/deal";
 import { Throw } from "./stages/throw";
-import { Cut } from "./stages/Cut";
+import { Cut } from "./stages/cut";
 import { Play } from "./stages/play";
 import { Crib } from "./stages/crib";
 import { ScoreStage } from "./stages/scoreStage";
