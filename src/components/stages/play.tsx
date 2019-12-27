@@ -50,24 +50,6 @@ export const Play: GameComponent = props => {
         Current count: {playedCards && sumCards(playedCards)}
         SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
 
-        <Button disabled={!cantPlay} onClick={() => {
-            // TODO have the other person play if they can
-
-            // Reset the current selection
-            setKeepCard({});
-
-            // Add the new played cards to the previously played stack
-            let newPrevious = [...previousPlayedCards, ...playedCards];
-
-            // Update played cards
-            props.setGameState({
-                ...props.game,
-                previousPlayedCards: newPrevious,
-                playedCards: []
-            }, false);
-        }}>
-            Pass
-        </Button>
         <Button
             disabled={disabled}
             onClick={() => {
@@ -98,8 +80,27 @@ export const Play: GameComponent = props => {
             Play selected card
         </Button>
 
+        <Button disabled={!cantPlay} onClick={() => {
+            // TODO have the other person play if they can
+
+            // Reset the current selection
+            setKeepCard({});
+
+            // Add the new played cards to the previously played stack
+            let newPrevious = [...previousPlayedCards, ...playedCards];
+
+            // Update played cards
+            props.setGameState({
+                ...props.game,
+                previousPlayedCards: newPrevious,
+                playedCards: []
+            }, false);
+        }}>
+            Pass
+        </Button>
+
         <Button onClick={() => props.setGameState(props.game, true)}>
-            Score hands
+            SKIP to Score hands
         </Button>
     </div>;
 }
