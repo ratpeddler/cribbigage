@@ -40,16 +40,17 @@ export const Play: GameComponent = props => {
         <Button
             disabled={disabled}
             onClick={() => {
-                // TODO: Play the other player's card
-                // Enforce 31
-                // Display 31 and previous cards
 
                 let playedCard = parseInt(Object.keys(keepCard).filter(c => !!keepCard[c as any])[0]);
                 let playedCards = [...props.game.playedCards || []];
                 playedCards.push(playedCard);
 
+                // TODO: this is only the current player...
                 let score = scorePlay(playedCards, playedCard);
-
+                
+                // TODO: Play the other player's card
+                // Enforce 31
+                // Display 31 and previous cards
 
                 // Reset the current selection
                 setKeepCard({});

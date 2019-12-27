@@ -19,7 +19,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[] }> = props => {
             <img src={arrow_right} height={150} />
         </div>
 
-        <div>
+        <div style={{ textAlign: "center" }}>
             {players.map((p, pi) => <span key={pi}
                 style={{ color: colors[pi], fontWeight: props.players.indexOf(p) == props.players.length - 1 ? 700 : 400, margin: 5 }}>
                 {p.name}: {p.score}
