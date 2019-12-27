@@ -1,7 +1,6 @@
 import { Card } from "./card";
 import { GameState } from "./turns";
 
-
 export function RunDeal(game: GameState): GameState {
     const { players } = game;
     const { hands, crib, cut } = deal(players.length);

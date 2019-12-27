@@ -1,10 +1,12 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { Hand, KeepCard } from "../hand";
+import { Hand, KeepCard, HandAndScore } from "../hand";
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
+
+    console.log(keepCard);
 
     // TODO: This should only show YOUR hand
     return <div>
@@ -16,7 +18,7 @@ export const Play: GameComponent = props => {
         Your Hand:
         {props.game.players.map((p, index) => {
             const remainingCards = p.hand.filter(c => props.game.playedCards!.indexOf(c) < 0);
-            return <Hand
+            return <HandAndScore
                 cards={remainingCards}
                 key={index}
                 maxKeep={1}
@@ -32,10 +34,15 @@ export const Play: GameComponent = props => {
                 let playedCards = [...props.game.playedCards || []];
                 playedCards.push(playedCard);
 
+                // Reset the current selection
+                setKeepCard({});
+
+                // Update played cards
                 props.setGameState({
                     ...props.game,
                     playedCards
                 }, false);
+
             }}>
             Play selected card
         </button>

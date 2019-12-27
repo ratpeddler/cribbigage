@@ -1,6 +1,6 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { Hand } from "../hand";
+import { HandAndScore } from "../hand";
 
 export const Throw: GameComponent = props => {
     const mustKeep = 4; // TODO Get this from game state
@@ -10,7 +10,7 @@ export const Throw: GameComponent = props => {
     // TODO: This should only show YOUR hand
     return <div>
         Throw cards to the crib
-        {props.game.players.map((p, index) => index == 0 && <Hand cards={p.hand} key={index} maxKeep={mustKeep} keepCards={keepCards} setKeepCards={setKeepCards} />)}
+        {props.game.players.map((p, index) => index == 0 && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={mustKeep} keepCards={keepCards} setKeepCards={setKeepCards} />)}
 
         <button
             disabled={disabled}
