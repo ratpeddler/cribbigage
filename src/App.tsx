@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScoreBoard } from './components/scoreboard';
 import { deal, createDeck } from './game/deal';
-import { initGameState } from './game/turns';
+import { initGameState, AdvanceGameState } from './game/turns';
 import { Game } from './components/game';
 
 const players = 2; // Number of players
@@ -12,13 +12,26 @@ const cribExtra = 0; // For CribBIGage
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState([{ name: "Peter" }, { name: "Alex" }]))
 
-  console.log(gameState);
+  console.log(JSON.stringify(gameState));
 
   return (
     <div>
       <ScoreBoard players={gameState.players} />
 
-      <Game game={gameState} setGameState={setGameState} />
+      <Game
+        game={gameState}
+        setGameState={(newGame, advance) => {
+          let game = newGame;
+          console.log(game);
+
+          if (advance) {
+            game = AdvanceGameState(game);
+            console.log("advancing", game);
+          }
+
+          setGameState(game);
+        }}
+      />
     </div>
   );
 }

@@ -19,10 +19,10 @@ export const Throw: GameComponent = props => {
                     ...props.game,
                     players: props.game.players.map(p => ({
                         ...p,
-                        hand: p.hand.filter((c, i) => keepCards[i])
+                        hand: p.hand.filter((c) => keepCards[c])
                     })),
-                    crib: props.game.players.flatMap(p => p.hand.filter((c, i) => !keepCards[i])),
-                });
+                    crib: props.game.players.flatMap(p => p.hand.filter(c => !keepCards[c])),
+                }, true);
             }}>
             Keep selected hand
             </button>

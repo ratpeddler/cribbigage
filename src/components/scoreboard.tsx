@@ -7,7 +7,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[] }> = props => {
     const colors = ["blue", "red", "green", "gold"];
     const body: JSX.Element[] = [];
     for (let i = 0; i < maxScore; i++) {
-        body.push(<div style={{ display: "flex", flexDirection: "column" }}>{props.players.map((p, pi) => <ScoreDot hasPlayer={p.score == i} playerColor={colors[pi]} />)}</div>);
+        body.push(<div key={i} style={{ display: "flex", flexDirection: "column" }}>{props.players.map((p, pi) => <ScoreDot key={pi} hasPlayer={p.score == i} playerColor={colors[pi]} />)}</div>);
     }
 
     return <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>

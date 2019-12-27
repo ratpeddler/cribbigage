@@ -7,30 +7,27 @@ import { Play } from "./stages/play";
 import { Crib } from "./stages/crib";
 import { ScoreStage } from "./stages/scoreStage";
 
-type GameComponentProps = { game: GameState, setGameState: (gameState: GameState) => void };
+export interface GameComponentProps {
+    game: GameState,
+    setGameState: (gameState: GameState, advance: boolean) => void
+};
+
 export type GameComponent = React.FC<GameComponentProps>;
 
 export const Game: GameComponent = props => {
-    // Wrap the setGameState call so that we always advance the game state correctly
-    const stageProps: GameComponentProps = {
-        ...props, 
-        setGameState: newState => {
-            props.setGameState(AdvanceGameState(newState));
-    }};
-
     switch (props.game.stage) {
         case "Deal":
-            return <Deal {...stageProps} />;
+            return <Deal {...props} />;
         case "Throw":
-            return <Throw {...stageProps} />;
+            return <Throw {...props} />;
         case "Cut":
-            return <Cut {...stageProps} />;
+            return <Cut {...props} />;
         case "Play":
-            return <Play {...stageProps} />;
+            return <Play {...props} />;
         case "Score":
-            return <ScoreStage {...stageProps} />;
+            return <ScoreStage {...props} />;
         case "Crib":
-            return <Crib {...stageProps} />;
+            return <Crib {...props} />;
         default:
             return <>{"No defined stage for " + props.game.stage}</>;
     }
