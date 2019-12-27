@@ -33,6 +33,9 @@ export interface GameState {
 
     // Current played cards
     playedCards?: Hand;
+
+    // Cards from previous plays (sets of 31)
+    previousPlayedCards?: Hand;
 }
 
 export function initGameState(players: PlayerInfo[]): GameState {
