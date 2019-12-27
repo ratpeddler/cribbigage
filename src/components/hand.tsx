@@ -2,26 +2,25 @@ import React from "react";
 import { parseCard } from "../game/card";
 import { HandScore } from "./handScore";
 
-export const Hand: React.FC<{ cards: number[], maxKeep?: number, cut?: number[] }> = props => {
-    const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
+export const Hand: React.FC<{ cards: number[], maxKeep?: number, cut?: number[], keepCards: { [card: number]: boolean }, setKeepCards: (newValue: { [card: number]: boolean }) => void }> = props => {
 
     return <div style={{ display: "flex", flexDirection: "row" }}>
         Hand:
-        {props.cards.map((card, i) => <Card card={card} index={i} key={i} throw={!!props.maxKeep && !keepCards[i]} onClick={() => {
+        {props.cards.map((card, i) => <Card card={card} index={i} key={i} throw={!!props.maxKeep && !props.keepCards[i]} onClick={() => {
             if (props.maxKeep) {
-                let newthrow = { ...keepCards };
+                let newthrow = { ...props.keepCards };
                 const keys = Object.keys(newthrow).filter(key => !!newthrow[key as any]);
-                if (keys.length >= props.maxKeep && !keepCards[i]) {
+                if (keys.length >= props.maxKeep && !props.keepCards[i]) {
                     return;
                 }
 
                 newthrow[i] = !newthrow[i];
-                setKeepCards(newthrow);
+                props.setKeepCards(newthrow);
             }
         }} />)}
 
         {/* Show the score for the currently selected cards only */}
-        <HandScore hand={props.cards.filter((card, index) => keepCards[index])} cut={props.cut} />
+        <HandScore hand={props.cards.filter((card, index) => props.keepCards[index])} cut={props.cut} />
     </div>;
 }
 
