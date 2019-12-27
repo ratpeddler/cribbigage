@@ -20,7 +20,8 @@ export const Crib: GameComponent = props => {
             let last = players.pop()!;
             last = {
                 ...last,
-                score: last.score + scoreHand(props.game.crib!, props.game.cut!).score
+                score: last.score + scoreHand(props.game.crib!, props.game.cut!).score,
+                lastScore: last.score // Strange coincidence :P
             };
             
             players.push(last);

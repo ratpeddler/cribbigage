@@ -52,8 +52,8 @@ const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, r
     const body: JSX.Element[] = [];
 
     for (let i = reverse ? dots + from - 1 : from; reverse ? i >= from : i < dots + from; reverse ? i-- : i++) {
-        body.push(<div key={i} style={{ display: "flex", flexDirection: "column", marginTop: 1 }}>
-            {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score == i} playerColor={colors[pi]} />)}
+        body.push(<div key={i} style={{ display: "flex", flexDirection: "column", marginTop: 1, backgroundColor: i % 5 == 0 ? "lightgrey" : undefined }}>
+            {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score == i || p.lastScore == i} playerColor={colors[pi]} />)}
         </div>);
     }
 

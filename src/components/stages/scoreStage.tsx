@@ -21,7 +21,7 @@ export const ScoreStage: GameComponent = props => {
                 ...props.game,
                 players: props.game.players.map((p, pi) => {
                     const score = scoreHand(p.hand, props.game.cut!);
-                    return { ...p, score: p.score + score.score };
+                    return { ...p, score: p.score + score.score, lastScore: p.score };
                 })
             }, true);
         }}>Next</Button>

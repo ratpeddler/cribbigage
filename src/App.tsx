@@ -11,7 +11,9 @@ const App: React.FC = () => {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      
       <img src={logo} width={200} style={{ position: "absolute", top: 30, left: 20 }} />
+      
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <ScoreBoard players={gameState.players} />
       </div>
