@@ -52,7 +52,7 @@ export const Hand: React.FC<HandProps> = props => {
                 card={card}
                 index={i}
                 key={i}
-                throw={props.keepCards && !!props.maxKeep && !props.keepCards[card]}
+                selected={props.keepCards && (!!props.maxKeep && props.keepCards[card])}
                 onClick={props.onClick ? () => props.onClick!(card) : undefined}
             />)}
         </div>);

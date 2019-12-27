@@ -16,7 +16,9 @@ const App: React.FC = () => {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <ScoreBoard players={gameState.players} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <ScoreBoard players={gameState.players} />
+      </div>
 
       <div style={{ minHeight: 500, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center" }}>
         <Game
