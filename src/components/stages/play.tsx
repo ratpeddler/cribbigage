@@ -1,6 +1,7 @@
 import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore } from "../hand";
+import { Button } from "../button";
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
@@ -18,7 +19,7 @@ export const Play: GameComponent = props => {
         Your Hand:
         {props.game.players.map((p, index) => {
             const remainingCards = p.hand.filter(c => props.game.playedCards!.indexOf(c) < 0);
-            return <HandAndScore
+            return index == 0 && <HandAndScore
                 cards={remainingCards}
                 key={index}
                 maxKeep={1}
@@ -27,7 +28,7 @@ export const Play: GameComponent = props => {
             />
         })}
 
-        <button
+        <Button
             disabled={disabled}
             onClick={() => {
                 let playedCard = parseInt(Object.keys(keepCard).filter(c => !!keepCard[c as any])[0]);
@@ -45,10 +46,10 @@ export const Play: GameComponent = props => {
 
             }}>
             Play selected card
-        </button>
+        </Button>
 
-        <button onClick={() => props.setGameState(props.game, true)}>
+        <Button onClick={() => props.setGameState(props.game, true)}>
             Score hands
-        </button>
+        </Button>
     </div>;
 }

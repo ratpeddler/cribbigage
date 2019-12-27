@@ -15,23 +15,25 @@ const App: React.FC = () => {
   console.log(JSON.stringify(gameState));
 
   return (
-    <div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <ScoreBoard players={gameState.players} />
 
-      <Game
-        game={gameState}
-        setGameState={(newGame, advance) => {
-          let game = newGame;
-          console.log(game);
+      <div style={{ minHeight: 500, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center" }}>
+        <Game
+          game={gameState}
+          setGameState={(newGame, advance) => {
+            let game = newGame;
+            console.log(game);
 
-          if (advance) {
-            game = AdvanceGameState(game);
-            console.log("advancing", game);
-          }
+            if (advance) {
+              game = AdvanceGameState(game);
+              console.log("advancing", game);
+            }
 
-          setGameState(game);
-        }}
-      />
+            setGameState(game);
+          }}
+        />
+      </div>
     </div>
   );
 }
