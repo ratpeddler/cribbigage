@@ -60,19 +60,25 @@ export const Play: GameComponent = props => {
         <Button
             disabled={disabled}
             onClick={() => {
-
                 let playedCard = ExtractKeptCard(keepCard);
                 let newPlayedCards = [...playedCards];
                 newPlayedCards.push(playedCard);
 
-                // TODO: Add score to the players
+                // Add your score
                 let score = scorePlay(playedCards, playedCard);
+                const newPlayers = [...players];
+                newPlayers.map(p => {
+                    if (IsYou(p)) {
+                        if (score > 0) {
+                            p.lastScore = p.score;
+                            p.score += score;
+                        }
+                    }
 
-                // TODO: Play the other player's card
-                // Enforce 31 (done)
-                // Reset on GO
-                // Allow pass only when unable to play
-                // Display 31 and previous cards
+                    return p;
+                })
+
+                // TODO: Play the other player's card and add their scores
 
                 // Reset the current selection
                 setKeepCard({});
@@ -80,7 +86,8 @@ export const Play: GameComponent = props => {
                 // Update played cards
                 setGameState({
                     ...game,
-                    playedCards: newPlayedCards
+                    playedCards: newPlayedCards,
+                    players: newPlayers,
                 }, false);
 
             }}>

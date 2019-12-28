@@ -18,6 +18,10 @@ export const Throw: GameComponent = props => {
         Your hand:
         {props.game.players.map((p, index) => IsYou(p) && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={keepSize} keepCards={keepCards} setKeepCards={setKeepCards} />)}
 
+        {game.players[game.players.length - 1].name} has the crib!
+
+        <br />
+
         <Button
             disabled={disabled}
             onClick={() => {
