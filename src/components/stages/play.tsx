@@ -3,6 +3,7 @@ import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
 import { scorePlay, sumCards, canPlay, cantPlayAtAll } from "../../game/play";
+import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
@@ -30,7 +31,7 @@ export const Play: GameComponent = props => {
         Your Hand:
         {players.map((p, index) => {
             const remainingCards = p.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
-            return index == 0 && <HandAndScore
+            return IsYou(p) && <HandAndScore
                 cards={remainingCards}
                 key={index}
                 maxKeep={1}

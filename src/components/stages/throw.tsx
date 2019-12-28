@@ -2,6 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { HandAndScore } from "../hand";
 import { Button } from "../button";
+import { IsYou } from "./chooseGameMode";
 
 export const Throw: GameComponent = props => {
     const { game } = props;
@@ -15,7 +16,7 @@ export const Throw: GameComponent = props => {
         Select which cards you will keep in your hand. (You must keep {keepSize})
 
         Your hand:
-        {props.game.players.map((p, index) => index == 0 && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={keepSize} keepCards={keepCards} setKeepCards={setKeepCards} />)}
+        {props.game.players.map((p, index) => IsYou(p) && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={keepSize} keepCards={keepCards} setKeepCards={setKeepCards} />)}
 
         <Button
             disabled={disabled}
