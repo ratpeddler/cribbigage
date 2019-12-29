@@ -74,7 +74,6 @@ export function playAI(game: GameState): GameState {
 
                 // SCORE
                 const playScore = scorePlay(playedCards, card);
-                player.hand = hand.filter(c => c != card);
                 newGame.playedCards = [...playedCards, card];
                 player.lastScore = player.score;
                 player.score += playScore;
@@ -123,24 +122,24 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
     }
 
     // TODO: Runs
-    if(playedCards && playedCards.length > 0){
+    if (playedCards && playedCards.length > 0) {
         let runLength = 1;
         let max = parseNumericalValue(playedCards[0]);
         let min = max;
-        let reversed =[...playedCards].reverse();
-        for(let card of reversed){
+        let reversed = [...playedCards].reverse();
+        for (let card of reversed) {
             const next = parseNumericalValue(card);
-            if(next == max + 1){
+            if (next == max + 1) {
                 max = next;
                 runLength++;
             }
-            else if(next == min - 1) {
+            else if (next == min - 1) {
                 min = next
                 runLength++;
             }
         }
 
-        if(runLength >= 3){
+        if (runLength >= 3) {
             score += runLength * SCORE_PER_RUN_CARD;
         }
 

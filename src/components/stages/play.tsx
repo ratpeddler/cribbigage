@@ -19,11 +19,15 @@ export const Play: GameComponent = props => {
     return <div>
         Play cards!
 
-        Cut:
-        <Hand cards={cut!} />
-
-        Previous Played cards:
+<div style={{ display: "flex", flexDirection: "row" }}>
+            <div>
+                Cut:
+        <Hand cards={cut!} /></div>
+            <div>
+                Previous Played cards:
         {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
+            </div>
+        </div>
 
         Played cards:
         {playedCards && <Hand cards={playedCards} keepCards={{}} />}
