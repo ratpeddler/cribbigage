@@ -123,7 +123,7 @@ export const Play: GameComponent = props => {
             ...props.game,
             previousPlayedCards: [],
             playedCards: [],
-            nextToPlay: undefined,
+            nextToPlay: 0,
             lastToPlay: undefined,
         }, true)}>
             SKIP to Score hands

@@ -50,11 +50,14 @@ export function playAI(game: GameState): GameState {
     const newGame = { ...game };
     const { players, playedCards = [] } = newGame;
     let { nextToPlay = 0 } = newGame; // this should be the player AFTER the dealer
+    if (!nextToPlay || !(nextToPlay >= 0) || !(nextToPlay >= players.length)) {
+        nextToPlay = 0;
+    }
 
     let wasGo = !IsYou(players[nextToPlay]);
     while (!IsYou(players[nextToPlay])) {
         const player = players[nextToPlay];
-        const { hand } = player;
+        const hand = player.hand.filter(c => playedCards.indexOf(c) < 0);
         console.log("checking if ai can play", hand);
 
         if (cantPlayAtAll(playedCards, hand)) {
