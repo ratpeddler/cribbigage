@@ -21,7 +21,9 @@ export const ScoreStage: GameComponent = props => {
                 ...props.game,
                 players: props.game.players.map((p, pi) => {
                     const score = scoreHand(p.hand, props.game.cut!);
-                    return { ...p, score: p.score + score.score, lastScore: p.score };
+                    const newScore = p.score + score.score;
+                    if (newScore >= 120) { alert(`${p.name} won!`) }
+                    return { ...p, score: newScore, lastScore: p.score };
                 })
             }, true);
         }}>Next</Button>

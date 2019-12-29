@@ -75,7 +75,7 @@ export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cr
         }
     }
 
-    // Add extra dealer cards (Dealer is always *last* player to receive card)
+    // Add extra dealer cards (Dealer is always *last* player to receive card // TODO: This will be by index in the game state )
     for (let i = 0; i < dealerExtra; i++) {
         hands[players - 1].push(shuffled.pop()!);
     }

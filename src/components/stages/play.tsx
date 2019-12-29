@@ -2,17 +2,17 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
 
-    const { game, setGameState } = props;
-    const { players, previousPlayedCards = [], playedCards = [], cut } = game;
+    const { setGameState } = props;
+    const { game } = props;
 
-    console.log(keepCard);
+    const { players, previousPlayedCards = [], playedCards = [], cut } = game;
 
     const cantPlay = cantPlayAtAll(playedCards, players[0].hand);
 
@@ -84,11 +84,12 @@ export const Play: GameComponent = props => {
                 setKeepCard({});
 
                 // Update played cards
-                setGameState({
+                setGameState(playAI({
                     ...game,
                     playedCards: newPlayedCards,
                     players: newPlayers,
-                }, false);
+                    nextToPlay: (game.nextToPlay || 0) + 1
+                }), false);
 
             }}>
             Play selected card
@@ -104,16 +105,23 @@ export const Play: GameComponent = props => {
             let newPrevious = [...previousPlayedCards, ...playedCards];
 
             // Update played cards
-            setGameState({
+            setGameState(playAI({
                 ...game,
                 previousPlayedCards: newPrevious,
-                playedCards: []
-            }, false);
+                playedCards: [],
+                nextToPlay: (game.nextToPlay || 0) + 1
+            }), false);
         }}>
             Pass
         </Button>
 
-        <Button onClick={() => props.setGameState(props.game, true)}>
+        <Button onClick={() => props.setGameState({
+            ...props.game,
+            previousPlayedCards: [],
+            playedCards: [],
+            nextToPlay: undefined,
+            lastToPlay: undefined,
+        }, true)}>
             SKIP to Score hands
         </Button>
     </div>;

@@ -8,6 +8,15 @@ export interface GameState {
     // List of the players (current dealer is always LAST)
     players: PlayerState[];
 
+    // Store who the dealer is (best by index or id or something)
+    dealer?: number;
+
+    /** Play/Peg stage only! The next person who needs to play a card. Used for tracking who will play */
+    nextToPlay?: number;
+
+    /** Play/Peg stage only! The last person who played a card. Used for tracking GO */
+    lastToPlay?: number;
+
     // Current turn number
     turnNumber: number;
 
