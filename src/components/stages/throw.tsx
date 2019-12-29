@@ -30,8 +30,7 @@ export const Throw: GameComponent = props => {
                     players: props.game.players.map((p, pi) => ({
                         ...p,
                         hand: p.hand.filter((c, ci) => {
-                            if (pi > 0) {
-                                // This is a local hack for now:
+                            if (!IsYou(p)) {
                                 return ci < keepSize;
                             }
 
@@ -39,7 +38,7 @@ export const Throw: GameComponent = props => {
                         })
                     })),
                     crib: props.game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
-                        if (pi > 0) {
+                        if (!IsYou(p)) {
                             // This is a local hack for now:
                             return ci >= keepSize;
                         }
