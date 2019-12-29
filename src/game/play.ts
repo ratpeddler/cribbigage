@@ -47,14 +47,13 @@ export function playAI(game: GameState): GameState {
     console.log("ai is playing");
 
     // Start at the next person who needs to play
-    const newGame = { ...game };
-    const { players, playedCards = [] } = newGame;
-    let { nextToPlay = 0 } = newGame; // this should be the player AFTER the dealer
+    game = {...game};
+    const { players, playedCards = [] } = game;
+    let { nextToPlay = 0 } = game; // this should be the player AFTER the dealer
     if (!nextToPlay || !(nextToPlay >= 0) || !(nextToPlay >= players.length)) {
         nextToPlay = 0;
     }
 
-    let wasGo = !IsYou(players[nextToPlay]);
     while (!IsYou(players[nextToPlay])) {
         const player = players[nextToPlay];
         const hand = player.hand.filter(c => playedCards.indexOf(c) < 0);
@@ -65,38 +64,33 @@ export function playAI(game: GameState): GameState {
             // TODO: Handle GO
             nextToPlay++;
             nextToPlay %= players.length;
-            newGame.nextToPlay = nextToPlay;
+            game.nextToPlay = nextToPlay;
             continue;
         }
 
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
+                game.lastToPlay = game.nextToPlay;
                 console.log("ai can play", card)
-                // cool play the first card
-                wasGo = false;
+                // TODO: record last to play
 
                 // SCORE
                 const playScore = scorePlay(playedCards, card);
-                newGame.playedCards = [...playedCards, card];
+                game.playedCards = [...playedCards, card];
                 player.lastScore = player.score;
                 player.score += playScore;
 
                 // TODO: move to function and handle go
                 nextToPlay++;
                 nextToPlay %= players.length;
-                newGame.nextToPlay = nextToPlay;
+                game.nextToPlay = nextToPlay;
 
                 break;
             }
         }
     }
 
-    if (wasGo) {
-        // reset the played cards and give the player a point!
-        console.log("AI players couldn't play! This is a go basically? Need to handle scoring");
-    }
-
-    return newGame;
+    return game;
 }
 
 export function scorePlay(playedCards: Hand, newCard: Card): number {
@@ -124,7 +118,7 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         score += pairs * SCORE_PER_PAIR;
     }
 
-    // TODO: Runs
+    // Runs
     if (playedCards && playedCards.length > 0) {
         let runLength = 1;
         let max = parseNumericalValue(playedCards[0]);
