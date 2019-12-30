@@ -44,27 +44,29 @@ export function cantPlayAtAll(playedCards: Hand | undefined, hand: Hand) {
 }
 
 export function playAI(game: GameState): GameState {
-    console.log("ai is playing");
+    console.log("ai is playing", game.nextToPlay);
 
     // Start at the next person who needs to play
-    game = {...game};
+    game = { ...game };
     const { players, playedCards = [] } = game;
-    let { nextToPlay = 0 } = game; // this should be the player AFTER the dealer
-    if (!nextToPlay || !(nextToPlay >= 0) || !(nextToPlay >= players.length)) {
-        nextToPlay = 0;
+    if (!game.nextToPlay) {
+        console.log("reseting next to play to 0")
+        game.nextToPlay = 0;
     }
 
-    while (!IsYou(players[nextToPlay])) {
-        const player = players[nextToPlay];
+    console.log("next to play", game.nextToPlay);
+    console.log("is you?", IsYou(players[game.nextToPlay]));
+
+    while (!IsYou(players[game.nextToPlay])) {
+        const player = players[game.nextToPlay];
         const hand = player.hand.filter(c => playedCards.indexOf(c) < 0);
         console.log("checking if ai can play", hand);
 
         if (cantPlayAtAll(playedCards, hand)) {
             console.log("Ai couldn't play", playedCards, hand);
             // TODO: Handle GO
-            nextToPlay++;
-            nextToPlay %= players.length;
-            game.nextToPlay = nextToPlay;
+            game.nextToPlay++;
+            game.nextToPlay %= players.length;
             continue;
         }
 
@@ -81,9 +83,8 @@ export function playAI(game: GameState): GameState {
                 player.score += playScore;
 
                 // TODO: move to function and handle go
-                nextToPlay++;
-                nextToPlay %= players.length;
-                game.nextToPlay = nextToPlay;
+                game.nextToPlay++;
+                game.nextToPlay %= players.length;
 
                 break;
             }
@@ -137,10 +138,9 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         }
 
         if (runLength >= 3) {
+            console.log(`Run of ${runLength}, ${min} to ${max}`);
             score += runLength * SCORE_PER_RUN_CARD;
         }
-
-        console.log(`Run of ${runLength}, ${min} to ${max}`);
     }
 
 

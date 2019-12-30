@@ -16,6 +16,19 @@ export const Play: GameComponent = props => {
 
     const cantPlay = cantPlayAtAll(playedCards, players[0].hand);
 
+
+    React.useEffect(()=>{
+        console.log("checking if user should play")
+        let nextToPlay = game.nextToPlay || 0;
+        if(!IsYou(players[nextToPlay])){
+            console.log("user was NOT next, so having ai play");
+            setGameState(playAI(game), false);
+        }
+        else {
+            console.log("yep it was the users turn");
+        }
+    }, [game, game.nextToPlay, players, setGameState]);
+
     return <div>
         Play cards!
 
@@ -87,6 +100,7 @@ export const Play: GameComponent = props => {
                 // Reset the current selection
                 setKeepCard({});
 
+                console.log("playing a card. next to play is:", game.nextToPlay);
                 // Update played cards
                 setGameState(playAI({
                     ...game,
