@@ -13,7 +13,7 @@ const SCORE_PER_FIFTEEN = 2;
 const SCORE_PER_PAIR = 2;
 const SCORE_PER_RUN_CARD = 1;
 
-export function filterHand(hand: Hand, playedCards: Hand = [], previousPlayedCards: Hand = []){
+export function filterHand(hand: Hand, playedCards: Hand = [], previousPlayedCards: Hand = []) {
     return hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
 }
 
@@ -35,6 +35,17 @@ export function cantPlayAtAll(user: PlayerState, playedCards: Hand = [], previou
     for (let card of hand) {
         // skip cards that have been played
         if (canPlay(playedCards, card)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function playStageOver(game: GameState) {
+    for (let player of game.players) {
+        let hand = filterHand(player.hand, game.playedCards, game.previousPlayedCards);
+        if (hand.length > 0) {
             return false;
         }
     }
@@ -78,8 +89,10 @@ export function playAI(game: GameState): GameState {
                 // SCORE
                 const playScore = scorePlay(playedCards, card);
                 game.playedCards = [...playedCards, card];
-                player.lastScore = player.score;
-                player.score += playScore;
+                if (playScore) {
+                    player.lastScore = player.score;
+                    player.score += playScore;
+                }
 
                 // TODO: move to function and handle go
                 game.nextToPlay++;
@@ -92,6 +105,8 @@ export function playAI(game: GameState): GameState {
 
     return game;
 }
+
+
 
 export function scorePlay(playedCards: Hand, newCard: Card): number {
     let score = 0;

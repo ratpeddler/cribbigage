@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
@@ -30,21 +30,24 @@ export const Play: GameComponent = props => {
         }
     }, [game, game.nextToPlay, players, setGameState]);
 
-    return <div style={{height:"100%", width: "100%"}}>
+    return <div style={{ height: "100%", width: "100%" }}>
         Play cards!
 
         <div style={{ display: "flex", flexDirection: "row" }}>
             <div>
                 Cut:
-                <Hand cards={cut!} /></div>
+                <Hand cards={cut!} />
+            </div>
             <div>
                 Previous Played cards:
                 {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
             </div>
+            <div>
+                Played cards:
+                {playedCards && <Hand cards={playedCards} keepCards={{}} />}
+            </div>
         </div>
-
-        Played cards:
-        {playedCards && <Hand cards={playedCards} keepCards={{}} />}
+        <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
 
         Your Hand:
         {players.map((p, index) => {
@@ -72,7 +75,7 @@ export const Play: GameComponent = props => {
             />
         })}
 
-        Current count: {playedCards && sumCards(playedCards)}
+
         SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
 
         <Button
@@ -115,7 +118,7 @@ export const Play: GameComponent = props => {
             Play selected card
         </Button>
 
-        <Button disabled={!cantPlay} onClick={() => {
+        {!playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
             // TODO have the other person play if they can
 
             // Reset the current selection
@@ -133,9 +136,21 @@ export const Play: GameComponent = props => {
             }), false);
         }}>
             Pass
-        </Button>
+        </Button>}
 
-        <Button onClick={() => props.setGameState({
+        {playStageOver(game) && <Button
+            disabled={!playStageOver(game)}
+            onClick={() => props.setGameState({
+                ...props.game,
+                previousPlayedCards: [],
+                playedCards: [],
+                nextToPlay: 0,
+                lastToPlay: undefined,
+            }, true)}>
+            Play is done. Go to score hands
+        </Button>}
+
+        {!playStageOver(game) && <Button onClick={() => props.setGameState({
             ...props.game,
             previousPlayedCards: [],
             playedCards: [],
@@ -143,6 +158,6 @@ export const Play: GameComponent = props => {
             lastToPlay: undefined,
         }, true)}>
             SKIP to Score hands
-        </Button>
+        </Button>}
     </div>;
 }
