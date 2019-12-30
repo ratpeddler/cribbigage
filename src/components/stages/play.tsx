@@ -30,7 +30,7 @@ export const Play: GameComponent = props => {
         }
     }, [game, game.nextToPlay, players, setGameState]);
 
-    return <div>
+    return <div style={{height:"100%", width: "100%"}}>
         Play cards!
 
         <div style={{ display: "flex", flexDirection: "row" }}>

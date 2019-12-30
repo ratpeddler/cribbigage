@@ -11,22 +11,23 @@ export const IsYou = (player: PlayerInfo): boolean => {
 }
 
 export const ChooseGameMode: GameComponent = props => {
-    return <div>
-        Choose a game mode
-        {GameModes.map(mode => <Button
-            key={mode.name}
-            big={mode.name.indexOf("Big") >= 0}
-            onClick={() => {
-                props.setGameState(
-                    startGame([
-                        { name: "You" },
-                        { name: "AI 1" },
-                        { name: "AI 2" }],
-                        mode),
-                    false);
-            }}
-        >
-            {mode.name}
-        </Button>)}
+    return <div style={{ height: "100%", width: "100%", textAlign: "center" }}>
+        <h1>Choose a game mode</h1>
+        {GameModes.map(mode => <div key={mode.name}>
+            <Button
+                big={mode.name.indexOf("BIG") >= 0}
+                onClick={() => {
+                    props.setGameState(
+                        startGame([
+                            { name: "You" },
+                            { name: "AI 1" },
+                            { name: "AI 2" }],
+                            mode),
+                        false);
+                }}
+            >
+                {mode.name}
+            </Button>
+        </div>)}
     </div>
 }
