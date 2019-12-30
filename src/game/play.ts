@@ -2,6 +2,7 @@ import { Hand } from "./deal";
 import { Card, parseCard, parseNumericalValue } from "./card";
 import { GameState } from "./game";
 import { IsYou } from "../components/stages/chooseGameMode";
+import { PlayerInfo, PlayerState } from "./turns";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -12,13 +13,8 @@ const SCORE_PER_FIFTEEN = 2;
 const SCORE_PER_PAIR = 2;
 const SCORE_PER_RUN_CARD = 1;
 
-export function RunScore(game: GameState): GameState {
-    const { players } = game;
-    //const score = scorePlay(game.playedCards!);
-
-    return {
-        ...game,
-    };
+export function filterHand(hand: Hand, playedCards: Hand = [], previousPlayedCards: Hand = []){
+    return hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
 }
 
 export function sumCards(cards: Hand) {
@@ -33,10 +29,11 @@ export function canPlay(playedCards: Hand | undefined, newCard: Card) {
     return currentCount + parseCard(newCard).count <= MAX_PLAY_COUNT;
 }
 
-export function cantPlayAtAll(playedCards: Hand | undefined, hand: Hand) {
+// TODO: this should handle previously played cards as well
+export function cantPlayAtAll(user: PlayerState, playedCards: Hand = [], previousPlayedCards: Hand = []) {
+    const hand = filterHand(user.hand, playedCards, previousPlayedCards);
     for (let card of hand) {
         // skip cards that have been played
-        if (playedCards && playedCards.indexOf(card) >= 0) { continue; }
         if (canPlay(playedCards, card)) {
             return false;
         }
@@ -61,10 +58,10 @@ export function playAI(game: GameState): GameState {
 
     while (!IsYou(players[game.nextToPlay])) {
         const player = players[game.nextToPlay];
-        const hand = player.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
+        const hand = filterHand(player.hand, playedCards, previousPlayedCards);
         console.log("checking if ai can play", hand);
 
-        if (cantPlayAtAll(playedCards, hand)) {
+        if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
             console.log("Ai couldn't play", playedCards, hand);
             // TODO: Handle GO
             game.nextToPlay++;

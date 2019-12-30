@@ -39,6 +39,9 @@ export function AdvanceGameState(game: GameState): GameState {
             crib: [],
             cut: [],
             playedCards: [],
+            previousPlayedCards: [],
+            nextToPlay: 0,
+            lastToPlay: undefined,
         }
     }
 

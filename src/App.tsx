@@ -7,7 +7,7 @@ import { initGameState } from './game/game';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
-  console.log(JSON.stringify(gameState));
+  //console.log(JSON.stringify(gameState));
 
   return (
     <div style={{ position: "absolute", height: "100%", width: "100%" }}>

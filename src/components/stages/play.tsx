@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
@@ -11,18 +11,15 @@ export const Play: GameComponent = props => {
 
     const { setGameState } = props;
     const { game } = props;
-
     const { players, previousPlayedCards = [], playedCards = [], cut } = game;
 
     const user = players.filter(IsYou)[0];
 
     // need to filter out the already played cards
-    const userRemainingCards = user.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
-    console.log("remaining user cards", userRemainingCards);
-    const cantPlay = cantPlayAtAll(playedCards, userRemainingCards);
+    const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
 
     React.useEffect(() => {
-        console.log("checking if user should play")
+        console.log("checking if user should play", game.nextToPlay)
         let nextToPlay = game.nextToPlay || 0;
         if (!IsYou(players[nextToPlay])) {
             console.log("user was NOT next, so having ai play");
@@ -51,7 +48,7 @@ export const Play: GameComponent = props => {
 
         Your Hand:
         {players.map((p, index) => {
-            const remainingCards = p.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
+            const remainingCards = filterHand(p.hand, game.playedCards, game.previousPlayedCards);
             return IsYou(p) && <HandAndScore
                 cards={remainingCards}
                 key={index}
