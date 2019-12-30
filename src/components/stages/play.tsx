@@ -14,13 +14,17 @@ export const Play: GameComponent = props => {
 
     const { players, previousPlayedCards = [], playedCards = [], cut } = game;
 
-    const cantPlay = cantPlayAtAll(playedCards, players[0].hand);
+    const user = players.filter(IsYou)[0];
 
+    // need to filter out the already played cards
+    const userRemainingCards = user.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
+    console.log("remaining user cards", userRemainingCards);
+    const cantPlay = cantPlayAtAll(playedCards, userRemainingCards);
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         console.log("checking if user should play")
         let nextToPlay = game.nextToPlay || 0;
-        if(!IsYou(players[nextToPlay])){
+        if (!IsYou(players[nextToPlay])) {
             console.log("user was NOT next, so having ai play");
             setGameState(playAI(game), false);
         }

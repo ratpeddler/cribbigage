@@ -35,6 +35,8 @@ export function canPlay(playedCards: Hand | undefined, newCard: Card) {
 
 export function cantPlayAtAll(playedCards: Hand | undefined, hand: Hand) {
     for (let card of hand) {
+        // skip cards that have been played
+        if (playedCards && playedCards.indexOf(card) >= 0) { continue; }
         if (canPlay(playedCards, card)) {
             return false;
         }
@@ -48,7 +50,7 @@ export function playAI(game: GameState): GameState {
 
     // Start at the next person who needs to play
     game = { ...game };
-    const { players, playedCards = [] } = game;
+    const { players, playedCards = [], previousPlayedCards = [] } = game;
     if (!game.nextToPlay) {
         console.log("reseting next to play to 0")
         game.nextToPlay = 0;
@@ -59,7 +61,7 @@ export function playAI(game: GameState): GameState {
 
     while (!IsYou(players[game.nextToPlay])) {
         const player = players[game.nextToPlay];
-        const hand = player.hand.filter(c => playedCards.indexOf(c) < 0);
+        const hand = player.hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
         console.log("checking if ai can play", hand);
 
         if (cantPlayAtAll(playedCards, hand)) {
