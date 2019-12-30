@@ -13,7 +13,7 @@ export const Card: React.FC<{ card: number, index: number, selected?: boolean, o
     return <div
         style={{
             margin,
-            marginLeft: stacked ? -100 : margin,
+            marginLeft: stacked ? -125 : margin,
             border: selected ? "5px solid lightblue" : "5px solid transparent",
             borderRadius: 10,
             padding: 10,

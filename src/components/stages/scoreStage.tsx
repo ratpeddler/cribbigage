@@ -6,13 +6,12 @@ import { Button } from "../button";
 import { scoreHand } from "../../game/score";
 
 export const ScoreStage: GameComponent = props => {
-    return <div>
+    return <div style={{ height: "100%", width: "100%" }}>
         Cut:
         <Hand cards={props.game.cut!} />
 
-        Scores:
         {props.game.players.map(p => <div key={p.name}>
-            <div>{p.name}:</div>
+            <h3>{p.name}:</h3>
             <HandScore key={p.name} hand={p.hand} cut={props.game.cut} />
             <Hand cards={p.hand} />
         </div>)}
