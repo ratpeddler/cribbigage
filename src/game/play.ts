@@ -53,24 +53,25 @@ export function playStageOver(game: GameState) {
     return true;
 }
 
+export function ensureNextPlayer(game: GameState): number {
+    if (!game.nextToPlay) {
+        console.log("reseting next to play to 0")
+        return 0;
+    }
+
+    return game.nextToPlay % game.players.length;
+}
+
 export function playAI(game: GameState): GameState {
     console.log("ai is playing", game.nextToPlay);
 
     // Start at the next person who needs to play
     game = { ...game };
-    const { players, playedCards = [], previousPlayedCards = [] } = game;
-    if (!game.nextToPlay) {
-        console.log("reseting next to play to 0")
-        game.nextToPlay = 0;
-    }
+    game.nextToPlay = ensureNextPlayer(game);
 
-    // Ensure the play never goes beyond the range of actual players
-    game.nextToPlay %= players.length;
-
-    console.log("next to play", game.nextToPlay);
-    console.log("is you?", IsYou(players[game.nextToPlay]));
-
-    while (!IsYou(players[game.nextToPlay])) {
+    while (!IsYou(game.players[ensureNextPlayer(game)])) {
+        const { players, playedCards = [], previousPlayedCards = [] } = game;
+        game.nextToPlay = ensureNextPlayer(game);
         const player = players[game.nextToPlay];
         const hand = filterHand(player.hand, playedCards, previousPlayedCards);
         console.log("checking if ai can play", hand);
@@ -85,22 +86,7 @@ export function playAI(game: GameState): GameState {
 
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
-                game.lastToPlay = game.nextToPlay;
-                console.log("ai can play", card)
-                // TODO: record last to play
-
-                // SCORE
-                const playScore = scorePlay(playedCards, card);
-                game.playedCards = [...playedCards, card];
-                if (playScore) {
-                    player.lastScore = player.score;
-                    player.score += playScore;
-                }
-
-                // TODO: move to function and handle go
-                game.nextToPlay++;
-                game.nextToPlay %= players.length;
-
+                game = playCard(game, card);
                 break;
             }
         }
@@ -110,6 +96,37 @@ export function playAI(game: GameState): GameState {
 }
 
 
+export function playCard(game: GameState, card: Card): GameState {
+    const { players, playedCards = [] } = game;
+    let nextToPlay = ensureNextPlayer(game);
+    const player = players[nextToPlay];
+
+    if(!canPlay(playedCards, card)){
+        throw `Can't play that! ${card}`;
+    }
+
+    game.lastToPlay = nextToPlay;
+
+    console.log("ai can play", card)
+
+    // SCORE
+    const playScore = scorePlay(playedCards, card);
+    game.playedCards = [...playedCards, card];
+    if (playScore) {
+        player.lastScore = player.score;
+        player.score += playScore;
+    }
+
+    nextToPlay++;
+    nextToPlay %= players.length;
+
+    // TODO Handle 31 and GO
+
+    return {
+        ...game,
+        nextToPlay,
+    }
+}
 
 export function scorePlay(playedCards: Hand, newCard: Card): number {
     let score = 0;

@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
@@ -83,38 +83,12 @@ export const Play: GameComponent = props => {
             disabled={disabled}
             onClick={() => {
                 let playedCard = ExtractKeptCard(keepCard);
-                let newPlayedCards = [...playedCards];
-                newPlayedCards.push(playedCard);
-
-                // Add your score
-                let score = scorePlay(playedCards, playedCard);
-                const newPlayers = [...players];
-                newPlayers.map(p => {
-                    if (IsYou(p)) {
-                        if (score > 0) {
-                            p.lastScore = p.score;
-                            p.score += score;
-                        }
-                    }
-
-                    return p;
-                })
-
-                // TODO: Play the other player's card and add their scores
 
                 // Reset the current selection
                 setKeepCard({});
 
-                console.log("playing a card. next to play is:", game.nextToPlay);
                 // Update played cards
-                setGameState(playAI({
-                    ...game,
-                    playedCards: newPlayedCards,
-                    players: newPlayers,
-                    lastToPlay: game.nextToPlay,
-                    nextToPlay: (game.nextToPlay || 0) + 1
-                }), false);
-
+                setGameState(playAI(playCard(game, playedCard)), false);
             }}>
             Play selected card
         </Button>
