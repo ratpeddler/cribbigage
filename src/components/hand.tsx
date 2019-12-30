@@ -1,6 +1,7 @@
 import React from "react";
 import { HandScore } from "./handScore";
 import { Card } from "./card";
+import { parseCard } from "../game/card";
 
 export type KeepCard = { [card: number]: boolean };
 interface SelectableHandProps {
@@ -10,6 +11,7 @@ interface SelectableHandProps {
     keepCards?: KeepCard,
     setKeepCards?: (newValue: KeepCard) => void
     showScore?: boolean;
+    currentCount?: number;
 }
 
 export function ExtractKeptCard(keepCard: KeepCard): number {
@@ -17,28 +19,29 @@ export function ExtractKeptCard(keepCard: KeepCard): number {
 }
 
 export const HandAndScore: React.FC<SelectableHandProps> = props => {
-    const onClick = React.useMemo<((newCard: number) => void) | undefined>(() => props.keepCards && props.setKeepCards
+    const { maxKeep, setKeepCards, keepCards, cut, showScore, cards } = props;
+    const onClick = React.useMemo<((newCard: number) => void) | undefined>(() => keepCards && setKeepCards
         ? card => {
-            if (props.maxKeep && props.setKeepCards && props.keepCards) {
-                let newthrow = { ...props.keepCards };
+            if (maxKeep && setKeepCards && keepCards) {
+                let newthrow = { ...keepCards };
                 const keys = Object.keys(newthrow).filter(key => !!newthrow[key as any]);
-                if (keys.length >= props.maxKeep && !props.keepCards[card]) {
+                if (keys.length >= maxKeep && !keepCards[card]) {
                     return;
                 }
 
                 newthrow[card] = !newthrow[card];
-                props.setKeepCards(newthrow);
+                setKeepCards(newthrow);
             }
         }
         : undefined,
-        [props.keepCards, props.setKeepCards]);
+        [keepCards, maxKeep, setKeepCards]);
 
     return <>
         <Hand
             {...props}
             onClick={onClick}
         />
-        {props.keepCards && props.showScore && <HandScore key="score" hand={props.cards.filter((card, index) => !!props.keepCards![card])} cut={props.cut} />}
+        {keepCards && showScore && <HandScore key="score" hand={cards.filter((card, index) => !!keepCards![card])} cut={cut} />}
     </>;
 }
 
@@ -48,18 +51,24 @@ interface HandProps {
     keepCards?: KeepCard,
     onClick?: (card: number) => void,
     stacked?: boolean,
+    currentCount?: number;
 }
 
 export const Hand: React.FC<HandProps> = props => {
+    const { maxKeep, keepCards, stacked, cards, onClick, currentCount } = props;
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-            {props.cards.map((card, i) => <Card
-                stacked={props.stacked}
-                card={card}
-                index={i}
-                key={i}
-                selected={props.keepCards && (!!props.maxKeep && props.keepCards[card])}
-                onClick={props.onClick ? () => props.onClick!(card) : undefined}
-            />)}
+            {cards.map((card, i) => {
+                let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
+                return <Card
+                    disabled={disabled}
+                    stacked={stacked}
+                    card={card}
+                    index={i}
+                    key={i}
+                    selected={keepCards && (!!maxKeep && keepCards[card])}
+                    onClick={onClick ? () => onClick!(card) : undefined}
+                />
+            })}
         </div>);
 }

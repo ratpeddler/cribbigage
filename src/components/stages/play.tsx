@@ -56,6 +56,7 @@ export const Play: GameComponent = props => {
                 cards={remainingCards}
                 key={index}
                 maxKeep={1}
+                currentCount={playedCards ? sumCards(playedCards) : 0}
                 keepCards={keepCard}
                 setKeepCards={newKeptCards => {
                     let card = ExtractKeptCard(newKeptCards);

@@ -2,7 +2,7 @@ import { Hand } from "./deal";
 import { Card, parseCard, parseNumericalValue } from "./card";
 import { GameState } from "./game";
 import { IsYou } from "../components/stages/chooseGameMode";
-import { PlayerInfo, PlayerState } from "./turns";
+import { PlayerState } from "./turns";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -24,7 +24,7 @@ export function sumCards(cards: Hand) {
 }
 
 export function canPlay(playedCards: Hand | undefined, newCard: Card) {
-    if (!playedCards || playedCards.length == 0) { return true; }
+    if (!playedCards || playedCards.length === 0) { return true; }
     const currentCount = sumCards(playedCards);
     return currentCount + parseCard(newCard).count <= MAX_PLAY_COUNT;
 }
@@ -63,6 +63,9 @@ export function playAI(game: GameState): GameState {
         console.log("reseting next to play to 0")
         game.nextToPlay = 0;
     }
+
+    // Ensure the play never goes beyond the range of actual players
+    game.nextToPlay %= players.length;
 
     console.log("next to play", game.nextToPlay);
     console.log("is you?", IsYou(players[game.nextToPlay]));
