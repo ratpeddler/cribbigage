@@ -10,29 +10,28 @@ const App: React.FC = () => {
   console.log(JSON.stringify(gameState));
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      
-      <img src={logo} width={200} style={{ position: "absolute", top: 30, left: 20 }} />
-      
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <ScoreBoard players={gameState.players} />
-      </div>
+    <div style={{ position: "absolute", height: "100%", width: "100%" }}>
 
-      <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center" }}>
-        <Game
-          game={gameState}
-          setGameState={(newGame, advance) => {
-            let game = newGame;
-            console.log(game);
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-            if (advance) {
-              game = AdvanceGameState(game);
-              console.log("advancing", game);
-            }
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <ScoreBoard players={gameState.players} />
+        </div>
 
-            setGameState(game);
-          }}
-        />
+        <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+          <Game
+            game={gameState}
+            setGameState={(newGame, advance) => {
+              let game = newGame;
+              if (advance) {
+                game = AdvanceGameState(game);
+                console.log("advancing", game);
+              }
+
+              setGameState(game);
+            }}
+          />
+        </div>
       </div>
     </div>
   );
