@@ -42,9 +42,7 @@ export const Play: GameComponent = props => {
         }
     }, [game.nextToPlay, isYourTurn]);
 
-    return <div style={{ height: "100%", width: "100%" }}>
-        <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
-
+    return <div style={{ height: "100%", width: "100%", padding: "0 20px" }}>
         <div style={{ display: "flex", flexDirection: "row" }}>
             {previousPlayedCards && previousPlayedCards.length > 0 && <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
                 Previous cards:
@@ -56,92 +54,84 @@ export const Play: GameComponent = props => {
             </div>
         </div>
         <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+            <div>
+                Your Hand:
+                {players.map((p, index) => {
+                    const remainingCards = filterHand(p.hand, game.playedCards, game.previousPlayedCards);
+                    return IsYou(p) && <HandAndScore
+                        allDisabled={!isYourTurn}
+                        cards={remainingCards}
+                        key={index}
+                        maxKeep={1}
+                        currentCount={playedCards ? sumCards(playedCards) : 0}
+                        keepCards={keepCard}
+                        setKeepCards={newKeptCards => {
+                            let card = ExtractKeptCard(newKeptCards);
+                            if (card) {
+                                // ENFORCE play rules
+                                if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
+                                    setKeepCard(newKeptCards);
+                                }
+                                else {
+                                    alert("cant play that!");
+                                }
+                            }
+                            else {
+                                setKeepCard(newKeptCards);
+                            }
+                        }}
+                    />
+                })}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", justifyContent: "center", padding: 10 }}>
+                <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
+                {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
-        Your Hand:
-        {players.map((p, index) => {
-            const remainingCards = filterHand(p.hand, game.playedCards, game.previousPlayedCards);
-            return IsYou(p) && <HandAndScore
-                allDisabled={!isYourTurn}
-                cards={remainingCards}
-                key={index}
-                maxKeep={1}
-                currentCount={playedCards ? sumCards(playedCards) : 0}
-                keepCards={keepCard}
-                setKeepCards={newKeptCards => {
-                    let card = ExtractKeptCard(newKeptCards);
-                    if (card) {
-                        // ENFORCE play rules
-                        if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
-                            setKeepCard(newKeptCards);
-                        }
-                        else {
-                            alert("cant play that!");
-                        }
-                    }
-                    else {
-                        setKeepCard(newKeptCards);
-                    }
-                }}
-            />
-        })}
+                {!isYourTurn && !SlowAdvanceToYourTurn && <Button
+                    onClick={() => { setGameState(playAI(game, false), false) }}>
+                    AI's turn
+                </Button>}
 
-        {/*isYourTurn && !playStageOver(game) && <div>
-            SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
-        </div>*/}
+                {!cantPlay && isYourTurn && !playStageOver(game) && <Button
+                    disabled={disabled}
+                    onClick={() => {
+                        let playedCard = ExtractKeptCard(keepCard);
 
-        {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
+                        // Reset the current selection
+                        setKeepCard({});
+                        // only have PLAYAI if you want to auto advance!
+                        setGameState(AutoAdvanceToYourTurn ? playAI(playCard(game, playedCard)) : playCard(game, playedCard), false);
+                    }}>
+                    {disabled ? "Select a card to play" : "Play selected card"}
+                </Button>}
 
-        {!isYourTurn && !SlowAdvanceToYourTurn && <Button
-            onClick={() => { setGameState(playAI(game, false), false) }}>
-            AI's turn
-        </Button>}
+                {cantPlay && isYourTurn && !playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
+                    // Reset the current selection
+                    setKeepCard({});
+                    // always advance on pass?
+                    setGameState(AutoAdvanceToYourTurn ? playAI(pass(game), true) : pass(game), false);
+                }}>
+                    Pass
+                </Button>}
 
-        {isYourTurn && !playStageOver(game) && <Button
-            disabled={disabled}
-            onClick={() => {
-                let playedCard = ExtractKeptCard(keepCard);
+                {playStageOver(game) && <Button
+                    disabled={!playStageOver(game)}
+                    onClick={() => {
+                        // TODO: This needs to handle LAST CARD
+                        // NEEDS TO CHECK IF it ended on 31 too!
+                        props.setGameState({
+                            ...props.game,
+                            previousPlayedCards: [],
+                            playedCards: [],
+                            nextToPlay: 0,
+                            lastToPlay: undefined,
+                        }, true)
+                    }}>
+                    Play is done. Go to score hands
+                </Button>}
+            </div>
 
-                // Reset the current selection
-                setKeepCard({});
-                // only have PLAYAI if you want to auto advance!
-                setGameState(AutoAdvanceToYourTurn ? playAI(playCard(game, playedCard)) : playCard(game, playedCard), false);
-            }}>
-            Play selected card
-        </Button>}
-
-        {isYourTurn && !playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
-            // Reset the current selection
-            setKeepCard({});
-            // always advance on pass?
-            setGameState(AutoAdvanceToYourTurn ? playAI(pass(game), true) : pass(game), false);
-        }}>
-            Pass
-        </Button>}
-
-        {playStageOver(game) && <Button
-            disabled={!playStageOver(game)}
-            onClick={() => {
-                // TODO: This needs to handle LAST CARD
-                // NEEDS TO CHECK IF it ended on 31 too!
-                props.setGameState({
-                    ...props.game,
-                    previousPlayedCards: [],
-                    playedCards: [],
-                    nextToPlay: 0,
-                    lastToPlay: undefined,
-                }, true)
-            }}>
-            Play is done. Go to score hands
-        </Button>}
-
-        {/*!playStageOver(game) && <Button onClick={() => props.setGameState({
-            ...props.game,
-            previousPlayedCards: [],
-            playedCards: [],
-            nextToPlay: 0,
-            lastToPlay: undefined,
-        }, true)}>
-            SKIP to Score hands
-    </Button>*/}
+        </div>
     </div>;
 }

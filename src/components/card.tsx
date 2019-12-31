@@ -18,7 +18,7 @@ type CardProps = {
     onMove?: (thisCard: number, droppedCard: number) => void;
 };
 
-const padding = 10;
+const padding = 0;
 export const CardMargin = 5;
 export const CardWidth = 100;
 export const StackedMargin = -1 * CardWidth - CardMargin;

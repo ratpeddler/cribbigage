@@ -22,19 +22,24 @@ const App: React.FC = () => {
           </div>
         </div>}
 
-        <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
-          <Game
-            game={gameState}
-            setGameState={(newGame, advance) => {
-              let game = newGame;
-              if (advance) {
-                game = AdvanceGameState(game);
-                //console.log("New Stage", game.stage);
-              }
+        <div style={{ minHeight: 300, display: "flex", flex: "auto", flexDirection: "row", overflow: "auto" }}>
+          <div style={{ display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+            <Game
+              game={gameState}
+              setGameState={(newGame, advance) => {
+                let game = newGame;
+                if (advance) {
+                  game = AdvanceGameState(game);
+                  //console.log("New Stage", game.stage);
+                }
 
-              setGameState(game);
-            }}
-          />
+                setGameState(game);
+              }}
+            />
+          </div>
+          <div>
+            {/* Status area! show last couple actions! */}
+          </div>
         </div>
       </div>
     </div>
