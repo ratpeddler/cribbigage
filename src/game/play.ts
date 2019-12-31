@@ -125,13 +125,16 @@ export function playCard(game: GameState, card: Card): GameState {
     game.lastToPlay = ensureNextPlayer(game);
 
     // SCORE
-    const playScore = scorePlay(playedCards, card);
+    const playScore = scorePlay(playedCards, card);    
+    addPlayerScore(player, playScore, game.rules.pointsToWin);
+
+    // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
-    addPlayerScore(player, playScore);
+    player.playedCards = [...player.playedCards || [], card];
 
     // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        addPlayerScore(player, SCORE_LAST_CARD);
+        addPlayerScore(player, SCORE_LAST_CARD, game.rules.pointsToWin);
     }
 
     return {
@@ -149,12 +152,13 @@ export function pass(game: GameState): GameState {
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            addPlayerScore(player, SCORE_GO);
+            addPlayerScore(player, SCORE_GO, game.rules.pointsToWin);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];
         game.previousPlayedCards = newPrevious;
         game.playedCards = [];
+        game.players.forEach(player => player.playedCards = []);
     }
 
     // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 

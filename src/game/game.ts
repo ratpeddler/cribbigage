@@ -35,9 +35,6 @@ export interface GameState {
 
     // Cards from previous plays (sets of 31)
     previousPlayedCards?: Hand;
-
-    // Default is 120
-    pointsToWin?: number;
 }
 
 export function initGameState(): GameState {

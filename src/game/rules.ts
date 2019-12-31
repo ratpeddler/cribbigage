@@ -6,9 +6,10 @@ export interface GameRules {
     dealerExtra: number;
     cribExtra: number;
     cutSize: number;
+    pointsToWin: number
 }
 
-function createGame(name: string, players: number, dealSize: number, keepSize: number, dealerExtra = 0, cribExtra = 0, cutSize = 1): GameRules {
+function createGame(name: string, players: number, dealSize: number, keepSize: number, dealerExtra = 0, cribExtra = 0, cutSize = 1, pointsToWin = 120): GameRules {
     // Sanity check the rules
 
     // Crib should be same size as regular hand
@@ -27,7 +28,8 @@ function createGame(name: string, players: number, dealSize: number, keepSize: n
         keepSize,
         dealerExtra,
         cribExtra,
-        cutSize
+        cutSize,
+        pointsToWin
     }
 }
 

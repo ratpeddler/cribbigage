@@ -1,6 +1,7 @@
 import { parseCard, parseNumericalValue, Suit } from "./card";
 import { Hand } from "./deal";
 import { PlayerState } from "./players";
+import { GameState } from "./game";
 
 const SCORE_FIFTEEN = 2;
 const SCORE_PAIR = 2;
@@ -23,6 +24,17 @@ export function addPlayerScore(player: PlayerState, points: number, maxPoints: n
             alert(player.name + " won!!");
         }
     }
+}
+
+export function anyPlayerHasWon(game: GameState) {
+    for (let player of game.players) {
+        // HACK for now, should be stored in game state
+        if (player.score > (game.rules.pointsToWin || 120)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**

@@ -3,45 +3,40 @@ import { GameComponent } from "../game";
 import { HandAndScore } from "../hand";
 import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
+import * as _ from "lodash";
+import { getCurrentDealer } from "../../game/play";
+import { scoreHand } from "../../game/score";
 
 export const Throw: GameComponent = props => {
+    const Layout = props.layout;
     const { game, setGameState } = props;
-    const { rules } = game;
+    const { rules, players } = game;
     const { keepSize } = rules;
     const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
+
+    const user = players.filter(IsYou)[0];
+    const dealer = getCurrentDealer(game);
+    const yourCrib = IsYou(dealer);
+
+    // TODO Only select the cards you will DISCARD not the ones you will keep
+    const mustDiscard = user.hand.length - keepSize;
+
     const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length !== keepSize;
 
+    const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
+
     // TODO: This should either let you pick all hands or just your own
-    return <div style={{ height: "100%", width: "100%", padding: "0 20px" }}>
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
-            {props.game.players.map((p, index) => IsYou(p) && <HandAndScore
-                showScore={false}
-                cards={p.hand}
-                key={index}
-                maxKeep={keepSize}
-                keepCards={keepCards}
-                setKeepCards={setKeepCards}
-                onReorder={newHand => {
-                    setGameState({
-                        ...game,
-                        players: game.players.map((np, pi) => {
-                            if (pi === index) {
-                                np.hand = newHand;
-                            }
-
-                            return np;
-                        })
-                    }, false);
-                }} />)}
-        </div>
-
-        {/*{game.players[game.players.length - 1].name} has the crib!*/}
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", justifyContent: "center" }}>
-            <h3>Select which cards you will keep in your hand. (You must keep {keepSize} cards)</h3>
+    return <Layout
+        game={props.game}
+        selectedCards={keepCards}
+        setSelectedCards={setKeepCards}
+        maxSelectedCards={keepSize}
+        userActions={() => <>
+            <h3>Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib. (You must keep {keepSize} cards)</h3>
             <Button
                 disabled={disabled}
                 onClick={() => {
-                    props.setGameState({
+                    setGameState({
                         ...props.game,
                         players: props.game.players.map((p, pi) => ({
                             ...p,
@@ -53,7 +48,7 @@ export const Throw: GameComponent = props => {
                                 return keepCards[c];
                             })
                         })),
-                        crib: [...props.game.crib || [], ...props.game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
+                        crib: [...game.crib || [], ..._.flatMap(game.players, (p, pi) => p.hand.filter((c, ci) => {
                             if (!IsYou(p)) {
                                 // This is a local hack for now:
                                 return ci >= keepSize;
@@ -63,9 +58,7 @@ export const Throw: GameComponent = props => {
                         }))],
                     }, true);
                 }}>
-                Keep selected cards
+                Keep selected cards ({score.score} pts)
             </Button>
-        </div>
-
-    </div>;
+        </>} />;
 }
