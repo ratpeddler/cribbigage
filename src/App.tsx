@@ -5,10 +5,15 @@ import { Game } from './components/game';
 import logo from "./cribbigage.png";
 import { initGameState } from './game/game';
 import { DeckAndCut } from './components/deckAndCut';
+import { anyPlayerHasWon } from './game/score';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
-  //console.log(JSON.stringify(gameState));
+  React.useEffect(() => {
+    if (anyPlayerHasWon(gameState)) {
+      setGameState(initGameState());
+    }
+  }, [gameState, gameState.players]);
 
   return (
     <div style={{ position: "absolute", height: "100%", width: "100%" }}>
@@ -18,7 +23,7 @@ const App: React.FC = () => {
         {isGameStage(gameState) && <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
           <DeckAndCut game={gameState.stage != "Throw" ? gameState : undefined} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
-            <ScoreBoard players={gameState.players} />
+            <ScoreBoard players={gameState.players} pointsToWin={gameState.pointsToWin} />
           </div>
         </div>}
 

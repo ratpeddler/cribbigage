@@ -12,12 +12,12 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
     return -1;
 };
 
-export const ScoreBoard: React.FC<{ players: PlayerState[] }> = props => {
+export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number }> = props => {
     const players = [...props.players].sort(byPlayerName);
     return <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", flexDirection: "row" }}>
             <img src={arrow_left} height={150} />
-            <Board players={players} total={120} lines={3} />
+            <Board players={players} total={props.pointsToWin || 120} lines={3} />
             <img src={arrow_right} height={150} />
         </div>
 
