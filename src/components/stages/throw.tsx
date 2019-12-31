@@ -5,18 +5,36 @@ import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
 
 export const Throw: GameComponent = props => {
-    const { game } = props;
+    const { game, setGameState } = props;
     const { rules } = game;
     const { keepSize } = rules;
     const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
-    const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length != keepSize;
+    const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length !== keepSize;
 
     // TODO: This should either let you pick all hands or just your own
     return <div style={{ height: "100%", width: "100%" }}>
         Select which cards you will keep in your hand. (You must keep {keepSize})
 
         Your hand:
-        {props.game.players.map((p, index) => IsYou(p) && <HandAndScore showScore={true} cards={p.hand} key={index} maxKeep={keepSize} keepCards={keepCards} setKeepCards={setKeepCards} />)}
+        {props.game.players.map((p, index) => IsYou(p) && <HandAndScore
+            showScore={true}
+            cards={p.hand}
+            key={index}
+            maxKeep={keepSize}
+            keepCards={keepCards}
+            setKeepCards={setKeepCards}
+            onReorder={newHand => {
+                setGameState({
+                    ...game,
+                    players: game.players.map((np, pi) => {
+                        if (pi === index) {
+                            np.hand = newHand;
+                        }
+
+                        return np;
+                    })
+                }, false);
+            }} />)}
 
         {game.players[game.players.length - 1].name} has the crib!
 
