@@ -6,19 +6,22 @@ import { Button } from "../button";
 import { scoreHand } from "../../game/score";
 
 export const ScoreStage: GameComponent = props => {
-    return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-        <div style={{ flex: "auto", overflow: "auto", display: "flex", flexDirection: "column" }}>
-            {props.game.players.map(p => <div key={p.name} style={{textAlign: "center"}} >
-                <h3>{p.name}:</h3>
-                <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
-                    <div><Hand cards={p.hand} /></div>
-                    <div><HandScore key={p.name} hand={p.hand} cut={props.game.cut} /></div>
-                </div>
+    const Layout = props.layout;
+    return <Layout
+        game={props.game}
+        userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: "auto", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                {props.game.players.map(p => <div key={p.name} style={{ textAlign: "center" }} >
+                    <h3>{p.name}:</h3>
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+                        <div><Hand cards={p.hand} /></div>
+                        <div><HandScore key={p.name} hand={p.hand} cut={props.game.cut} /></div>
+                    </div>
 
 
-            </div>)}
-        </div>
-        <div style={{textAlign:"center"}}>
+                </div>)}
+            </div>
+            <div style={{ textAlign: "center" }}>
                 <Button onClick={() => {
                     props.setGameState({
                         ...props.game,
@@ -31,5 +34,7 @@ export const ScoreStage: GameComponent = props => {
                     }, true);
                 }}>Next</Button>
             </div>
-    </div>;
+        </div>
+        }
+    />;
 }

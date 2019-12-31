@@ -30,6 +30,10 @@ export const Throw: GameComponent = props => {
         selectedCards={keepCards}
         setSelectedCards={setKeepCards}
         maxSelectedCards={keepSize}
+        onReorderHand={newHand => {
+            user.hand = newHand;
+            setGameState({ ...game }, false);
+        }}
         userActions={() => <>
             <h3>Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib. (You must keep {keepSize} cards)</h3>
             <Button

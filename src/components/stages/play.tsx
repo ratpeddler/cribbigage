@@ -70,39 +70,42 @@ export const Play: GameComponent = props => {
                 AI's turn
                 </Button>}
 
-            {!cantPlay && isYourTurn && !playStageOver(game) && <Button
-                disabled={disabled}
-                onClick={() => {
-                    let playedCard = ExtractKeptCard(keepCard);
+            {!cantPlay && isYourTurn && !playStageOver(game) &&
+                <Button
+                    disabled={disabled}
+                    onClick={() => {
+                        let playedCard = ExtractKeptCard(keepCard);
+                        // Reset the current selection
+                        setKeepCard({});
+                        // only have PLAYAI if you want to auto advance!
+                        setGameState(AutoAdvanceToYourTurn ? playAI(playCard(game, playedCard)) : playCard(game, playedCard), false);
+                    }}>
+                    {disabled ? "Select a card to play" : "Play selected card"}
+                </Button>}
 
+            {cantPlay && isYourTurn && !playStageOver(game) &&
+                <Button disabled={!cantPlay} onClick={() => {
                     // Reset the current selection
                     setKeepCard({});
-                    // only have PLAYAI if you want to auto advance!
-                    setGameState(AutoAdvanceToYourTurn ? playAI(playCard(game, playedCard)) : playCard(game, playedCard), false);
+                    // always advance on pass?
+                    setGameState(AutoAdvanceToYourTurn ? playAI(pass(game), true) : pass(game), false);
                 }}>
-                {disabled ? "Select a card to play" : "Play selected card"}
-            </Button>}
-
-            {cantPlay && isYourTurn && !playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
-                // Reset the current selection
-                setKeepCard({});
-                // always advance on pass?
-                setGameState(AutoAdvanceToYourTurn ? playAI(pass(game), true) : pass(game), false);
-            }}>
-                Pass
+                    Pass
                 </Button>}
 
             {playStageOver(game) && <Button
                 disabled={!playStageOver(game)}
                 onClick={() => {
-                    // TODO: This needs to handle LAST CARD
-                    // NEEDS TO CHECK IF it ended on 31 too!
                     props.setGameState({
                         ...props.game,
                         previousPlayedCards: [],
                         playedCards: [],
                         nextToPlay: 0,
                         lastToPlay: undefined,
+                        players: game.players.map(player => {
+                            player.playedCards = [];
+                            return player;
+                        })
                     }, true)
                 }}>
                 Play is done. Go to score hands

@@ -13,32 +13,42 @@ export interface LayoutProps {
     selectedCards?: SelectedCards,
     setSelectedCards?: (newValue: SelectedCards) => void,
     maxSelectedCards?: number,
+    onReorderHand?: (newHand: number[]) => void,
 }
 
 // This layout is designed for 2 players with the board on the side optimised for desktops (Landscape)
 // Opponent is always TOP, the user is always BOTTOM
 export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
-    const { game, selectedCards, setSelectedCards, maxSelectedCards } = props;
+    const { game, selectedCards, setSelectedCards, maxSelectedCards, onReorderHand } = props;
     const { players } = game;
 
-    if (players.length !== 2) { throw "2 player only layout!" }
+    if (players.length > 3) { throw "2-3 player only layout for now!" }
 
-    const opponent = players.filter(p => !IsYou(p))[0];
+    // Opponent properties
+    const opponents = players.filter(p => !IsYou(p));
+    const opponent1 = opponents[0];
+    const opponent2 = opponents.length > 1 ? opponents[1] : undefined;
+
+    // Opponent hands
+    const opponent1Hand = getPlayableHand(opponent1, game).map(c => game.stage == "Score" ? c : -1);
+    const opponent2Hand = opponent2 && getPlayableHand(opponent2, game).map(c => game.stage == "Score" ? c : -1);
+    
+    // User properties
     const user = players.filter(IsYou)[0];
+    const userHand = getPlayableHand(user, game);
     const dealer = getCurrentDealer(game);
     const yourCrib = user === dealer;
     const isYourTurn = IsYou(getCurrentPlayer(game));
 
-    const opponentHand = getPlayableHand(opponent, game);
-    const userHand = getPlayableHand(user, game);
-
+    // Stage specifics
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
+    const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
     return <Row fill>
         {/* LEFT Board and Deck area */}
         <Column justified border="1px solid lightgrey">
             {/* Deck should be on the side of the dealer (TOP: Opponent, BOTTOM: You) */}
-            {!yourCrib && <DeckAndCut />}
+            {!yourCrib && <DeckAndCut game={cutGame} />}
             <Row justified>
                 <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
             </Row>
@@ -48,9 +58,19 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
         {/* RIGHT Hand and play area (From to: Op hand, Op played, SCORE, Your played, Your Hand) */}
         <Column fill>
             {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
-            <Row justified>
-                <Hand cards={opponentHand.map(c => -1)} stacked />
-                {opponent.playedCards && <Hand cards={opponent.playedCards} />}
+            <Row spaceBetween={!!opponent2} justified={!opponent2}>
+                {opponent1 && <Row>
+                    {/* Opponent 1 */}
+                    {opponent1Hand.length > 0 && <Hand cards={opponent1Hand} stacked />}
+                    {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} />}
+                </Row>}
+
+                {opponent2 && <Row>
+                    {/* Opponent 2 */}
+                    {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} />}
+                    {opponent2Hand && opponent2Hand.length > 0 && <Hand cards={opponent2Hand} stacked />}
+                </Row>}
+
             </Row>
 
             <Column fill justified centered>
@@ -72,6 +92,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                         setKeepCards={setSelectedCards}
                         maxKeep={maxSelectedCards}
                         currentCount={currentCount}
+                        onReorder={onReorderHand}
                     />
                 </Row>}
         </Column>
@@ -82,6 +103,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 interface FlexProps {
     fill?: boolean;
     justified?: boolean;
+    spaceBetween?: boolean;
     centered?: boolean;
     alignStart?: boolean;
     border?: string;
@@ -114,7 +136,7 @@ function flex(props: FlexProps) {
 }
 
 function justifyContent(props: FlexProps) {
-    return props.justified ? "center" : undefined;
+    return props.justified ? "center" : (props.spaceBetween ? "space-between" : undefined);
 }
 
 function alignItems(props: FlexProps) {
