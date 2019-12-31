@@ -3,39 +3,29 @@ import { GameComponent, Game } from "../game";
 import { HandScore } from "../handScore";
 import { Hand } from "../hand";
 import { Button } from "../button";
-import { scoreHand } from "../../game/score";
+import { scoreHand, addPlayerScore } from "../../game/score";
+import { getCurrentDealer } from "../../game/play";
 
 export const Crib: GameComponent = props => {
+    let game = {...props.game};
     return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "row" }}>
         <div style={{ flex: "none", padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 20 }}>
             <h3>Cut:</h3>
-            <Hand cards={props.game.cut!} />
+            <Hand cards={game.cut!} />
             <div>
                 <Button onClick={() => {
-                    // last player is always dealer
-                    let players = [...props.game.players];
-                    let last = players.pop()!;
-                    last = {
-                        ...last,
-                        score: last.score + scoreHand(props.game.crib!, props.game.cut!).score,
-                        lastScore: last.score // Strange coincidence :P
-                    };
-
-                    players.push(last);
-                    if (last.score >= 120) { alert(`${last.name} won!`) }
-
+                    addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score)
                     props.setGameState({
-                        ...props.game,
-                        players
+                        ...game,
                     }, true);
                 }}>Next</Button>
             </div>
         </div>
         <div style={{ flex: "auto" }}>
-            <h3>Crib for {props.game.players[props.game.players.length - 1].name}:</h3>
+            <h3>Crib for {game.players[game.players.length - 1].name}:</h3>
             <div style={{ display: "flex", flexDirection: "row" }}>
-                <div><Hand cards={props.game.crib!} /></div>
-                <div><HandScore hand={props.game.crib!} cut={props.game.cut} /></div>
+                <div><Hand cards={game.crib!} /></div>
+                <div><HandScore hand={game.crib!} cut={game.cut} /></div>
             </div>
         </div>
     </div>;

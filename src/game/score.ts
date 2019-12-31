@@ -1,5 +1,6 @@
 import { parseCard, parseNumericalValue, Suit } from "./card";
 import { Hand } from "./deal";
+import { PlayerState } from "./players";
 
 const SCORE_FIFTEEN = 2;
 const SCORE_PAIR = 2;
@@ -13,6 +14,16 @@ const MINIMUM_RUN_LENGTH = 3;
 /** Min number of cards to count for a flush. This should probably be hand size */
 const MINIMUM_FLUSH_LENGTH = 4;
 
+export function addPlayerScore(player: PlayerState, points: number, maxPoints: number = 120) {
+    if (points > 0) {
+        player.lastScore = player.score;
+        player.score += points;
+
+        if (player.score > maxPoints) {
+            alert(player.name + " won!!");
+        }
+    }
+}
 
 /**
  * Scores a normal hand

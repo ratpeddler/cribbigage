@@ -1,6 +1,7 @@
-import { PlayerState, Stage, PlayerInfo, NonGameStages } from "./turns";
+import { Stage, NonGameStages } from "./turns";
 import { Hand } from "./deal";
 import { GameRules } from "./rules";
+import { PlayerState, PlayerInfo } from "./players";
 
 export interface GameState {
     rules: GameRules;
@@ -34,6 +35,9 @@ export interface GameState {
 
     // Cards from previous plays (sets of 31)
     previousPlayedCards?: Hand;
+
+    // Default is 120
+    pointsToWin?: number;
 }
 
 export function initGameState(): GameState {

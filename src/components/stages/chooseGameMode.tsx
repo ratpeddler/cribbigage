@@ -3,8 +3,8 @@ import { GameComponent } from "../game";
 import { Button } from "../button";
 import { GameModes } from "../../game/rules";
 import { startGame } from "../../game/game";
-import { PlayerInfo } from "../../game/turns";
 import logo from "./../../cribbigage.png";
+import { PlayerInfo } from "../../game/players";
 
 // Total hack for now
 export const IsYou = (player: PlayerInfo): boolean => {
