@@ -1,7 +1,7 @@
 import React from "react";
 import { GameState } from "../../game/game";
 import { ScoreBoard } from "../scoreboard";
-import { getCurrentDealer, getPlayableHand, sumCards } from "../../game/play";
+import { getCurrentDealer, getPlayableHand, sumCards, ensureNextPlayer, getCurrentPlayer } from "../../game/play";
 import { IsYou } from "../stages/chooseGameMode";
 import { DeckAndCut } from "../deckAndCut";
 import { Hand, HandAndScore } from "../hand";
@@ -27,9 +27,12 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const user = players.filter(IsYou)[0];
     const dealer = getCurrentDealer(game);
     const yourCrib = user === dealer;
+    const isYourTurn = IsYou(getCurrentPlayer(game));
 
     const opponentHand = getPlayableHand(opponent, game);
     const userHand = getPlayableHand(user, game);
+
+    const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
 
     return <Row fill>
         {/* LEFT Board and Deck area */}
@@ -44,22 +47,33 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 
         {/* RIGHT Hand and play area (From to: Op hand, Op played, SCORE, Your played, Your Hand) */}
         <Column fill>
+            {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
             <Row justified>
                 <Hand cards={opponentHand.map(c => -1)} stacked />
-            </Row>
-            <Row justified>
                 {opponent.playedCards && <Hand cards={opponent.playedCards} />}
             </Row>
+
             <Column fill justified centered>
-                {game.stage == "Play" && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
+                {currentCount !== undefined && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
                 {props.userActions?.()}
             </Column>
-            <Row justified>
-                {user.playedCards && <Hand cards={user.playedCards} />}
-            </Row>
-            {userHand && userHand.length > 0 && <Row justified fill alignStart>
-                <HandAndScore cards={userHand} keepCards={selectedCards} setKeepCards={setSelectedCards} maxKeep={maxSelectedCards} />
-            </Row>}
+
+            {user.playedCards && user.playedCards.length > 0 &&
+                <Row justified fill={!userHand || userHand.length === 0}>
+                    <Hand cards={user.playedCards} />
+                </Row>}
+
+            {userHand && userHand.length > 0 &&
+                <Row justified fill alignStart>
+                    <HandAndScore
+                        allDisabled={!isYourTurn}
+                        cards={userHand}
+                        keepCards={selectedCards}
+                        setKeepCards={setSelectedCards}
+                        maxKeep={maxSelectedCards}
+                        currentCount={currentCount}
+                    />
+                </Row>}
         </Column>
 
     </Row>

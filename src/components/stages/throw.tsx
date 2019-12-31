@@ -58,8 +58,7 @@ export const Throw: GameComponent = props => {
                         }))],
                     }, true);
                 }}>
-                Keep selected cards
+                Keep selected cards ({score.score} pts)
             </Button>
-            {score.score}
         </>} />;
 }

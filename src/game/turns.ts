@@ -22,7 +22,10 @@ export function AdvanceGameState(game: GameState): GameState {
     const stage = StageOrder[newStage];
 
     if (newStage == 0) {
-        let [first, ...rest] = game.players;
+        let [first, ...rest] = game.players.map(player => {
+            player.playedCards = [];
+            return player;
+        });
         return {
             ...game,
             stage,
