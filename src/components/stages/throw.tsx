@@ -13,7 +13,6 @@ export const Throw: GameComponent = props => {
 
     // TODO: This should either let you pick all hands or just your own
     return <div style={{ height: "100%", width: "100%", padding: "0 20px" }}>
-        <h3>Your hand:</h3>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
             {props.game.players.map((p, index) => IsYou(p) && <HandAndScore
                 showScore={false}

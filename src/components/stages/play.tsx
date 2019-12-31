@@ -43,8 +43,9 @@ export const Play: GameComponent = props => {
     }, [game.nextToPlay, isYourTurn]);
     const remainingCards = getPlayableHand(players.filter(IsYou)[0], game);
 
-    return <div style={{ height: "100%", width: "100%", padding: "0 20px" }}>
-        <div style={{ display: "flex", flexDirection: "row" }}>
+    return <div style={{ height: "100%", width: "100%", padding: "0 20px", textAlign: "center" }}>
+        <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
+        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", textAlign: "center" }}>
             {previousPlayedCards && previousPlayedCards.length > 0 && <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
                 Previous cards:
                 {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
@@ -54,7 +55,6 @@ export const Play: GameComponent = props => {
                 {playedCards && <Hand cards={playedCards} keepCards={{}} />}
             </div>
         </div>
-        <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
             {remainingCards.length > 0 && <div>
                 Your Hand:
