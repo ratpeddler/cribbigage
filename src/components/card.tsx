@@ -41,6 +41,8 @@ export const Card: React.FC<CardProps> = props => {
 
     const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.persist();
+        ev.preventDefault();
+        ev.stopPropagation();
         const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
         if (droppedCard !== card) {
             onMove && onMove(card, droppedCard);
