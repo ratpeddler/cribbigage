@@ -1,6 +1,6 @@
 {
   "name": "cribbigage",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage" : "https://aiplayersonline/CribBIGage/build",
   "private": true,
   "dependencies": {
