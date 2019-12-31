@@ -6,6 +6,7 @@ import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playSt
 import { IsYou } from "./chooseGameMode";
 
 const AutoAdvanceToYourTurn = false;
+const SlowAdvanceToYourTurn = true;
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
@@ -32,10 +33,16 @@ export const Play: GameComponent = props => {
                 setGameState(playAI(game, true), false);
             }
         }
-    }, [game, game.nextToPlay, players, setGameState]);
+        else if (SlowAdvanceToYourTurn && !isYourTurn) {
+            // Add some time out here
+            setTimeout(() => {
+                setGameState(playAI(game, false), false);
+            }, 1500);
+        }
+    }, [game, game.nextToPlay, isYourTurn, players, setGameState]);
 
     return <div style={{ height: "100%", width: "100%" }}>
-        Play cards!
+        <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
 
         <div style={{ display: "flex", flexDirection: "row" }}>
             <div>
@@ -81,15 +88,16 @@ export const Play: GameComponent = props => {
             />
         })}
 
+        {isYourTurn && !playStageOver(game) && <div>
+            SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
+        </div>}
 
-        SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
-
-        {!isYourTurn && <Button
+        {!isYourTurn && !SlowAdvanceToYourTurn && <Button
             onClick={() => { setGameState(playAI(game, false), false) }}>
             AI's turn
         </Button>}
 
-        {isYourTurn && <Button
+        {isYourTurn && !playStageOver(game) && <Button
             disabled={disabled}
             onClick={() => {
                 let playedCard = ExtractKeptCard(keepCard);
