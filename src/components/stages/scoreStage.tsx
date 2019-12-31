@@ -7,7 +7,7 @@ import { scoreHand } from "../../game/score";
 
 export const ScoreStage: GameComponent = props => {
     return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-        <div style={{ flex: "auto" }}>
+        <div style={{ flex: "auto", overflow: "auto", display: "flex", flexDirection: "column" }}>
             {props.game.players.map(p => <div key={p.name} style={{textAlign: "center"}} >
                 <h3>{p.name}:</h3>
                 <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>

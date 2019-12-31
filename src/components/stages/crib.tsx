@@ -11,7 +11,7 @@ export const Crib: GameComponent = props => {
     return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: "auto", textAlign: "center" }}>
             <h3>Crib for {game.players[game.players.length - 1].name}:</h3>
-            <div style={{ display: "flex", flexDirection: "row" }}>
+            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
                 <div><Hand cards={game.crib!} /></div>
                 <div><HandScore hand={game.crib!} cut={game.cut} /></div>
             </div>

@@ -50,10 +50,10 @@ export const Play: GameComponent = props => {
                 Previous cards:
                 {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
             </div>}
-            <div style={{ marginLeft: 15 }}>
+            {playedCards && playedCards.length > 0 && <div style={{ marginLeft: 15 }}>
                 Played cards:
                 {playedCards && <Hand cards={playedCards} keepCards={{}} />}
-            </div>
+            </div>}
         </div>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
             {remainingCards.length > 0 && <div>
