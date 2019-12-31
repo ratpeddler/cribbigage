@@ -46,15 +46,15 @@ export const Play: GameComponent = props => {
         <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
 
         <div style={{ display: "flex", flexDirection: "row" }}>
-            <div>
+            <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
                 Cut:
                 <Hand cards={cut!} />
             </div>
-            <div>
-                Previous Played cards:
+            {previousPlayedCards && previousPlayedCards.length > 0 && <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
+                Previous cards:
                 {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
-            </div>
-            <div>
+            </div>}
+            <div style={{ marginLeft: 15 }}>
                 Played cards:
                 {playedCards && <Hand cards={playedCards} keepCards={{}} />}
             </div>
@@ -93,7 +93,7 @@ export const Play: GameComponent = props => {
             SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
         </div>}
 
-        {isYourTurn ? null : <Button onClick={()=>{}} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
+        {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
         {!isYourTurn && !SlowAdvanceToYourTurn && <Button
             onClick={() => { setGameState(playAI(game, false), false) }}>

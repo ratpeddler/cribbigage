@@ -12,6 +12,8 @@ type CardProps = {
     onMove?: (thisCard: number, droppedCard: number) => void;
 };
 
+export const StackedMargin = -125;
+
 export const Card: React.FC<CardProps> = props => {
     const { card, selected, onClick, stacked, disabled,onMove } = props;
     const { value, suit } = parseCard(card);
@@ -50,7 +52,7 @@ export const Card: React.FC<CardProps> = props => {
         {...dragProps}
         style={{
             margin,
-            marginLeft: stacked ? -125 : margin,
+            marginLeft: stacked ? StackedMargin : margin,
             border: selected ? "5px solid lightblue" : "5px solid transparent",
             borderRadius: 10,
             padding: 10,

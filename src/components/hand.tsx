@@ -1,6 +1,6 @@
 import React from "react";
 import { HandScore } from "./handScore";
-import { Card } from "./card";
+import { Card, StackedMargin } from "./card";
 import { parseCard } from "../game/card";
 
 export type KeepCard = { [card: number]: boolean };
@@ -61,7 +61,7 @@ interface HandProps {
 export const Hand: React.FC<HandProps> = props => {
     const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled } = props;
     return (
-        <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }}>
+        <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginLeft: stacked ? -1 * StackedMargin : undefined }}>
             {cards.map((card, i) => {
                 let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
                 return <Card
