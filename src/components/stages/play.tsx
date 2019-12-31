@@ -92,7 +92,7 @@ export const Play: GameComponent = props => {
             SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
         </div>}
 
-        {isYourTurn ? null : <h3>{players[ensureNextPlayer(game)].name} is playing...</h3>}
+        {isYourTurn ? null : <Button onClick={()=>{}} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
         {!isYourTurn && !SlowAdvanceToYourTurn && <Button
             onClick={() => { setGameState(playAI(game, false), false) }}>
