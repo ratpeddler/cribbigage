@@ -20,7 +20,7 @@ export interface LayoutProps {
 // Opponent is always TOP, the user is always BOTTOM
 export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const { game, selectedCards, setSelectedCards, maxSelectedCards, onReorderHand } = props;
-    const { players } = game;
+    const { players, playedCards = [] } = game;
 
     if (players.length > 3) { throw "2-3 player only layout for now!" }
 
@@ -32,10 +32,15 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     // Opponent hands
     const opponent1Hand = getPlayableHand(opponent1, game).map(c => game.stage == "Score" ? c : -1);
     const opponent2Hand = opponent2 && getPlayableHand(opponent2, game).map(c => game.stage == "Score" ? c : -1);
-    
+
+    // TODO: Fix previously played cards....
+    const opponent1PreviousPlayed = opponent1.hand.filter(c => playedCards.includes(c) && !opponent1.playedCards?.includes(c));
+    const opponent2PreviousPlayed = opponent2 && opponent2.hand.filter(c => playedCards.includes(c) && !opponent2.playedCards?.includes(c));
+
     // User properties
     const user = players.filter(IsYou)[0];
     const userHand = getPlayableHand(user, game);
+    const userPreviouslyPlayed = user.hand.filter(c => playedCards.includes(c) && !user.playedCards?.includes(c))
     const dealer = getCurrentDealer(game);
     const yourCrib = user === dealer;
     const isYourTurn = IsYou(getCurrentPlayer(game));
@@ -59,29 +64,39 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
         <Column fill>
             {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
             <Row spaceBetween={!!opponent2} justified={!opponent2}>
-                {opponent1 && <Row>
+                {opponent1 && <Row padding={10}>
+                    <h3>
+                        {opponent1.name}
+                        {dealer == opponent1 && <div>Dealer</div>}
+                    </h3>
                     {/* Opponent 1 */}
                     {opponent1Hand.length > 0 && <Hand cards={opponent1Hand} stacked />}
-                    {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} />}
+                    {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
+                    {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
                 </Row>}
 
-                {opponent2 && <Row>
+                {opponent2 && <Row padding={10}>
                     {/* Opponent 2 */}
-                    {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} />}
+                    {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
+                    {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
                     {opponent2Hand && opponent2Hand.length > 0 && <Hand cards={opponent2Hand} stacked />}
+                    <h3>
+                        {opponent2.name}
+                        {dealer == opponent2 && <div>Dealer</div>}
+                    </h3>
                 </Row>}
 
             </Row>
+
+            {user.playedCards && user.playedCards.length > 0 &&
+                <Row justified>
+                    <Hand cards={user.playedCards} />
+                </Row>}
 
             <Column fill justified centered>
                 {currentCount !== undefined && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
                 {props.userActions?.()}
             </Column>
-
-            {user.playedCards && user.playedCards.length > 0 &&
-                <Row justified fill={!userHand || userHand.length === 0}>
-                    <Hand cards={user.playedCards} />
-                </Row>}
 
             {userHand && userHand.length > 0 &&
                 <Row justified fill alignStart>
@@ -101,6 +116,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 }
 
 interface FlexProps {
+    padding?: number;
     fill?: boolean;
     justified?: boolean;
     spaceBetween?: boolean;
@@ -123,6 +139,7 @@ export const Fill: React.FC<FlexProps> = props => {
 
 function styles(props: FlexProps) {
     return {
+        padding: props.padding,
         display: "flex",
         flex: flex(props),
         justifyContent: justifyContent(props),
