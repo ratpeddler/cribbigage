@@ -7,11 +7,9 @@ import { scoreHand, addPlayerScore } from "../../game/score";
 import { getCurrentDealer } from "../../game/play";
 
 export const Crib: GameComponent = props => {
-    let game = {...props.game};
+    let game = { ...props.game };
     return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "row" }}>
         <div style={{ flex: "none", padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 20 }}>
-            <h3>Cut:</h3>
-            <Hand cards={game.cut!} />
             <div>
                 <Button onClick={() => {
                     addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score)

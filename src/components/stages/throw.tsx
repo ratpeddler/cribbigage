@@ -14,7 +14,6 @@ export const Throw: GameComponent = props => {
     // TODO: This should either let you pick all hands or just your own
     return <div style={{ height: "100%", width: "100%" }}>
         Select which cards you will keep in your hand. (You must keep {keepSize})
-
         Your hand:
         {props.game.players.map((p, index) => IsYou(p) && <HandAndScore
             showScore={true}

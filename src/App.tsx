@@ -4,6 +4,7 @@ import { AdvanceGameState, isGameStage } from './game/turns';
 import { Game } from './components/game';
 import logo from "./cribbigage.png";
 import { initGameState } from './game/game';
+import { DeckAndCut } from './components/deckAndCut';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
@@ -14,8 +15,11 @@ const App: React.FC = () => {
 
       <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-        {isGameStage(gameState) && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
-          <ScoreBoard players={gameState.players} />
+        {isGameStage(gameState) && <div style={{ display: "flex", flexDirection: "row" }}>
+          <DeckAndCut game={gameState.stage != "Throw" ? gameState : undefined} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+            <ScoreBoard players={gameState.players} />
+          </div>
         </div>}
 
         <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>

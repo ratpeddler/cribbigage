@@ -53,13 +53,14 @@ interface HandProps {
     keepCards?: KeepCard,
     onClick?: (card: number) => void,
     stacked?: boolean,
+    superStacked?: boolean,
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
     allDisabled?: boolean,
 }
 
 export const Hand: React.FC<HandProps> = props => {
-    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled } = props;
+    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled,superStacked } = props;
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginLeft: stacked ? -1 * StackedMargin : undefined }}>
             {cards.map((card, i) => {
@@ -74,6 +75,7 @@ export const Hand: React.FC<HandProps> = props => {
                     } : undefined}
                     disabled={disabled || allDisabled}
                     stacked={stacked}
+                    superStacked={superStacked}
                     card={card}
                     index={i}
                     key={i}

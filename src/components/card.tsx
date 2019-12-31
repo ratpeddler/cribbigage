@@ -1,26 +1,33 @@
 
 import React from "react";
-import { parseCard, parseNumericalValue } from "../game/card";
+import { parseCard, parseNumericalValue, Value, Suit } from "../game/card";
+import old from "./../cards/bike_old.jpg";
+import red from "./../cards/bike_red.jpg";
+import dragon from "./../cards/bike_dragon.jpg";
+import clam from "./../cards/clam.jpg";
 
 type CardProps = {
+    back?: Back;
     card: number;
     index: number;
     selected?: boolean;
     onClick?: () => void;
     stacked?: boolean;
+    superStacked?: boolean;
     disabled?: boolean;
     onMove?: (thisCard: number, droppedCard: number) => void;
 };
 
-export const StackedMargin = -125;
+const padding = 10;
+export const CardMargin = 5;
+export const CardWidth = 100;
+export const StackedMargin = -1 * CardWidth - CardMargin;
+export const SuperStackedMargin = -1 * (CardWidth + (2 * CardMargin) + (2 * padding) + 4);
+export const SuperStackedTopMargin = -1;
 
 export const Card: React.FC<CardProps> = props => {
-    const { card, selected, onClick, stacked, disabled,onMove } = props;
-    const { value, suit } = parseCard(card);
-    const raw = parseNumericalValue(card);
+    const { card, selected, onClick, stacked, disabled, onMove, superStacked, index } = props;
 
-    const margin = 5;
-    const width = 120;
 
     const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault();
@@ -35,7 +42,7 @@ export const Card: React.FC<CardProps> = props => {
     const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.persist();
         const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
-        if(droppedCard !== card){
+        if (droppedCard !== card) {
             onMove && onMove(card, droppedCard);
         }
     }
@@ -51,20 +58,53 @@ export const Card: React.FC<CardProps> = props => {
     return <div
         {...dragProps}
         style={{
-            margin,
-            marginLeft: stacked ? StackedMargin : margin,
+            margin: CardMargin,
+            marginTop: superStacked ? index * SuperStackedTopMargin : CardMargin,
+            marginLeft: stacked ? StackedMargin : (superStacked ? SuperStackedMargin : CardMargin),
             border: selected ? "5px solid lightblue" : "5px solid transparent",
             borderRadius: 10,
-            padding: 10,
+            padding,
             background: disabled ? "lightgrey" : undefined,
             cursor: disabled ? "not-allowed" : (onClick ? "pointer" : undefined),
         }}
         onClick={disabled ? undefined : onClick}
     >
-        <img
-            alt={`${value} of ${suit}`}
-            style={disabled ? { filter: "grayscale(100%)" } : {}}
-            src={`https://aiplayersonline.com/CribBIGage/cards/${raw}_of_${suit.toLowerCase()}.svg`}
-            width={width} />
+        {card === -1
+            ? <CardBack back={props.back} width={CardWidth} />
+            : <CardFace card={card} width={CardWidth} disabled={disabled} />}
     </div>;
+}
+
+const CardFace: React.FC<{ card: number, width: number, disabled?: boolean }> = props => {
+    const { card, width, disabled } = props;
+    const { value, suit } = parseCard(card);
+    const raw = parseNumericalValue(card);
+    return <img
+        alt={`${value} of ${suit}`}
+        style={disabled ? { filter: "grayscale(100%)" } : {}}
+        src={`https://aiplayersonline.com/CribBIGage/cards/${raw}_of_${suit.toLowerCase()}.svg`}
+        width={width}
+    />;
+}
+
+export type Back = "old" | "dragon" | "red" | "clam";
+const CardBack: React.FC<{ back?: Back, width: number }> = props => {
+    const { back = "red", width } = props;
+    let backCard = red;
+    switch (back) {
+        case "clam":
+            backCard = clam;
+            break;
+        case "old":
+            backCard = old;
+            break;
+        case "dragon":
+            backCard = dragon;
+            break;
+    }
+    return <img
+        alt="Back of a card"
+        src={backCard}
+        width={width}
+    />;
 }

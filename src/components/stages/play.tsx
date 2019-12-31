@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
+import { sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 const AutoAdvanceToYourTurn = false;
@@ -15,7 +15,7 @@ export const Play: GameComponent = props => {
 
     const { setGameState } = props;
     const { game } = props;
-    const { players, previousPlayedCards = [], playedCards = [], cut } = game;
+    const { players, previousPlayedCards = [], playedCards = [] } = game;
 
     const user = players.filter(IsYou)[0];
 
@@ -46,10 +46,6 @@ export const Play: GameComponent = props => {
         <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
 
         <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
-                Cut:
-                <Hand cards={cut!} />
-            </div>
             {previousPlayedCards && previousPlayedCards.length > 0 && <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
                 Previous cards:
                 {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
@@ -89,9 +85,9 @@ export const Play: GameComponent = props => {
             />
         })}
 
-        {isYourTurn && !playStageOver(game) && <div>
+        {/*isYourTurn && !playStageOver(game) && <div>
             SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
-        </div>}
+        </div>*/}
 
         {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
