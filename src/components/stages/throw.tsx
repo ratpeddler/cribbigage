@@ -3,7 +3,6 @@ import { GameComponent } from "../game";
 import { HandAndScore } from "../hand";
 import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
-import * as _ from "lodash";
 import { getCurrentDealer } from "../../game/play";
 import { scoreHand } from "../../game/score";
 
@@ -48,7 +47,7 @@ export const Throw: GameComponent = props => {
                                 return keepCards[c];
                             })
                         })),
-                        crib: [...game.crib || [], ..._.flatMap(game.players, (p, pi) => p.hand.filter((c, ci) => {
+                        crib: [...game.crib || [], ...game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
                             if (!IsYou(p)) {
                                 // This is a local hack for now:
                                 return ci >= keepSize;
