@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScoreBoard } from './components/scoreboard';
-import { AdvanceGameState } from './game/turns';
+import { AdvanceGameState, isGameStage } from './game/turns';
 import { Game } from './components/game';
 import logo from "./cribbigage.png";
 import { initGameState } from './game/game';
@@ -14,9 +14,9 @@ const App: React.FC = () => {
 
       <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {isGameStage(gameState) && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
           <ScoreBoard players={gameState.players} />
-        </div>
+        </div>}
 
         <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
           <Game

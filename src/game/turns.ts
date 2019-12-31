@@ -20,6 +20,10 @@ export interface PlayerState extends PlayerInfo {
     hand: Hand;
 }
 
+export function isGameStage(game: GameState) {
+    return StageOrder.indexOf(game.stage as Stage) >= 0;
+}
+
 export function AdvanceGameState(game: GameState): GameState {
     const currentStage = StageOrder.indexOf(game.stage as Stage);
     if (currentStage < 0) {

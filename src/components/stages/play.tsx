@@ -7,6 +7,7 @@ import { IsYou } from "./chooseGameMode";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
+const SlowAIDelay = 1200; // 1.2 seconds
 
 export const Play: GameComponent = props => {
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
@@ -37,7 +38,7 @@ export const Play: GameComponent = props => {
             // Add some time out here
             setTimeout(() => {
                 setGameState(playAI(game, false), false);
-            }, 1500);
+            }, SlowAIDelay);
         }
     }, [game, game.nextToPlay, isYourTurn, players, setGameState]);
 

@@ -7,8 +7,8 @@ import { scoreHand } from "../../game/score";
 
 export const Crib: GameComponent = props => {
     return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "row" }}>
-        <div style={{ flex: "none", padding: 15 }}>
-            Cut:
+        <div style={{ flex: "none", padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 20 }}>
+            <h3>Cut:</h3>
             <Hand cards={props.game.cut!} />
             <div>
                 <Button onClick={() => {
