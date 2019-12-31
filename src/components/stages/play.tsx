@@ -27,20 +27,20 @@ export const Play: GameComponent = props => {
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
         if (AutoAdvanceToYourTurn) {
-            console.log("checking if user should play", game.nextToPlay)
+            //console.log("checking if user should play", game.nextToPlay)
             let nextToPlay = game.nextToPlay || 0;
             if (!IsYou(players[nextToPlay])) {
-                console.log("user was NOT next, so having ai play");
                 setGameState(playAI(game, true), false);
             }
         }
         else if (SlowAdvanceToYourTurn && !isYourTurn) {
             // Add some time out here
             setTimeout(() => {
+                console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
                 setGameState(playAI(game, false), false);
             }, SlowAIDelay);
         }
-    }, [game, game.nextToPlay, isYourTurn, players, setGameState]);
+    }, [game.nextToPlay, isYourTurn]);
 
     return <div style={{ height: "100%", width: "100%" }}>
         <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
@@ -79,7 +79,7 @@ export const Play: GameComponent = props => {
                             setKeepCard(newKeptCards);
                         }
                         else {
-                            console.log("cant play that!");
+                            alert("cant play that!");
                         }
                     }
                     else {

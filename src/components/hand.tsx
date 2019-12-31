@@ -66,7 +66,7 @@ export const Hand: React.FC<HandProps> = props => {
                 let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
                 return <Card
                     onMove={onReorder ? (card, droppedCard) => {
-                        console.log(`${droppedCard} was dropped on ${card}`);
+                        //console.log(`${droppedCard} was dropped on ${card}`);
                         // let move the dropped card and place it before where it was dropped?
                         let newCards = [...cards].filter(c => c !== droppedCard);
                         newCards.splice(newCards.indexOf(card), 0, droppedCard);

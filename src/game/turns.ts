@@ -30,7 +30,7 @@ export function AdvanceGameState(game: GameState): GameState {
         throw `Cant use advance game stage from non-game loop stage: ${game.stage}`;
     }
 
-    const newStage = (currentStage + + 1) % StageOrder.length;
+    const newStage = (currentStage + 1) % StageOrder.length;
     const stage = StageOrder[newStage];
 
     if (newStage == 0) {

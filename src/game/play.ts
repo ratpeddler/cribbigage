@@ -55,7 +55,7 @@ export function playStageOver(game: GameState) {
 
 export function ensureNextPlayer(game: GameState): number {
     if (!game.nextToPlay) {
-        console.log("reseting next to play to 0")
+        //console.log("reseting next to play to 0")
         return 0;
     }
 
@@ -63,7 +63,7 @@ export function ensureNextPlayer(game: GameState): number {
 }
 
 export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
-    console.log("ai is playing", game.nextToPlay);
+    console.log("play ai called", game.nextToPlay, autoAdvanceUntilPlayer);
 
     // Start at the next person who needs to play
     game = { ...game };
@@ -72,15 +72,16 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameSta
     let keepRunning = true;
     // WHILE will run all AI players until your turn, IF will run 1 AI player
     while (!IsYou(game.players[ensureNextPlayer(game)]) && keepRunning) {
-        if (autoAdvanceUntilPlayer) { keepRunning = false; }
+        console.log("ai is playing in loop", game.nextToPlay, autoAdvanceUntilPlayer);
+        if (!autoAdvanceUntilPlayer) { keepRunning = false; }
         const { players, playedCards = [], previousPlayedCards = [] } = game;
         game.nextToPlay = ensureNextPlayer(game);
         const player = players[game.nextToPlay];
         const hand = filterHand(player.hand, playedCards, previousPlayedCards);
-        console.log("checking if ai can play", hand);
+        //console.log("checking if ai can play", hand);
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
-            console.log("Ai said GO");
+            console.log(player.name + " said GO");
             game = pass(game);
             continue;
         }
@@ -108,8 +109,6 @@ export function playCard(game: GameState, card: Card): GameState {
 
     game.lastToPlay = nextToPlay;
 
-    console.log("ai can play", card)
-
     // SCORE
     const playScore = scorePlay(playedCards, card);
     playedCards = game.playedCards = [...playedCards, card];
@@ -120,7 +119,6 @@ export function playCard(game: GameState, card: Card): GameState {
 
     // check if the round is over. If so you get 1 point for last card IF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        console.log("LAST CARD!", player.name);
         player.lastScore = player.score;
         player.score++;
     }
@@ -216,12 +214,10 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         }
 
         if (runLength >= 3) {
+            console.log(`Run of ${runLength}`);
             score += runLength * SCORE_PER_RUN_CARD;
         }
-
-        console.log(`Run of ${runLength}`);
     }
-
 
     // There are no flushes in pegging
     return score;

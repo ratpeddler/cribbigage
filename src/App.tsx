@@ -25,7 +25,7 @@ const App: React.FC = () => {
               let game = newGame;
               if (advance) {
                 game = AdvanceGameState(game);
-                console.log("advancing", game);
+                //console.log("New Stage", game.stage);
               }
 
               setGameState(game);

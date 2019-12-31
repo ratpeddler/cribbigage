@@ -55,14 +55,14 @@ export const Throw: GameComponent = props => {
                             return keepCards[c];
                         })
                     })),
-                    crib: props.game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
+                    crib: [...props.game.crib || [], ...props.game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
                         if (!IsYou(p)) {
                             // This is a local hack for now:
                             return ci >= keepSize;
                         }
 
                         return !keepCards[c];
-                    })),
+                    }))],
                 }, true);
             }}>
             Keep selected cards
