@@ -8,18 +8,6 @@ export type NonGameStages = "ChooseGameMode" | "GameOver";
 
 export const StageOrder: Readonly<Stage[]> = ["Deal", "Throw", "Cut", "Play", "Score", "Crib"];
 
-export interface PlayerInfo {
-    name: string;
-
-    // Can add things like USERID etc here in the future or leave as is
-}
-
-export interface PlayerState extends PlayerInfo {
-    score: number;
-    lastScore: number;
-    hand: Hand;
-}
-
 export function isGameStage(game: GameState) {
     return StageOrder.indexOf(game.stage as Stage) >= 0;
 }

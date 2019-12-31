@@ -1,7 +1,7 @@
 import React from "react";
-import { PlayerState } from "../game/turns";
 import arrow_left from "../arrow_left.png";
 import arrow_right from "../arrow_right.png";
+import { PlayerState } from "../game/players";
 
 const boardColor = "sandybrown";
 

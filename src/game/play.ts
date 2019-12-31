@@ -2,7 +2,8 @@ import { Hand } from "./deal";
 import { Card, parseCard, parseNumericalValue } from "./card";
 import { GameState } from "./game";
 import { IsYou } from "../components/stages/chooseGameMode";
-import { PlayerState } from "./turns";
+import { addPlayerScore } from "./score";
+import { PlayerState } from "./players";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -12,6 +13,13 @@ const SCORE_MAX_COUNT = 2;
 const SCORE_PER_FIFTEEN = 2;
 const SCORE_PER_PAIR = 2;
 const SCORE_PER_RUN_CARD = 1;
+const SCORE_GO = 1;
+const SCORE_LAST_CARD = 1;
+
+export function getPlayableHand(player: PlayerState, game: GameState) {
+    const { playedCards, previousPlayedCards } = game;
+    return filterHand(player.hand, playedCards, previousPlayedCards);
+}
 
 export function filterHand(hand: Hand, playedCards: Hand = [], previousPlayedCards: Hand = []) {
     return hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
@@ -53,32 +61,40 @@ export function playStageOver(game: GameState) {
     return true;
 }
 
+export function incrementNextPlayer(game: GameState): number {
+    return (ensureNextPlayer(game) + 1) % game.players.length;
+}
+
 export function ensureNextPlayer(game: GameState): number {
     if (!game.nextToPlay) {
-        //console.log("reseting next to play to 0")
         return 0;
     }
 
     return game.nextToPlay % game.players.length;
 }
 
-export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
-    console.log("play ai called", game.nextToPlay, autoAdvanceUntilPlayer);
+export function getCurrentPlayer(game: GameState): PlayerState {
+    return game.players[ensureNextPlayer(game)];
+}
 
+export function getCurrentDealer(game: GameState): PlayerState {
+    return game.players[game.players.length - 1];
+}
+
+/** Play the AI players NOT A PURE FUNCTION */
+export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
     // Start at the next person who needs to play
-    game = { ...game };
     game.nextToPlay = ensureNextPlayer(game);
 
     let keepRunning = true;
-    // WHILE will run all AI players until your turn, IF will run 1 AI player
-    while (!IsYou(game.players[ensureNextPlayer(game)]) && keepRunning) {
-        console.log("ai is playing in loop", game.nextToPlay, autoAdvanceUntilPlayer);
+    while (!IsYou(getCurrentPlayer(game)) && keepRunning) {
         if (!autoAdvanceUntilPlayer) { keepRunning = false; }
-        const { players, playedCards = [], previousPlayedCards = [] } = game;
-        game.nextToPlay = ensureNextPlayer(game);
-        const player = players[game.nextToPlay];
-        const hand = filterHand(player.hand, playedCards, previousPlayedCards);
-        //console.log("checking if ai can play", hand);
+        game.nextToPlay = ensureNextPlayer(game); // Not sure if needed anymore..
+
+        // Get current player and hand
+        const player = getCurrentPlayer(game);
+        const hand = getPlayableHand(player, game);
+        const { playedCards = [], previousPlayedCards = [] } = game;
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
             console.log(player.name + " said GO");
@@ -99,52 +115,41 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameSta
 
 
 export function playCard(game: GameState, card: Card): GameState {
-    let { players, playedCards = [] } = game;
-    let nextToPlay = ensureNextPlayer(game);
-    const player = players[nextToPlay];
+    let { playedCards = [] } = game;
+    const player = getCurrentPlayer(game);
 
     if (!canPlay(playedCards, card)) {
         throw `Can't play that! ${card}`;
     }
 
-    game.lastToPlay = nextToPlay;
+    game.lastToPlay = ensureNextPlayer(game);
 
     // SCORE
     const playScore = scorePlay(playedCards, card);
     playedCards = game.playedCards = [...playedCards, card];
-    if (playScore) {
-        player.lastScore = player.score;
-        player.score += playScore;
-    }
+    addPlayerScore(player, playScore);
 
-    // check if the round is over. If so you get 1 point for last card IF the count is not 31
+    // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        player.lastScore = player.score;
-        player.score++;
+        addPlayerScore(player, SCORE_LAST_CARD);
     }
-
-
-    nextToPlay++;
-    nextToPlay %= players.length;
 
     return {
         ...game,
-        nextToPlay,
+        nextToPlay: incrementNextPlayer(game),
     }
 }
 
 export function pass(game: GameState): GameState {
+    const player = getCurrentPlayer(game);
+
     // pass to the next player and check if there has been a GO
     if (game.lastToPlay != undefined && game.nextToPlay === game.lastToPlay) {
-        // WE should ensure that that player cannot play either!
-        console.log("we have gone around and no one could play!");
         const { previousPlayedCards = [], playedCards = [] } = game;
 
-        // check for 31 since you do not get a go for 31
+        // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            // ADD 1 to the score of the last to play player.
-            game.players[game.lastToPlay].lastScore = game.players[game.lastToPlay].score;
-            game.players[game.lastToPlay].score++;
+            addPlayerScore(player, SCORE_GO);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];
@@ -152,11 +157,11 @@ export function pass(game: GameState): GameState {
         game.playedCards = [];
     }
 
-    // After a go, the next to play person is the person AFTER the last to play person. which in this case is the same logic (next person)
-    game.nextToPlay = ensureNextPlayer(game);
-    game.nextToPlay++;
-    game.nextToPlay %= game.players.length;
-    return game;
+    // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 
+    return {
+        ...game,
+        nextToPlay: incrementNextPlayer(game)
+    };
 }
 
 export function isPlayStageRun(cards: Hand) {
