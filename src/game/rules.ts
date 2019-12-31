@@ -34,7 +34,7 @@ function createGame(name: string, players: number, dealSize: number, keepSize: n
 }
 
 export const GameModes: GameRules[] = [
-    createGame("2 Player CribBIGage", 2, 7, 5, 1, 0, 1, 30),
+    createGame("2 Player CribBIGage", 2, 7, 5, 1),
     createGame("3 Player CribBIGage", 3, 6, 5, 1, 1),
     createGame("2 Player regular cribbage", 2, 6, 4),
     createGame("3 Player regular cribbage", 3, 5, 4, 1),

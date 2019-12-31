@@ -4,7 +4,8 @@ import { RunDeal } from "../../game/deal";
 import { Button } from "../button";
 
 export const Deal: GameComponent = props => {
-    return (
+    const Layout = props.layout;
+    return <Layout game={props.game} userActions={() =>
         <Button
             big={true}
             onClick={() => {
@@ -12,6 +13,5 @@ export const Deal: GameComponent = props => {
             }}
         >
             Deal
-        </Button>
-    );
+        </Button>} />;
 }

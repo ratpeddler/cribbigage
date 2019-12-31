@@ -18,8 +18,8 @@ type CardProps = {
     onMove?: (thisCard: number, droppedCard: number) => void;
 };
 
-const padding = 0;
-export const CardMargin = 5;
+const padding = 5;
+export const CardMargin = 2;
 export const CardWidth = 100;
 export const StackedMargin = -1 * CardWidth - CardMargin;
 export const SuperStackedMargin = -1 * (CardWidth + (2 * CardMargin) + (2 * padding) + 4);
@@ -27,7 +27,6 @@ export const SuperStackedTopMargin = -1;
 
 export const Card: React.FC<CardProps> = props => {
     const { card, selected, onClick, stacked, disabled, onMove, superStacked, index } = props;
-
 
     const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault();
@@ -60,6 +59,7 @@ export const Card: React.FC<CardProps> = props => {
     return <div
         {...dragProps}
         style={{
+            maxHeight: CardWidth * 1.45,
             margin: CardMargin,
             marginTop: superStacked ? index * SuperStackedTopMargin : CardMargin,
             marginLeft: stacked ? StackedMargin : (superStacked ? SuperStackedMargin : CardMargin),

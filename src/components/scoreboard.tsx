@@ -12,13 +12,13 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
     return -1;
 };
 
-export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number }> = props => {
+export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number, vertical?: boolean, lines?: number }> = props => {
     const players = [...props.players].sort(byPlayerName);
     return <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            <img src={arrow_left} height={150} />
-            <Board players={players} total={props.pointsToWin || 120} lines={3} />
-            <img src={arrow_right} height={150} />
+        <div className="BoardWrapper" style={{ display: "flex", flexDirection: props.vertical ? "column" : "row" }}>
+            
+            <Board players={players} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />
+            
         </div>
 
         <div style={{ textAlign: "center" }}>
@@ -31,9 +31,10 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 }
 
 const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: number }> = props => {
-    const diameter = 10;
-    const border = 4;
+    const diameter = 5;
+    const border = 3;
     return <div
+        className="ScoreDot"
         title={props.index.toString()}
         style={{
             margin: 2,
@@ -45,30 +46,31 @@ const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: numbe
         }}></div>;
 }
 
-const Board: React.FC<{ players: PlayerState[], total: number, lines: number }> = props => {
-    const { total, lines, players } = props;
+const Board: React.FC<{ players: PlayerState[], total: number, lines: number, vertical?: boolean }> = props => {
+    const { total, lines, players, vertical } = props;
     const perRow = Math.floor(total / lines);
     if (total / lines !== perRow) { throw "Bad choice of line numbers! doesn't divide evenly!" }
     const body: JSX.Element[] = [];
     for (let i = 0; i < lines; i++) {
-        body.push(<ScoreRow key={i} players={players} dots={perRow} from={perRow * i} reverse={i % 2 !== 0} />)
+        body.push(<ScoreRow key={i} players={players} dots={perRow} from={perRow * i} reverse={i % 2 !== 0} vertical={vertical} />)
     }
-    return <div style={{ display: "flex", flexDirection: "column", backgroundColor: boardColor }}>
+    return <div className="board" style={{ display: "flex", flexDirection: vertical ? "row" : "column", backgroundColor: boardColor }}>
         {body}
     </div>
 }
 
-const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean }> = props => {
+const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
     const players = [...props.players].sort(byPlayerName);
-    const { dots, from, reverse } = props;
+    const { dots, from, reverse, vertical } = props;
     const body: JSX.Element[] = [];
 
     for (let i = reverse ? dots + from - 1 : from; reverse ? i >= from : i < dots + from; reverse ? i-- : i++) {
         body.push(<div
+            className="ScoreRowInner"
             key={i}
             style={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: vertical ? "row" : "column",
                 marginTop: 1,
                 outline: i % 30 === 0 ? "2px solid yellow" : i % 5 === 0 ? "1px solid black" : undefined
             }}>
@@ -76,5 +78,5 @@ const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, r
         </div>);
     }
 
-    return <div style={{ display: "flex", flexDirection: "row", margin: 5 }}>{body}</div>;
+    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5 }}>{body}</div>;
 }

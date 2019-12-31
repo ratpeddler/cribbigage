@@ -10,4 +10,5 @@ export interface PlayerState extends PlayerInfo {
     score: number;
     lastScore: number;
     hand: Hand;
+    playedCards?: Hand;
 }
