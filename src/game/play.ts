@@ -179,14 +179,15 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         score += pairs * SCORE_PER_PAIR;
     }
 
-    // Runs
-    if (playedCards && playedCards.length > 0) {
+    // Runs (In play phase is an unorder contiguous list with no duplicates)
+    if (playedCards && playedCards.length > 1) {
         let runLength = 1;
-        let max = parseNumericalValue(playedCards[0]);
+        let max = parseNumericalValue(newCard);
         let min = max;
         let reversed = [...playedCards].reverse();
         for (let card of reversed) {
             const next = parseNumericalValue(card);
+            // This fails for some valid play stage runs
             if (next === max + 1) {
                 max = next;
                 runLength++;
@@ -198,9 +199,10 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         }
 
         if (runLength >= 3) {
-            console.log(`Run of ${runLength}, ${min} to ${max}`);
             score += runLength * SCORE_PER_RUN_CARD;
         }
+
+        console.log(`Run of ${runLength}, ${min+1} to ${max+1}`);
     }
 
 
