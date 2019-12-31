@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
+import { sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer, getCurrentPlayer, getPlayableHand } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 const AutoAdvanceToYourTurn = false;
@@ -41,6 +41,7 @@ export const Play: GameComponent = props => {
             }, SlowAIDelay);
         }
     }, [game.nextToPlay, isYourTurn]);
+    const remainingCards = getPlayableHand(players.filter(IsYou)[0], game);
 
     return <div style={{ height: "100%", width: "100%", padding: "0 20px" }}>
         <div style={{ display: "flex", flexDirection: "row" }}>
@@ -54,11 +55,10 @@ export const Play: GameComponent = props => {
             </div>
         </div>
         <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            <div>
+        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+            {remainingCards.length > 0 && <div>
                 Your Hand:
                 {players.map((p, index) => {
-                    const remainingCards = filterHand(p.hand, game.playedCards, game.previousPlayedCards);
                     return IsYou(p) && <HandAndScore
                         allDisabled={!isYourTurn}
                         cards={remainingCards}
@@ -83,9 +83,9 @@ export const Play: GameComponent = props => {
                         }}
                     />
                 })}
-            </div>
+            </div>}
             <div style={{ display: "flex", alignItems: "center", flexDirection: "column", justifyContent: "center", padding: 10 }}>
-                <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
+                {playStageOver(game) ? null : <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>}
                 {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
                 {!isYourTurn && !SlowAdvanceToYourTurn && <Button
