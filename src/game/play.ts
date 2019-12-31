@@ -127,11 +127,11 @@ export function playCard(game: GameState, card: Card): GameState {
     // SCORE
     const playScore = scorePlay(playedCards, card);
     playedCards = game.playedCards = [...playedCards, card];
-    addPlayerScore(player, playScore, game.pointsToWin);
+    addPlayerScore(player, playScore, game.rules.pointsToWin);
 
     // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        addPlayerScore(player, SCORE_LAST_CARD);
+        addPlayerScore(player, SCORE_LAST_CARD, game.rules.pointsToWin);
     }
 
     return {
@@ -149,7 +149,7 @@ export function pass(game: GameState): GameState {
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            addPlayerScore(player, SCORE_GO, game.pointsToWin);
+            addPlayerScore(player, SCORE_GO, game.rules.pointsToWin);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];

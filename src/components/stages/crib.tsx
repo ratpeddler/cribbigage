@@ -18,7 +18,7 @@ export const Crib: GameComponent = props => {
         </div>
         <div style={{ textAlign: "center" }}>
             <Button onClick={() => {
-                addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game.pointsToWin)
+                addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game.rules.pointsToWin)
                 props.setGameState({
                     ...game,
                 }, true);
