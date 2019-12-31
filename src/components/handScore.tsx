@@ -7,7 +7,7 @@ export const HandScore: React.FC<{ hand: Hand, cut?: Hand }> = props => {
     const score = scoreHand(hand, cut);
     return <div>
         {/* Display the scores for now while finishing scoring */}
-        <div>SCORE: {score.score}</div>
+        <h4><b>SCORE: </b>{score.score}</h4>
         {!!score.fifteen && <div>fifteen: {score.fifteen}</div>}
         {!!score.pairs && <div>pairs: {score.pairs}</div>}
         {!!score.knobs && <div>knobs: {score.knobs}</div>}

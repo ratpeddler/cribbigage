@@ -57,7 +57,7 @@ interface HandProps {
 export const Hand: React.FC<HandProps> = props => {
     const { maxKeep, keepCards, stacked, cards, onClick, currentCount } = props;
     return (
-        <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }}>
             {cards.map((card, i) => {
                 let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
                 return <Card

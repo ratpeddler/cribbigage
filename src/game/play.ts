@@ -77,10 +77,8 @@ export function playAI(game: GameState): GameState {
         console.log("checking if ai can play", hand);
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
-            console.log("Ai couldn't play", playedCards, hand);
-            // TODO: Handle GO
-            game.nextToPlay++;
-            game.nextToPlay %= players.length;
+            console.log("Ai said GO");
+            game = pass(game);
             continue;
         }
 
@@ -101,7 +99,7 @@ export function playCard(game: GameState, card: Card): GameState {
     let nextToPlay = ensureNextPlayer(game);
     const player = players[nextToPlay];
 
-    if(!canPlay(playedCards, card)){
+    if (!canPlay(playedCards, card)) {
         throw `Can't play that! ${card}`;
     }
 
@@ -128,6 +126,34 @@ export function playCard(game: GameState, card: Card): GameState {
     }
 }
 
+export function pass(game: GameState): GameState {
+    // pass to the next player and check if there has been a GO
+    if (game.lastToPlay != undefined && game.nextToPlay === game.lastToPlay) {
+        // WE should ensure that that player cannot play either!
+        console.log("we have gone around and no one could play!");
+        const { previousPlayedCards = [], playedCards = [] } = game;
+
+        // check for 31
+        if (sumCards(playedCards) !== 31) {
+            // no points for go!
+
+            // ADD 1 to the score of the last to play player.
+            game.players[game.lastToPlay].lastScore = game.players[game.lastToPlay].score;
+            game.players[game.lastToPlay].score++;
+        }
+
+        let newPrevious = [...previousPlayedCards, ...playedCards];
+        game.previousPlayedCards = newPrevious;
+        game.playedCards = [];
+    }
+
+    // After a go, the next to play person is the person AFTER the last to play person. which in this case is the same logic (next person)
+    game.nextToPlay = ensureNextPlayer(game);
+    game.nextToPlay++;
+    game.nextToPlay %= game.players.length;
+    return game;
+}
+
 export function scorePlay(playedCards: Hand, newCard: Card): number {
     let score = 0;
     const currentCount = sumCards(playedCards);
@@ -135,12 +161,12 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
     if (!canPlay(playedCards, newCard)) { throw `Invalid play! Can't play ${newCardParsed.count} when count is already ${currentCount}` }
 
     // 15
-    if (currentCount + newCardParsed.count == 15) {
+    if (currentCount + newCardParsed.count === 15) {
         score += SCORE_PER_FIFTEEN;
     }
 
     // 31
-    if (currentCount + newCardParsed.count == MAX_PLAY_COUNT) {
+    if (currentCount + newCardParsed.count === MAX_PLAY_COUNT) {
         score += SCORE_MAX_COUNT;
     }
 
@@ -148,7 +174,7 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
     const parsedPlayedCards = playedCards.map(parseCard);
     const playedValues = parsedPlayedCards.map(card => card.value);
     let pairs = 0;
-    while (playedValues.pop() == newCardParsed.value) {
+    while (playedValues.pop() === newCardParsed.value) {
         pairs++;
         score += pairs * SCORE_PER_PAIR;
     }
@@ -161,11 +187,11 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         let reversed = [...playedCards].reverse();
         for (let card of reversed) {
             const next = parseNumericalValue(card);
-            if (next == max + 1) {
+            if (next === max + 1) {
                 max = next;
                 runLength++;
             }
-            else if (next == min - 1) {
+            else if (next === min - 1) {
                 min = next
                 runLength++;
             }

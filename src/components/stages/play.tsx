@@ -2,7 +2,7 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard } from "../../game/play";
+import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 
 export const Play: GameComponent = props => {
@@ -86,42 +86,32 @@ export const Play: GameComponent = props => {
 
                 // Reset the current selection
                 setKeepCard({});
-
-                // Update played cards
                 setGameState(playAI(playCard(game, playedCard)), false);
             }}>
             Play selected card
         </Button>
 
         {!playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
-            // TODO have the other person play if they can
-
             // Reset the current selection
             setKeepCard({});
-
-            // Add the new played cards to the previously played stack
-            let newPrevious = [...previousPlayedCards, ...playedCards];
-
-            // Update played cards
-            setGameState(playAI({
-                ...game,
-                previousPlayedCards: newPrevious,
-                playedCards: [],
-                nextToPlay: (game.nextToPlay || 0) + 1
-            }), false);
+            setGameState(playAI(pass(game)), false);
         }}>
             Pass
         </Button>}
 
         {playStageOver(game) && <Button
             disabled={!playStageOver(game)}
-            onClick={() => props.setGameState({
-                ...props.game,
-                previousPlayedCards: [],
-                playedCards: [],
-                nextToPlay: 0,
-                lastToPlay: undefined,
-            }, true)}>
+            onClick={() => {
+                // TODO: This needs to handle LAST CARD
+                // NEEDS TO CHECK IF it ended on 31 too!
+                props.setGameState({
+                    ...props.game,
+                    previousPlayedCards: [],
+                    playedCards: [],
+                    nextToPlay: 0,
+                    lastToPlay: undefined,
+                }, true)
+            }}>
             Play is done. Go to score hands
         </Button>}
 
