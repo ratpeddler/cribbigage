@@ -13,6 +13,7 @@ interface SelectableHandProps {
     showScore?: boolean;
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
+    allDisabled?: boolean,
 }
 
 export function ExtractKeptCard(keepCard: KeepCard): number {
@@ -54,10 +55,11 @@ interface HandProps {
     stacked?: boolean,
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
+    allDisabled?: boolean,
 }
 
 export const Hand: React.FC<HandProps> = props => {
-    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder } = props;
+    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled } = props;
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }}>
             {cards.map((card, i) => {
@@ -70,7 +72,7 @@ export const Hand: React.FC<HandProps> = props => {
                         newCards.splice(newCards.indexOf(card), 0, droppedCard);
                         onReorder(newCards);
                     } : undefined}
-                    disabled={disabled}
+                    disabled={disabled || allDisabled}
                     stacked={stacked}
                     card={card}
                     index={i}

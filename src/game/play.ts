@@ -62,14 +62,17 @@ export function ensureNextPlayer(game: GameState): number {
     return game.nextToPlay % game.players.length;
 }
 
-export function playAI(game: GameState): GameState {
+export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
     console.log("ai is playing", game.nextToPlay);
 
     // Start at the next person who needs to play
     game = { ...game };
     game.nextToPlay = ensureNextPlayer(game);
 
-    while (!IsYou(game.players[ensureNextPlayer(game)])) {
+    let keepRunning = true;
+    // WHILE will run all AI players until your turn, IF will run 1 AI player
+    while (!IsYou(game.players[ensureNextPlayer(game)]) && keepRunning) {
+        if (autoAdvanceUntilPlayer) { keepRunning = false; }
         const { players, playedCards = [], previousPlayedCards = [] } = game;
         game.nextToPlay = ensureNextPlayer(game);
         const player = players[game.nextToPlay];
@@ -202,7 +205,7 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
             score += runLength * SCORE_PER_RUN_CARD;
         }
 
-        console.log(`Run of ${runLength}, ${min+1} to ${max+1}`);
+        console.log(`Run of ${runLength}, ${min + 1} to ${max + 1}`);
     }
 
 

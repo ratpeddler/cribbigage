@@ -57,7 +57,7 @@ export const Card: React.FC<CardProps> = props => {
             background: disabled ? "lightgrey" : undefined,
             cursor: disabled ? "not-allowed" : (onClick ? "pointer" : undefined),
         }}
-        onClick={onClick}
+        onClick={disabled ? undefined : onClick}
     >
         <img
             alt={`${value} of ${suit}`}
