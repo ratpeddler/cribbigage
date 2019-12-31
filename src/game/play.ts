@@ -125,8 +125,8 @@ export function playCard(game: GameState, card: Card): GameState {
     game.lastToPlay = ensureNextPlayer(game);
 
     // SCORE
-    const playScore = scorePlay(playedCards, card);    
-    addPlayerScore(player, playScore, game.rules.pointsToWin);
+    const playScore = scorePlay(playedCards, card);
+    addPlayerScore(player, playScore.score, game.rules.pointsToWin);
 
     // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
@@ -184,31 +184,38 @@ export function isPlayStageRun(cards: Hand) {
     return true;
 }
 
-export function scorePlay(playedCards: Hand, newCard: Card): number {
+export function scorePlay(playedCards: Hand, newCard: Card) {
     let score = 0;
     const currentCount = sumCards(playedCards);
     const newCardParsed = parseCard(newCard);
     if (!canPlay(playedCards, newCard)) { throw `Invalid play! Can't play ${newCardParsed.count} when count is already ${currentCount}` }
 
     // 15
+    let fifteen = 0;
     if (currentCount + newCardParsed.count === 15) {
         score += SCORE_PER_FIFTEEN;
+        fifteen += SCORE_PER_FIFTEEN;
     }
 
     // 31
+    let thirtyone = 0;
     if (currentCount + newCardParsed.count === MAX_PLAY_COUNT) {
         score += SCORE_MAX_COUNT;
+        thirtyone += SCORE_MAX_COUNT;
     }
 
     // Pairs
     const parsedPlayedCards = playedCards.map(parseCard);
     const playedValues = parsedPlayedCards.map(card => card.value);
-    let pairs = 0;
+    let pairCount = 0;
+    let pairScore = 0;
     while (playedValues.pop() === newCardParsed.value) {
-        pairs++;
-        score += pairs * SCORE_PER_PAIR;
+        pairCount++;
+        score += pairCount * SCORE_PER_PAIR;
+        pairScore += pairCount * SCORE_PER_PAIR;
     }
 
+    let runs = 0;
     // Runs (In play phase is an unorder contiguous list with no duplicates)
     if (playedCards && playedCards.length > 1) {
         let runLength = 0;
@@ -225,9 +232,10 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         if (runLength >= 3) {
             console.log(`Run of ${runLength}`);
             score += runLength * SCORE_PER_RUN_CARD;
+            runs += runLength * SCORE_PER_RUN_CARD;
         }
     }
 
     // There are no flushes in pegging
-    return score;
+    return { score, runs, fifteen, thirtyone, pairs: pairScore };
 }

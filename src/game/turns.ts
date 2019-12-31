@@ -24,6 +24,7 @@ export function AdvanceGameState(game: GameState): GameState {
     if (newStage == 0) {
         let [first, ...rest] = game.players.map(player => {
             player.playedCards = [];
+            player.hand = [];
             return player;
         });
         return {

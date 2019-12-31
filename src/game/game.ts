@@ -44,11 +44,12 @@ export function initGameState(): GameState {
     } as GameState;
 }
 
+const colors = ["red", "green", "blue", "gold"];
 export function startGame(players: PlayerInfo[], rules: GameRules): GameState {
     return {
         rules,
         turnNumber: 0,
-        players: players.filter((p, pi) => pi < rules.players).map(player => ({ ...player, score: 0, lastScore: 0, hand: [] })),
+        players: players.filter((p, pi) => pi < rules.players).map((player, pi) => ({ ...player, color: colors[pi], score: 0, lastScore: 0, hand: [] })),
         stage: "Deal",
         crib: [],
         cut: [],

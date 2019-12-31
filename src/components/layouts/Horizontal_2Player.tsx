@@ -65,7 +65,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
             <Row spaceBetween={!!opponent2} justified={!opponent2}>
                 {opponent1 && <Row padding={10}>
-                    <h3>
+                    <h3 style={{ color: opponent1.color }}>
                         {opponent1.name}
                         {dealer == opponent1 && <div>Dealer</div>}
                     </h3>
@@ -80,7 +80,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                     {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
                     {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
                     {opponent2Hand && opponent2Hand.length > 0 && <Hand cards={opponent2Hand} stacked />}
-                    <h3>
+                    <h3 style={{ color: opponent2.color }}>
                         {opponent2.name}
                         {dealer == opponent2 && <div>Dealer</div>}
                     </h3>
@@ -101,7 +101,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             {userHand && userHand.length > 0 &&
                 <Row justified fill alignStart>
                     <HandAndScore
-                        allDisabled={!isYourTurn}
+                        allDisabled={game.stage != "Throw" && !isYourTurn}
                         cards={userHand}
                         keepCards={selectedCards}
                         setKeepCards={setSelectedCards}

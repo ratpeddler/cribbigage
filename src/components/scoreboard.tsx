@@ -5,7 +5,6 @@ import { PlayerState } from "../game/players";
 
 const boardColor = "sandybrown";
 
-const colors = ["blue", "red", "green", "gold"];
 const byPlayerName = (a: PlayerState, b: PlayerState) => {
     if (a.name > b.name) { return 1; }
     if (a.name === b.name) { return 0; }
@@ -23,7 +22,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
         <div style={{ textAlign: "center" }}>
             {players.map((p, pi) => <span key={pi}
-                style={{ color: colors[pi], fontWeight: props.players.indexOf(p) == props.players.length - 1 ? 700 : 400, margin: 5 }}>
+                style={{ color: p.color, fontWeight: props.players.indexOf(p) == props.players.length - 1 ? 700 : 400, margin: 5 }}>
                 {p.name}: {p.score}
             </span>)}
         </div>
@@ -74,7 +73,7 @@ const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, r
                 marginTop: 1,
                 outline: i % 30 === 0 ? "2px solid yellow" : i % 5 === 0 ? "1px solid black" : undefined
             }}>
-            {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score === i || p.lastScore === i} playerColor={colors[pi]} />)}
+            {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score === i || p.lastScore === i} playerColor={p.color} />)}
         </div>);
     }
 

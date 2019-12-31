@@ -20,7 +20,8 @@ export const Throw: GameComponent = props => {
     // TODO Only select the cards you will DISCARD not the ones you will keep
     const mustDiscard = user.hand.length - keepSize;
 
-    const disabled = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length !== keepSize;
+    const selectedLength =Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
+    const disabled = selectedLength !== keepSize;
 
     const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
 
@@ -35,7 +36,10 @@ export const Throw: GameComponent = props => {
             setGameState({ ...game }, false);
         }}
         userActions={() => <>
-            <h3>Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib. (You must keep {keepSize} cards)</h3>
+            <h3 style={{textAlign: "center"}}>
+                Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib.
+            <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
+            </h3>
             <Button
                 disabled={disabled}
                 onClick={() => {
@@ -61,7 +65,7 @@ export const Throw: GameComponent = props => {
                         }))],
                     }, true);
                 }}>
-                Keep selected cards ({score.score} pts)
+                {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`}
             </Button>
         </>} />;
 }
