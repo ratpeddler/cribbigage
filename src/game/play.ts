@@ -98,7 +98,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameSta
 
 
 export function playCard(game: GameState, card: Card): GameState {
-    const { players, playedCards = [] } = game;
+    let { players, playedCards = [] } = game;
     let nextToPlay = ensureNextPlayer(game);
     const player = players[nextToPlay];
 
@@ -112,16 +112,22 @@ export function playCard(game: GameState, card: Card): GameState {
 
     // SCORE
     const playScore = scorePlay(playedCards, card);
-    game.playedCards = [...playedCards, card];
+    playedCards = game.playedCards = [...playedCards, card];
     if (playScore) {
         player.lastScore = player.score;
         player.score += playScore;
     }
 
+    // check if the round is over. If so you get 1 point for last card IF the count is not 31
+    if (playStageOver(game) && sumCards(playedCards) !== 31) {
+        console.log("LAST CARD!", player.name);
+        player.lastScore = player.score;
+        player.score++;
+    }
+
+
     nextToPlay++;
     nextToPlay %= players.length;
-
-    // TODO Handle 31 and GO
 
     return {
         ...game,
@@ -136,10 +142,8 @@ export function pass(game: GameState): GameState {
         console.log("we have gone around and no one could play!");
         const { previousPlayedCards = [], playedCards = [] } = game;
 
-        // check for 31
+        // check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            // no points for go!
-
             // ADD 1 to the score of the last to play player.
             game.players[game.lastToPlay].lastScore = game.players[game.lastToPlay].score;
             game.players[game.lastToPlay].score++;
