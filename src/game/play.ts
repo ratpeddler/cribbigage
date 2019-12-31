@@ -161,6 +161,22 @@ export function pass(game: GameState): GameState {
     return game;
 }
 
+export function isPlayStageRun(cards: Hand) {
+    // order doesn't matter
+    let sorted = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    let last: number | undefined = undefined;
+    for (let card of sorted) {
+        if (last === undefined || card === last + 1) {
+            last = card;
+        }
+        else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function scorePlay(playedCards: Hand, newCard: Card): number {
     let score = 0;
     const currentCount = sumCards(playedCards);
@@ -188,20 +204,14 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
 
     // Runs (In play phase is an unorder contiguous list with no duplicates)
     if (playedCards && playedCards.length > 1) {
-        let runLength = 1;
-        let max = parseNumericalValue(newCard);
-        let min = max;
-        let reversed = [...playedCards].reverse();
-        for (let card of reversed) {
-            const next = parseNumericalValue(card);
-            // This fails for some valid play stage runs
-            if (next === max + 1) {
-                max = next;
-                runLength++;
-            }
-            else if (next === min - 1) {
-                min = next
-                runLength++;
+        let runLength = 0;
+        let checkCards = [];
+        let allCards = [...playedCards, newCard];
+
+        while (allCards.length) {
+            checkCards.push(allCards.pop()!);
+            if (isPlayStageRun(checkCards)) {
+                runLength = checkCards.length;
             }
         }
 
@@ -209,7 +219,7 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
             score += runLength * SCORE_PER_RUN_CARD;
         }
 
-        console.log(`Run of ${runLength}, ${min + 1} to ${max + 1}`);
+        console.log(`Run of ${runLength}`);
     }
 
 
