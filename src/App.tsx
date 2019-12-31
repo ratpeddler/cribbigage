@@ -15,7 +15,7 @@ const App: React.FC = () => {
 
       <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-        {isGameStage(gameState) && <div style={{ display: "flex", flexDirection: "row" }}>
+        {isGameStage(gameState) && <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
           <DeckAndCut game={gameState.stage != "Throw" ? gameState : undefined} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
             <ScoreBoard players={gameState.players} />
