@@ -61,7 +61,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             <Row justified>
                 <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
             </Row>
-            {yourCrib && <DeckAndCut />}
+            {yourCrib && <DeckAndCut game={cutGame} />}
         </Column>
 
         {/* RIGHT Hand and play area (From to: Op hand, Op played, SCORE, Your played, Your Hand) */}

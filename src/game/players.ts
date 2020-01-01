@@ -13,3 +13,7 @@ export interface PlayerState extends PlayerInfo {
     playedCards?: Hand;
     color: string;
 }
+
+export function getPlayerByName(name: string, players: PlayerState[]){
+    return players.find(p => p.name == name)!;
+}
