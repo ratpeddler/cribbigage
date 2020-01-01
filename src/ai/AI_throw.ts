@@ -4,14 +4,17 @@ import { PlayerState } from "../game/players";
 import { Hand } from "../game/deal";
 import { IsYou } from "../components/stages/chooseGameMode";
 import { scoreHand } from "../game/score";
+import { getCurrentDealer } from "../game/play";
 
 export function throwAI(player: PlayerState, game: GameState) {
     if (IsYou(player)) throw "Called AI to throw hand on player!";
 
+    // TODO: factor in expected value from CUT and from CRIB
+    const haveCrib = getCurrentDealer(game) == player;
+
     // go through and try scoring all the hands
     let maxScore = 0;
     let maxHand: Hand = [];
-    
     allHands(player.hand, game.rules.keepSize).forEach(hand =>
         {
             const score = scoreHand(hand, []).score;
