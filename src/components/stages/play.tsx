@@ -26,28 +26,30 @@ export const Play: GameComponent = props => {
     const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
 
     const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
- 
-const passYourTurn = () => {
-    // Reset the current selection
-    setKeepCard({});
-    // always advance on pass?
-    setGameState(AutoAdvanceToYourTurn
-        ? playAI(pass(game, scoreContext), true, scoreContext)
-        : pass(game, scoreContext), false);
-}
+
+    const passYourTurn = () => {
+        // Reset the current selection
+        setKeepCard({});
+        // always advance on pass?
+        setGameState(AutoAdvanceToYourTurn
+            ? playAI(pass(game, scoreContext), true, scoreContext)
+            : pass(game, scoreContext), false);
+    }
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
         // special case for "GO" OR "31"
 
-        if(sumCards(game.playedCards || []) == 31){
-            if(isYourTurn){
+        if (sumCards(game.playedCards || []) == 31) {
+            if (isYourTurn) {
                 passYourTurn();
             }
             else {
-                // Quickly run all the AI's until your turn
-                // TODO: ACTUALLY: this should be run instantly until we have gone around the table and it is no longer GO
-                setGameState(playAI(game, true, scoreContext), false);
+                // Add some time out here
+                setTimeout(() => {
+                    console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
+                    setGameState(playAI(game, false, scoreContext), false);
+                }, SlowAIDelay);
             }
         }
 

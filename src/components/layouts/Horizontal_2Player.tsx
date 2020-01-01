@@ -7,6 +7,7 @@ import { DeckAndCut } from "../deckAndCut";
 import { Hand, HandAndScore } from "../hand";
 import { ScoreIcon } from "../scoreIcon";
 import { HandScore } from "../handScore";
+import { PlayLog } from "../playLog";
 
 export type SelectedCards = { [card: number]: boolean };
 export interface LayoutProps {
@@ -62,6 +63,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                 <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
             </Row>
             {yourCrib && <DeckAndCut game={cutGame} />}
+            <PlayLog />
         </Column>
 
         {/* RIGHT Hand and play area (From to: Op hand, Op played, SCORE, Your played, Your Hand) */}
@@ -137,6 +139,7 @@ interface FlexProps {
     centered?: boolean;
     alignStart?: boolean;
     border?: string;
+    overflow?: string;
 }
 
 export const Column: React.FC<FlexProps> = props => {
@@ -153,6 +156,7 @@ export const Fill: React.FC<FlexProps> = props => {
 
 function styles(props: FlexProps) {
     return {
+        overflow: props.overflow,
         padding: props.padding,
         display: "flex",
         flex: flex(props),

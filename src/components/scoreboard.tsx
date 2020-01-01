@@ -44,7 +44,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
                         return lp;
                     }));
-                }, 250);
+                }, 100);
 
                 break;
             }

@@ -20,10 +20,7 @@ export interface IScoreContext {
 
 export const ScoreContext = React.createContext<IScoreContext>({ lookup: {}, addPlayerScore: () => { } });
 
-export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
-    const scoreContext = React.useContext(ScoreContext);
-    const score = scoreContext?.lookup[props.player.name];
-
+export function createScoreMessage(score: IScore){
     let scoreStrings = [];
     if (score) {
         if (score.fifteen) {
@@ -49,6 +46,15 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
         }
     }
 
+    return scoreStrings.join(", ");
+}
+
+export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
+    const scoreContext = React.useContext(ScoreContext);
+    const score = scoreContext?.lookup[props.player.name];
+
+    let scoreString = createScoreMessage(score);
+
     return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24 }}>
-        {score && score.score > 0 && "+" + scoreStrings.join(", ") + "!"}</div>;
+        {score && score.score > 0 && "+" + scoreString + "!"}</div>;
 }
