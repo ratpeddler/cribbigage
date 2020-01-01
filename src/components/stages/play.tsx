@@ -1,11 +1,12 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
+import { KeepCard, ExtractKeptCard } from "../hand";
 import { Button } from "../button";
-import { sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer, getCurrentPlayer, getPlayableHand } from "../../game/play";
+import { sumCards, canPlay, cantPlayAtAll, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 import { ScoreContext } from "../scoreIcon";
 import { PlayLogContext } from "../playLog";
+import { playAI } from "../../ai/AI_play";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;

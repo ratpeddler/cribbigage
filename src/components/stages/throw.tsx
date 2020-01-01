@@ -5,6 +5,8 @@ import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
 import { getCurrentDealer } from "../../game/play";
 import { scoreHand } from "../../game/score";
+import { throwAI } from "../../ai/AI_throw";
+import _ from "lodash";
 
 export const Throw: GameComponent = props => {
     const Layout = props.layout;
@@ -20,14 +22,14 @@ export const Throw: GameComponent = props => {
     // TODO Only select the cards you will DISCARD not the ones you will keep
     const mustDiscard = user.hand.length - keepSize;
 
-    const selectedLength =Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
+    const selectedLength = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
     const disabled = selectedLength !== keepSize;
 
     const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
 
     // TODO: This should either let you pick all hands or just your own
     return <Layout
-        game={props.game}
+        game={game}
         selectedCards={keepCards}
         setSelectedCards={setKeepCards}
         maxSelectedCards={keepSize}
@@ -36,33 +38,33 @@ export const Throw: GameComponent = props => {
             setGameState({ ...game }, false);
         }}
         userActions={() => <>
-            <h3 style={{textAlign: "center"}}>
+            <h3 style={{ textAlign: "center" }}>
                 Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib.
             <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
             </h3>
             <Button
                 disabled={disabled}
                 onClick={() => {
+                    // get hands and discards for each player
+                    let players = _.cloneDeep(game.players);
+                    let crib = [...game.crib || []];
+
+                    for (let player of players) {
+                        if (IsYou(player)) {
+                            crib.push(...player.hand.filter(c => !keepCards[c]));
+                            player.hand = player.hand.filter(c => keepCards[c]);
+                        }
+                        else {
+                            const { keep, discard } = throwAI(player, game);
+                            crib.push(...discard);
+                            player.hand = keep;
+                        }
+                    }
+
                     setGameState({
-                        ...props.game,
-                        players: props.game.players.map((p, pi) => ({
-                            ...p,
-                            hand: p.hand.filter((c, ci) => {
-                                if (!IsYou(p)) {
-                                    return ci < keepSize;
-                                }
-
-                                return keepCards[c];
-                            })
-                        })),
-                        crib: [...game.crib || [], ...game.players.flatMap((p, pi) => p.hand.filter((c, ci) => {
-                            if (!IsYou(p)) {
-                                // This is a local hack for now:
-                                return ci >= keepSize;
-                            }
-
-                            return !keepCards[c];
-                        }))],
+                        ...game,
+                        players,
+                        crib,
                     }, true);
                 }}>
                 {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`}
