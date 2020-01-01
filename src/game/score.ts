@@ -15,13 +15,25 @@ const MINIMUM_RUN_LENGTH = 3;
 /** Min number of cards to count for a flush. This should probably be hand size */
 const MINIMUM_FLUSH_LENGTH = 4;
 
-export function addPlayerScore(player: PlayerState, points: number, maxPoints: number = 120) {
+export function addPlayerScore(player: PlayerState, points: number, game: GameState) {
     if (points > 0) {
         player.lastScore = player.score;
         player.score += points;
 
-        if (player.score > maxPoints) {
-            alert(player.name + " won!!");
+        if (player.score > game.rules.pointsToWin) {
+            let messages = [player.name + " won!"];
+            //skunk = 90 / 120 = 3/4
+            // TODO: handle skunk better
+            game.players.forEach(p => {
+                if (p.score < game.rules.pointsToWin * .5) {
+                    messages.push(`${p.name} was DOUBLE skunked!`);
+                }
+                else if (p.score < game.rules.pointsToWin * .75) {
+                    messages.push(`${p.name} was skunked!`);
+                }
+            })
+
+            alert(messages.join(", "));
         }
     }
 }

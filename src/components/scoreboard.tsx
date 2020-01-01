@@ -15,9 +15,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
     const players = [...props.players].sort(byPlayerName);
     return <div style={{ display: "flex", flexDirection: "column" }}>
         <div className="BoardWrapper" style={{ display: "flex", flexDirection: props.vertical ? "column" : "row" }}>
-            
             <Board players={players} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />
-            
         </div>
 
         <div style={{ textAlign: "center" }}>
@@ -47,12 +45,14 @@ const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: numbe
 
 const Board: React.FC<{ players: PlayerState[], total: number, lines: number, vertical?: boolean }> = props => {
     const { total, lines, players, vertical } = props;
+
     const perRow = Math.floor(total / lines);
     if (total / lines !== perRow) { throw "Bad choice of line numbers! doesn't divide evenly!" }
     const body: JSX.Element[] = [];
     for (let i = 0; i < lines; i++) {
         body.push(<ScoreRow key={i} players={players} dots={perRow} from={perRow * i} reverse={i % 2 !== 0} vertical={vertical} />)
     }
+
     return <div className="board" style={{ display: "flex", flexDirection: vertical ? "row" : "column", backgroundColor: boardColor }}>
         {body}
     </div>

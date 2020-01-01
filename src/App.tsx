@@ -7,8 +7,6 @@ import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import { ScoreContext, ScoreLookup, IScoreContext } from './components/scoreIcon';
 
-let scoreLookup: ScoreLookup = {};
-
 const App: React.FC = () => {
   const [scoreLookup, setScoreLookup] = React.useState<ScoreLookup>({});
   const [gameState, setGameState] = React.useState(initGameState());

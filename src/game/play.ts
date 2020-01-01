@@ -127,7 +127,7 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
 
     // SCORE
     const playScore = scorePlay(playedCards, card);
-    addPlayerScore(player, playScore.score, game.rules.pointsToWin);
+    addPlayerScore(player, playScore.score, game);
     if (scoreContext) {
         scoreContext.addPlayerScore(player, playScore);
     }
@@ -138,7 +138,7 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
 
     // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        addPlayerScore(player, SCORE_LAST_CARD, game.rules.pointsToWin);
+        addPlayerScore(player, SCORE_LAST_CARD, game);
     }
 
     return {
@@ -157,7 +157,7 @@ export function pass(game: GameState, scoreContext?: IScoreContext): GameState {
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
             scoreContext && scoreContext.addPlayerScore(player, { score: SCORE_GO, go: SCORE_GO });
-            addPlayerScore(player, SCORE_GO, game.rules.pointsToWin);
+            addPlayerScore(player, SCORE_GO, game);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];
