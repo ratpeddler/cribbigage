@@ -32,8 +32,9 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const opponent2 = opponents.length > 1 ? opponents[1] : undefined;
 
     // Opponent hands
-    const opponent1Hand = getPlayableHand(opponent1, game).map(c => game.stage == "Score" ? c : -1);
-    const opponent2Hand = opponent2 && getPlayableHand(opponent2, game).map(c => game.stage == "Score" ? c : -1);
+    const showOpponentHands = game.stage == "Score" || game.stage == "Crib";
+    const opponent1Hand = getPlayableHand(opponent1, game).map(c => showOpponentHands ? c : -1);
+    const opponent2Hand = opponent2 && getPlayableHand(opponent2, game).map(c => showOpponentHands ? c : -1);
 
     // TODO: Fix previously played cards....
     const opponent1PreviousPlayed = opponent1.hand.filter(c => playedCards.includes(c) && !opponent1.playedCards?.includes(c));
@@ -51,7 +52,6 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
-    const showOpponentHands = game.stage == "Score" || game.stage == "Crib";
 
     return <Row fill>
         {/* LEFT Board and Deck area */}
