@@ -14,6 +14,7 @@ interface SelectableHandProps {
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
     allDisabled?: boolean,
+    stacked?: boolean,
 }
 
 export function ExtractKeptCard(keepCard: KeepCard): number {

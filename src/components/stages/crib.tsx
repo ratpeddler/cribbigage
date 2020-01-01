@@ -7,22 +7,27 @@ import { scoreHand, addPlayerScore } from "../../game/score";
 import { getCurrentDealer } from "../../game/play";
 
 export const Crib: GameComponent = props => {
+    const Layout = props.layout;
     let game = { ...props.game };
-    return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-        <div style={{ flex: "auto", textAlign: "center" }}>
-            <h3>Crib for {game.players[game.players.length - 1].name}:</h3>
-            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
-                <div><Hand cards={game.crib!} /></div>
-                <div><HandScore hand={game.crib!} cut={game.cut} /></div>
+    let dealer = getCurrentDealer(game);
+    return <Layout
+        game={game}
+        userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: "auto", textAlign: "center" }}>
+                <h3>Crib for <span style={{color: dealer.color}}>{dealer.name}</span>:</h3>
+                <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+                    <div><Hand cards={game.crib!} /></div>
+                    <div><HandScore hand={game.crib!} cut={game.cut} /></div>
+                </div>
             </div>
-        </div>
-        <div style={{ textAlign: "center" }}>
-            <Button onClick={() => {
-                addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game.rules.pointsToWin)
-                props.setGameState({
-                    ...game,
-                }, true);
-            }}>Next</Button>
-        </div>
-    </div>;
+            <div style={{ textAlign: "center" }}>
+                <Button onClick={() => {
+                    addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game.rules.pointsToWin)
+                    props.setGameState({
+                        ...game,
+                    }, true);
+                }}>Next</Button>
+            </div>
+        </div>}
+    />;
 }

@@ -4,6 +4,7 @@ import { GameState } from "./game";
 import { IsYou } from "../components/stages/chooseGameMode";
 import { addPlayerScore } from "./score";
 import { PlayerState } from "./players";
+import { IScoreContext, IScore } from "./../components/scoreIcon";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -82,7 +83,7 @@ export function getCurrentDealer(game: GameState): PlayerState {
 }
 
 /** Play the AI players NOT A PURE FUNCTION */
-export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
+export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreContext?: IScoreContext): GameState {
     // Start at the next person who needs to play
     game.nextToPlay = ensureNextPlayer(game);
 
@@ -98,13 +99,13 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameSta
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
             console.log(player.name + " said GO");
-            game = pass(game);
+            game = pass(game, scoreContext);
             continue;
         }
 
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card);
+                game = playCard(game, card, scoreContext);
                 break;
             }
         }
@@ -114,7 +115,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameSta
 }
 
 
-export function playCard(game: GameState, card: Card): GameState {
+export function playCard(game: GameState, card: Card, scoreContext?: IScoreContext): GameState {
     let { playedCards = [] } = game;
     const player = getCurrentPlayer(game);
 
@@ -127,6 +128,9 @@ export function playCard(game: GameState, card: Card): GameState {
     // SCORE
     const playScore = scorePlay(playedCards, card);
     addPlayerScore(player, playScore.score, game.rules.pointsToWin);
+    if (scoreContext) {
+        scoreContext.addPlayerScore(player, playScore);
+    }
 
     // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
@@ -143,7 +147,7 @@ export function playCard(game: GameState, card: Card): GameState {
     }
 }
 
-export function pass(game: GameState): GameState {
+export function pass(game: GameState, scoreContext?: IScoreContext): GameState {
     const player = getCurrentPlayer(game);
 
     // pass to the next player and check if there has been a GO
@@ -152,6 +156,7 @@ export function pass(game: GameState): GameState {
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
+            scoreContext && scoreContext.addPlayerScore(player, { score: SCORE_GO, go: SCORE_GO });
             addPlayerScore(player, SCORE_GO, game.rules.pointsToWin);
         }
 
@@ -159,6 +164,9 @@ export function pass(game: GameState): GameState {
         game.previousPlayedCards = newPrevious;
         game.playedCards = [];
         game.players.forEach(player => player.playedCards = []);
+    }
+    else {
+        scoreContext && scoreContext.addPlayerScore(player, { score: 0 });
     }
 
     // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 
@@ -184,7 +192,7 @@ export function isPlayStageRun(cards: Hand) {
     return true;
 }
 
-export function scorePlay(playedCards: Hand, newCard: Card) {
+export function scorePlay(playedCards: Hand, newCard: Card): IScore {
     let score = 0;
     const currentCount = sumCards(playedCards);
     const newCardParsed = parseCard(newCard);
@@ -198,10 +206,10 @@ export function scorePlay(playedCards: Hand, newCard: Card) {
     }
 
     // 31
-    let thirtyone = 0;
+    let thirtyOne = 0;
     if (currentCount + newCardParsed.count === MAX_PLAY_COUNT) {
         score += SCORE_MAX_COUNT;
-        thirtyone += SCORE_MAX_COUNT;
+        thirtyOne += SCORE_MAX_COUNT;
     }
 
     // Pairs
@@ -237,5 +245,5 @@ export function scorePlay(playedCards: Hand, newCard: Card) {
     }
 
     // There are no flushes in pegging
-    return { score, runs, fifteen, thirtyone, pairs: pairScore };
+    return { score, runs, fifteen, thirtyOne, pairs: pairScore };
 }
