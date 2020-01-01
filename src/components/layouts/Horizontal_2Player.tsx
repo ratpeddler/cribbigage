@@ -51,6 +51,8 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
+    const showOpponentHands = game.stage == "Score" || game.stage == "Crib";
+
     return <Row fill>
         {/* LEFT Board and Deck area */}
         <Column justified border="1px solid lightgrey">
@@ -72,17 +74,17 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                         {dealer == opponent1 && <div>Dealer</div>}
                     </h3>
                     {/* Opponent 1 */}
-                    {opponent1Hand.length > 0 && <HandAndScore cards={opponent1Hand} stacked cut={game.stage == "Score" ? game.cut : undefined} showScore={game.stage == "Score"} />}
+                    {opponent1Hand.length > 0 && <HandAndScore cards={opponent1Hand} stacked cut={showOpponentHands ? game.cut : undefined} showScore={showOpponentHands} />}
                     {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
                     {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
-                    {opponent1Hand && game.stage == "Score" && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
+                    {opponent1Hand && showOpponentHands && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
                     <ScoreIcon player={opponent1} />
                 </Row>}
 
                 {opponent2 && <Row padding={10}>
                     {/* Opponent 2 */}
                     <ScoreIcon player={opponent2} />
-                    {opponent2Hand && game.stage == "Score" && <HandScore hand={opponent2Hand} cut={props.game.cut} />}
+                    {opponent2Hand && showOpponentHands && <HandScore hand={opponent2Hand} cut={showOpponentHands ? game.cut : undefined} />}
                     {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
                     {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
                     {opponent2Hand && opponent2Hand.length > 0 && <Hand cards={opponent2Hand} stacked />}
@@ -120,7 +122,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                         currentCount={currentCount}
                         onReorder={onReorderHand}
                     />
-                    {userHand && game.stage == "Score" && <HandScore hand={userHand} cut={props.game.cut} />}
+                    {userHand && showOpponentHands && <HandScore hand={userHand} cut={game.cut} />}
                 </Row>}
         </Column>
 
