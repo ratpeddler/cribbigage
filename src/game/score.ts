@@ -52,6 +52,7 @@ export function scoreHand(hand: Hand, cut: Hand, isCrib = false) {
     const pairs = scorePairs(cards);
     const flush = scoreFlush(hand, cut, isCrib);
     const knobs = scoreKnobs(hand, cut);
+    // TODO - Recognize the UI scoring event of CRIBBIGAGE  
 
     return {
         score: fifteen + pairs + knobs + runs + flush,
