@@ -1,6 +1,6 @@
 
 import React from "react";
-import { parseCard, parseNumericalValue, Value, Suit } from "../game/card";
+import { parseCard, parseRank } from "../game/card";
 import old from "./../cards/bike_old.jpg";
 import red from "./../cards/bike_red.jpg";
 import dragon from "./../cards/bike_dragon.jpg";
@@ -80,7 +80,7 @@ export const Card: React.FC<CardProps> = props => {
 const CardFace: React.FC<{ card: number, width: number, disabled?: boolean }> = props => {
     const { card, width, disabled } = props;
     const { value, suit } = parseCard(card);
-    const raw = parseNumericalValue(card);
+    const raw = parseRank(card);
     return <img
         alt={`${value} of ${suit}`}
         style={disabled ? { filter: "grayscale(100%)" } : {}}

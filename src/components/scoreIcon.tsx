@@ -61,8 +61,6 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
 
     // If the last log was the player we can show that instead?
     if (logContext.log[0].startsWith(props.player.name)) {
-        console.log("log match!");
-
         if (!logContext.log[0].includes("played")) {
             // don't show just plays
             logString = logContext.log[0];

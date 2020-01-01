@@ -1,4 +1,4 @@
-import { parseCard, parseNumericalValue, Suit } from "./card";
+import { parseCard, parseRank, Suit } from "./card";
 import { Hand } from "./deal";
 import { PlayerState } from "./players";
 import { GameState } from "./game";
@@ -170,7 +170,7 @@ function scoreRuns(hand: Hand) {
     let score = 0;
 
     // sort the hand by raw numerical value. This is by rank and ignores suit.
-    cards = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    cards = cards.map(parseRank).sort((a, b) => a - b);
 
     // Look for contiguous sections
     let run: number[] = [];

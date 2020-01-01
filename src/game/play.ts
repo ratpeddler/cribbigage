@@ -1,5 +1,5 @@
 import { Hand } from "./deal";
-import { Card, parseCard, parseNumericalValue } from "./card";
+import { Card, parseCard, parseRank } from "./card";
 import { GameState } from "./game";
 import { IsYou } from "../components/stages/chooseGameMode";
 import { addPlayerScore } from "./score";
@@ -90,6 +90,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
 
     let keepRunning = true;
     while (!IsYou(getCurrentPlayer(game)) && keepRunning) {
+        console.log("playing ai " + getCurrentPlayer(game).name);
         if (!autoAdvanceUntilPlayer) { keepRunning = false; }
         game.nextToPlay = ensureNextPlayer(game); // Not sure if needed anymore..
 
@@ -104,13 +105,61 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
             continue;
         }
 
-        // TODO: Pick the best card to play!
+        const currentCount = sumCards(playedCards);
+        const prevCard = playedCards[playedCards.length - 1];
+   
+        // Common cases to greedily play
+        let cardPlayed = false;
+        for (let card of hand) {  
+            const cp = parseCard(card);
+            if (currentCount + cp.count === 15 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
+                game = playCard(game, card, scoreContext, logContext);
+                cardPlayed = true;
+                console.log("Greedy 15 play")
+                break;
+            }
+            if (currentCount + cp.count === 31 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
+                game = playCard(game, card, scoreContext, logContext);
+                cardPlayed = true;
+                console.log("Greedy 31 play")
+                break;
+            }
+        } 
+
+        // Common cases to avoid
+        if (cardPlayed) continue;
+        for (let card of hand) {
+            const cp = parseCard(card);
+            const pcp = prevCard != undefined && parseCard(prevCard);
+
+            if (currentCount + cp.count === 5) {
+                console.log("Avoid 5 count");
+                continue; // Avoid 5 Count
+            }
+            if (currentCount + cp.count === 21) {
+                console.log("Avoid 21 count");
+                continue; // Avoid 21
+            }
+            if (pcp && (pcp.rank === cp.rank - 1 || pcp.rank === cp.rank + 1)) {
+                console.log("Avoid 2 card sequence")
+                continue; // Avoid 2 card sequences
+            }
+            if (canPlay(playedCards, card)) {
+                game = playCard(game, card, scoreContext, logContext);
+                cardPlayed = true;
+                break;
+            }
+        }
+
+        // In case you can't avoid the bad situations
+        if (cardPlayed) continue;
+       console.log("fallback and play a card");
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
                 game = playCard(game, card, scoreContext, logContext);
                 break;
             }
-        }
+        } 
     }
 
     return game;
@@ -133,7 +182,7 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
         scoreContext.addPlayerScore(player, playScore);
     }
 
-    if(!playScore || !playScore.score){
+    if (!playScore || !playScore.score) {
         logContext && logContext.addPlayLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit);
     }
 
@@ -184,7 +233,7 @@ export function pass(game: GameState, scoreContext?: IScoreContext, logContext?:
 
 export function isPlayStageRun(cards: Hand) {
     // order doesn't matter
-    let sorted = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    let sorted = cards.map(parseRank).sort((a, b) => a - b);
     let last: number | undefined = undefined;
     for (let card of sorted) {
         if (last === undefined || card === last + 1) {
