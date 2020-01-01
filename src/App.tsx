@@ -6,8 +6,7 @@ import { initGameState } from './game/game';
 import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import { ScoreContext, ScoreLookup, IScoreContext } from './components/scoreIcon';
-
-let scoreLookup: ScoreLookup = {};
+import _ from 'lodash';
 
 const App: React.FC = () => {
   const [scoreLookup, setScoreLookup] = React.useState<ScoreLookup>({});
@@ -44,7 +43,23 @@ const App: React.FC = () => {
               game = AdvanceGameState(game);
             }
 
-            setGameState(game);
+            // this is where to check for player score changes
+
+            let oldAndNew = gameState.players.map(p => {
+              // find old player
+              return {
+                old: p,
+                new: newGame.players.find(op => op.name == p.name)
+              }
+            });
+
+            for (let item of oldAndNew) {
+              if (item.new?.score != item.old?.score) {
+                console.log(`${item?.new?.name}'s score change from ${item.old?.score} to ${item.new?.score}`);
+              }
+            }
+
+            setGameState(_.cloneDeep(game));
           }}
         />
       </div>

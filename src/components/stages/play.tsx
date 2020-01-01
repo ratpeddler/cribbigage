@@ -26,13 +26,33 @@ export const Play: GameComponent = props => {
     const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
 
     const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
+ 
+const passYourTurn = () => {
+    // Reset the current selection
+    setKeepCard({});
+    // always advance on pass?
+    setGameState(AutoAdvanceToYourTurn
+        ? playAI(pass(game, scoreContext), true, scoreContext)
+        : pass(game, scoreContext), false);
+}
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
-        if (AutoAdvanceToYourTurn) {
-            //console.log("checking if user should play", game.nextToPlay)
-            let nextToPlay = game.nextToPlay || 0;
-            if (!IsYou(players[nextToPlay])) {
+        // special case for "GO" OR "31"
+
+        if(sumCards(game.playedCards || []) == 31){
+            if(isYourTurn){
+                passYourTurn();
+            }
+            else {
+                // Quickly run all the AI's until your turn
+                // TODO: ACTUALLY: this should be run instantly until we have gone around the table and it is no longer GO
+                setGameState(playAI(game, true, scoreContext), false);
+            }
+        }
+
+        else if (AutoAdvanceToYourTurn) {
+            if (!isYourTurn) {
                 setGameState(playAI(game, true, scoreContext), false);
             }
         }
@@ -88,14 +108,7 @@ export const Play: GameComponent = props => {
                 </Button>}
 
             {cantPlay && isYourTurn && !playStageOver(game) &&
-                <Button disabled={!cantPlay} onClick={() => {
-                    // Reset the current selection
-                    setKeepCard({});
-                    // always advance on pass?
-                    setGameState(AutoAdvanceToYourTurn
-                        ? playAI(pass(game, scoreContext), true, scoreContext)
-                        : pass(game, scoreContext), false);
-                }}>
+                <Button disabled={!cantPlay} onClick={passYourTurn}>
                     Pass
                 </Button>}
 

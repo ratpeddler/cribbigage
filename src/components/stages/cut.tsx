@@ -10,7 +10,7 @@ export const Cut: GameComponent = props => {
     // Check for jack cut. Points go to the dealer.
     let jackCutScore = 0;
     props.game.cut?.filter(c => parseCard(c).value == "Jack").forEach(() => jackCutScore += SCORE_PER_JACK_CUT);
-    addPlayerScore(getCurrentDealer(props.game), jackCutScore, props.game.rules.pointsToWin);
+    addPlayerScore(getCurrentDealer(props.game), jackCutScore, props.game);
     props.setGameState(props.game, true);
     return <div>
         Cutting...
