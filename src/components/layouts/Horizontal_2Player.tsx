@@ -98,11 +98,17 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 
             </Row>
 
-            {user.playedCards && user.playedCards.length > 0 &&
-                <Row justified>
+            {/* Row for your played cards and ALL previous played cards */}
+            <Row >
+                {game.previousPlayedCards && game.previousPlayedCards.length > 0 &&
+                    <Column padding={5}>
+                        <h3>Previously played cards</h3>
+                        <Hand cards={game.previousPlayedCards} stacked />
+                    </Column>}
+                {user.playedCards && user.playedCards.length > 0 && <Row justified fill>
                     <Hand cards={user.playedCards} />
-                    <ScoreIcon player={user} />
-                </Row>}
+                    <ScoreIcon player={user} /></Row>}
+            </Row>
 
             <Column fill justified centered>
                 {currentCount !== undefined && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}

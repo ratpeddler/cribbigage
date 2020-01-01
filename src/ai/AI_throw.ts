@@ -18,7 +18,6 @@ export function throwAI(player: PlayerState, game: GameState) {
     allHands(player.hand, game.rules.keepSize).forEach(hand =>
         {
             const score = scoreHand(hand, []).score;
-            console.log(score);
             if(score > maxScore){
                 maxScore = score;
                 maxHand = hand;

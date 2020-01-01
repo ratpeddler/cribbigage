@@ -4,9 +4,12 @@ import { RunDeal } from "../../game/deal";
 import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
 import { getCurrentDealer } from "../../game/play";
+import { PlayLogContext } from "../playLog";
 
 export const Deal: GameComponent = props => {
     const Layout = props.layout;
+    const logContext = React.useContext(PlayLogContext);
+
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
 
@@ -16,6 +19,8 @@ export const Deal: GameComponent = props => {
                 props.setGameState(RunDeal(props.game), true);
             }, 1000);
         }
+
+        logContext.addPlayLog(dealer, "is dealer");
     }, []);
 
     // TODO: Animate dealing

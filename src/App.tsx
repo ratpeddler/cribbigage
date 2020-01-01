@@ -30,7 +30,7 @@ const App: React.FC = () => {
     }
   }, [gameState, gameState.players]);
 
-  // console.log(JSON.stringify(gameState));
+  console.log(JSON.stringify(gameState));
 
   // Some race conditions here!
   const scoreContext = React.useMemo<IScoreContext>(() => {
