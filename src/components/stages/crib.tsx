@@ -10,6 +10,14 @@ export const Crib: GameComponent = props => {
     const Layout = props.layout;
     let game = { ...props.game };
     let dealer = getCurrentDealer(game);
+
+    React.useEffect(()=>{
+        setTimeout(() => {
+            addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
+            props.setGameState(game, false);
+        }, 500);
+    }, []);
+
     return <Layout
         game={game}
         userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
@@ -22,7 +30,6 @@ export const Crib: GameComponent = props => {
             </div>
             <div style={{ textAlign: "center" }}>
                 <Button onClick={() => {
-                    addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
                     props.setGameState({
                         ...game,
                     }, true);
