@@ -29,7 +29,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
         for (let pi = 0; pi < players.length; pi++) {
             const p = players[pi];
             if (p.lastScore > fakedPlayers[pi].lastScore) {
-                console.log(`player last score was ${p.lastScore} old last score was ${fakedPlayers[pi].lastScore}`)
+                //console.log(`player last score was ${p.lastScore} old last score was ${fakedPlayers[pi].lastScore}`)
                 // TODO: how to "leap frog" the scores?
                 // count last score -> new last score, then score to score?
                 anyUpdates = true;
@@ -49,7 +49,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
                 break;
             }
             else if (p.score > fakedPlayers[pi].score) {
-                console.log(`player score was ${p.score} old score was ${fakedPlayers[pi].score}`)
+                //console.log(`player score was ${p.score} old score was ${fakedPlayers[pi].score}`)
                 anyUpdates = true;
                 // TODO: how to "leap frog" the scores?
                 // count last score -> new last score, then score to score?

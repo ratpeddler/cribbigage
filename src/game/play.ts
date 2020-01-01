@@ -5,6 +5,7 @@ import { IsYou } from "../components/stages/chooseGameMode";
 import { addPlayerScore } from "./score";
 import { PlayerState } from "./players";
 import { IScoreContext, IScore } from "./../components/scoreIcon";
+import { IPlayLogContext } from "../components/playLog";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -83,7 +84,7 @@ export function getCurrentDealer(game: GameState): PlayerState {
 }
 
 /** Play the AI players NOT A PURE FUNCTION */
-export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreContext?: IScoreContext): GameState {
+export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
     // Start at the next person who needs to play
     game.nextToPlay = ensureNextPlayer(game);
 
@@ -99,13 +100,14 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
             console.log(player.name + " said GO");
-            game = pass(game, scoreContext);
+            game = pass(game, scoreContext, logContext);
             continue;
         }
 
+        // TODO: Pick the best card to play!
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card, scoreContext);
+                game = playCard(game, card, scoreContext, logContext);
                 break;
             }
         }
@@ -114,8 +116,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
     return game;
 }
 
-
-export function playCard(game: GameState, card: Card, scoreContext?: IScoreContext): GameState {
+export function playCard(game: GameState, card: Card, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
     let { playedCards = [] } = game;
     const player = getCurrentPlayer(game);
 
@@ -130,6 +131,10 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
     addPlayerScore(player, playScore.score, game);
     if (scoreContext) {
         scoreContext.addPlayerScore(player, playScore);
+    }
+
+    if(!playScore || !playScore.score){
+        logContext && logContext.addPlayLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit);
     }
 
     // Add played cards
@@ -147,8 +152,9 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
     }
 }
 
-export function pass(game: GameState, scoreContext?: IScoreContext): GameState {
+export function pass(game: GameState, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
     const player = getCurrentPlayer(game);
+    logContext && logContext.addPlayLog(player, "said GO");
 
     // pass to the next player and check if there has been a GO
     if (game.lastToPlay != undefined && game.nextToPlay === game.lastToPlay) {

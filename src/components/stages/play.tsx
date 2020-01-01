@@ -5,6 +5,7 @@ import { Button } from "../button";
 import { sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer, getCurrentPlayer, getPlayableHand } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
 import { ScoreContext } from "../scoreIcon";
+import { PlayLogContext } from "../playLog";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
@@ -12,6 +13,7 @@ const SlowAIDelay = 1200; // 1.2 seconds
 
 export const Play: GameComponent = props => {
     const Layout = props.layout;
+    const logContext = React.useContext(PlayLogContext);
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const scoreContext = React.useContext(ScoreContext);
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
@@ -32,37 +34,38 @@ export const Play: GameComponent = props => {
         setKeepCard({});
         // always advance on pass?
         setGameState(AutoAdvanceToYourTurn
-            ? playAI(pass(game, scoreContext), true, scoreContext)
-            : pass(game, scoreContext), false);
+            ? playAI(pass(game, scoreContext, logContext), true, scoreContext, logContext)
+            : pass(game, scoreContext, logContext), false);
     }
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
         // special case for "GO" OR "31"
-
         if (sumCards(game.playedCards || []) == 31) {
             if (isYourTurn) {
-                passYourTurn();
+                setTimeout(() => {
+                    passYourTurn();
+                }, SlowAIDelay);
             }
             else {
                 // Add some time out here
                 setTimeout(() => {
                     console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
-                    setGameState(playAI(game, false, scoreContext), false);
+                    setGameState(playAI(game, false, scoreContext, logContext), false);
                 }, SlowAIDelay);
             }
         }
 
         else if (AutoAdvanceToYourTurn) {
             if (!isYourTurn) {
-                setGameState(playAI(game, true, scoreContext), false);
+                setGameState(playAI(game, true, scoreContext, logContext), false);
             }
         }
         else if (SlowAdvanceToYourTurn && !isYourTurn) {
             // Add some time out here
             setTimeout(() => {
                 console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
-                setGameState(playAI(game, false, scoreContext), false);
+                setGameState(playAI(game, false, scoreContext, logContext), false);
             }, SlowAIDelay);
         }
     }, [game.nextToPlay, isYourTurn]);
@@ -90,7 +93,7 @@ export const Play: GameComponent = props => {
             {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
             {!isYourTurn && !SlowAdvanceToYourTurn && <Button
-                onClick={() => { setGameState(playAI(game, false), false) }}>
+                onClick={() => { setGameState(playAI(game, false, scoreContext, logContext), false) }}>
                 AI's turn
                 </Button>}
 
@@ -103,8 +106,8 @@ export const Play: GameComponent = props => {
                         setKeepCard({});
                         // only have PLAYAI if you want to auto advance!
                         setGameState(AutoAdvanceToYourTurn
-                            ? playAI(playCard(game, playedCard, scoreContext), false, scoreContext)
-                            : playCard(game, playedCard, scoreContext), false);
+                            ? playAI(playCard(game, playedCard, scoreContext, logContext), false, scoreContext, logContext)
+                            : playCard(game, playedCard, scoreContext, logContext), false);
                     }}>
                     {disabled ? "Select a card to play" : "Play selected card"}
                 </Button>}

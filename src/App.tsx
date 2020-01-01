@@ -7,12 +7,23 @@ import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import { ScoreContext, ScoreLookup, IScoreContext, createScoreMessage } from './components/scoreIcon';
 import _ from 'lodash';
-import { PlayLogContext } from './components/playLog';
+import { PlayLogContext, IPlayLogContext } from './components/playLog';
+import { PlayerState } from './game/players';
 
 const App: React.FC = () => {
   const [scoreLookup, setScoreLookup] = React.useState<ScoreLookup>({});
   const [gameState, setGameState] = React.useState(initGameState());
   const [playLog, setPlayLog] = React.useState(["Game started. Have fun!"]);
+
+  const addPlayLog = React.useCallback((player: PlayerState, newLog: string)=> {
+    setPlayLog([player.name + " " + newLog, ...playLog])
+  }, [playLog, setPlayLog]);
+
+  const PlayLogContextValue = React.useMemo<IPlayLogContext>(()=>({
+    log: playLog,
+    addPlayLog
+  }), [playLog, addPlayLog]);
+
   React.useEffect(() => {
     if (anyPlayerHasWon(gameState)) {
       setGameState(initGameState());
@@ -27,7 +38,7 @@ const App: React.FC = () => {
       lookup: scoreLookup,
       addPlayerScore: (player, score) => {
         if(score.score > 0){
-          setPlayLog([player.name + " " + createScoreMessage(score), ...playLog])
+          addPlayLog(player, createScoreMessage(score));
         }
 
         setScoreLookup({ [player.name]: score });
@@ -37,7 +48,7 @@ const App: React.FC = () => {
 
   return (
     <ScoreContext.Provider value={scoreContext}>
-      <PlayLogContext.Provider value={playLog}>
+      <PlayLogContext.Provider value={PlayLogContextValue}>
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
           <Game
             layout={Horizontal2PlayerLayout}
