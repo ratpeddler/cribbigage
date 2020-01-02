@@ -5,6 +5,7 @@ import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
 import { getCurrentDealer } from "../../game/play";
 import { PlayLogContext } from "../playLog";
+import { playShuffleSound, playDealSound, Repeat } from "../../sounds/playSound";
 
 export const Deal: GameComponent = props => {
     const Layout = props.layout;
@@ -13,10 +14,13 @@ export const Deal: GameComponent = props => {
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
 
+    playShuffleSound();
+
     React.useEffect(() => {
         if (!yourCrib) {
             setTimeout(() => {
                 props.setGameState(RunDeal(props.game, logContext), true);
+                Repeat(playDealSound, 10, 250);
             }, 1000);
         }
 
@@ -34,6 +38,7 @@ export const Deal: GameComponent = props => {
                 big={true}
                 onClick={() => {
                     props.setGameState(RunDeal(props.game, logContext), true);
+                    Repeat(playDealSound, 10, 250);
                 }}
             >
                 {yourCrib ? "Deal" : `${dealer.name} is dealing...`}

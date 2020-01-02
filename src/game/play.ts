@@ -5,6 +5,7 @@ import { addPlayerScore } from "./score";
 import { PlayerState } from "./players";
 import { IScore } from "./../components/scoreIcon";
 import { IPlayLogContext } from "../components/playLog";
+import { playCardSound } from "../sounds/playSound";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -108,6 +109,8 @@ export function playCard(game: GameState, card: Card, logContext: IPlayLogContex
     }
     
     logContext.addLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
+
+    playCardSound();
 
     return {
         ...game,
