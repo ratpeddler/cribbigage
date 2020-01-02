@@ -28,22 +28,22 @@ export function createScoreMessage(score: IScore) {
             scoreStrings.push("15 for " + score.fifteen);
         }
         if (score.pairs) {
-            scoreStrings.push("pair for " + score.pairs);
+            scoreStrings.push("Pair for " + score.pairs);
         }
         if (score.runs) {
-            scoreStrings.push("run for " + score.runs);
+            scoreStrings.push("Run for " + score.runs);
         }
         if (score.thirtyOne) {
             scoreStrings.push("31 for " + score.thirtyOne);
         }
         if (score.knobs) {
-            scoreStrings.push("knobs for " + score.knobs);
+            scoreStrings.push("Knobs for " + score.knobs);
         }
         if (score.flush) {
-            scoreStrings.push("flush for " + score.flush);
+            scoreStrings.push("Flush for " + score.flush);
         }
         if (score.go) {
-            scoreStrings.push("go for " + score.go);
+            scoreStrings.push("Go for " + score.go);
         }
     }
 
@@ -68,6 +68,6 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
     }
 
     return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24 }}>
-        {score && score.score > 0 ? "+" + scoreString + "!" : logString}
+        {score && score.score > 0 ? scoreString + "!" : logString}
     </div>;
 }

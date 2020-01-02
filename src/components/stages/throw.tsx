@@ -39,7 +39,7 @@ export const Throw: GameComponent = props => {
         }}
         userActions={() => <>
             <h3 style={{ textAlign: "center" }}>
-                Select which cards you will keep and which you will discard to {yourCrib ? "your" : dealer.name + "'s"} crib.
+                Select which cards you will keep and which you will discard to <span style={{ color: dealer.color }}>{yourCrib ? "your" : dealer.name + "'s"} crib</span>.
             <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
             </h3>
             <Button

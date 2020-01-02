@@ -27,6 +27,7 @@ const App: React.FC = () => {
   React.useEffect(() => {
     if (anyPlayerHasWon(gameState)) {
       setGameState(initGameState());
+      setPlayLog([]);
     }
   }, [gameState, gameState.players]);
 

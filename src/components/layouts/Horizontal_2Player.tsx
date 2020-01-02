@@ -27,10 +27,15 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 
     if (players.length > 3) { throw "2-3 player only layout for now!" }
 
+    // Get table order of the people (start at you and then go around!)
+    let yourIndex = players.findIndex(IsYou);
+    let tableOrder = [...players.slice(yourIndex), ...players.slice(0, yourIndex)];
+    let tableOrderOpponents = tableOrder.filter(p => !IsYou(p));
+
     // Opponent properties
-    const opponents = players.filter(p => !IsYou(p));
-    const opponent1 = opponents[0];
-    const opponent2 = opponents.length > 1 ? opponents[1] : undefined;
+    //const opponents = players.filter(p => !IsYou(p));
+    const opponent1 = tableOrderOpponents[0];
+    const opponent2 = tableOrderOpponents.length > 1 ? tableOrderOpponents[1] : undefined;
 
     // Opponent hands
     const showOpponentHands = game.stage == "Score" || game.stage == "Crib";
@@ -44,9 +49,9 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     // User properties
     const user = players.filter(IsYou)[0];
     const userHand = getPlayableHand(user, game);
-    const userPreviouslyPlayed = user.hand.filter(c => playedCards.includes(c) && !user.playedCards?.includes(c))
     const dealer = getCurrentDealer(game);
     const yourCrib = user === dealer;
+    const currentPlayer = game.stage == "Play" && getCurrentPlayer(game);
     const isYourTurn = IsYou(getCurrentPlayer(game));
 
     // Stage specifics
@@ -70,10 +75,11 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
         <Column fill>
             {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
             <Row spaceBetween={!!opponent2} justified={!opponent2}>
-                {opponent1 && <Row padding={10}>
+                {opponent1 && <Row padding={10} border={currentPlayer == opponent1 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
                     <h3 style={{ color: opponent1.color }}>
                         {opponent1.name}
                         {dealer == opponent1 && <div>Dealer</div>}
+                        {currentPlayer == opponent1 && <div>Playing</div>}
                     </h3>
                     {/* Opponent 1 */}
                     {opponent1Hand.length > 0 && <HandAndScore cards={opponent1Hand} stacked cut={showOpponentHands ? game.cut : undefined} showScore={showOpponentHands} />}
@@ -83,7 +89,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                     <ScoreIcon player={opponent1} />
                 </Row>}
 
-                {opponent2 && <Row padding={10}>
+                {opponent2 && <Row padding={10} border={currentPlayer == opponent2 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
                     {/* Opponent 2 */}
                     <ScoreIcon player={opponent2} />
                     {opponent2Hand && showOpponentHands && <HandScore hand={opponent2Hand} cut={showOpponentHands ? game.cut : undefined} />}
@@ -93,6 +99,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                     <h3 style={{ color: opponent2.color }}>
                         {opponent2.name}
                         {dealer == opponent2 && <div>Dealer</div>}
+                        {currentPlayer == opponent2 && <div>Playing</div>}
                     </h3>
                 </Row>}
 
@@ -115,12 +122,15 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                 {props.userActions?.()}
             </Column>
 
+            {userHand && userHand.length > 0 && <Row justified centered>
+                <h3 style={{ color: user.color }}>
+                    Your hand
+                    </h3>
+            </Row>}
+
             {userHand && userHand.length > 0 &&
                 <Row justified fill alignStart>
-                    <h3 style={{ color: user.color }}>
-                        You
-                        {IsYou(dealer) && <div>Dealer</div>}
-                    </h3>
+
                     <HandAndScore
                         allDisabled={game.stage != "Throw" && !showOpponentHands && !isYourTurn}
                         cards={userHand}

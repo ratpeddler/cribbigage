@@ -41,8 +41,12 @@ export function checkDeck(deck: number[]) {
 }
 
 export function shuffleDeck(deck: number[]): Deck {
-    const shuffle = deck.map(card => ({ card, random: Math.random() }));
-    const newDeck = [...shuffle].sort((a, b) => {
+    return shuffle(deck);
+}
+
+export function shuffle<T>(items: T[]): T[] {
+    const shuffle = items.map(item => ({ item, random: Math.random() }));
+    const newItems = [...shuffle].sort((a, b) => {
         if (a.random > b.random) {
             return 1;
         }
@@ -52,7 +56,7 @@ export function shuffleDeck(deck: number[]): Deck {
         return -1;
     });
 
-    return newDeck.map(wrapper => wrapper.card);
+    return newItems.map(wrapper => wrapper.item);
 }
 
 export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cribExtra = 0, cutCount = 1) {

@@ -13,16 +13,19 @@ export function throwAI(player: PlayerState, game: GameState) {
     const haveCrib = getCurrentDealer(game) == player;
 
     // go through and try scoring all the hands
-    let maxScore = 0;
+    let maxScore = -1;
     let maxHand: Hand = [];
-    allHands(player.hand, game.rules.keepSize).forEach(hand =>
-        {
-            const score = scoreHand(hand, []).score;
-            if(score > maxScore){
-                maxScore = score;
-                maxHand = hand;
-            }
-        });
+    allHands(player.hand, game.rules.keepSize).forEach(hand => {
+        const score = scoreHand(hand, []).score;
+        if (score > maxScore) {
+            maxScore = score;
+            maxHand = hand;
+        }
+    });
+
+    if (maxHand.length != game.rules.keepSize || maxScore < 0) {
+        throw "INVALID DISCARD Attempt by AI!"
+    }
 
     return {
         keep: maxHand,
@@ -46,7 +49,7 @@ function allSets<T extends number | string | object>(items: T[]): T[][] {
 
         let [x, ...rest] = items;
         let otherAdditions = allSets(rest);
-        return [[x], ...otherAdditions.map(v => ([x, ...v])), ...otherAdditions ];
+        return [[x], ...otherAdditions.map(v => ([x, ...v])), ...otherAdditions];
     }
 
     return [];
