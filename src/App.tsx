@@ -54,7 +54,7 @@ const App: React.FC = () => {
               setGameState(_.cloneDeep(game));
             }}
           />
-          <div style={{position:"fixed", bottom: 0, right: 0, padding: 10, fontSize: 12}}>© 2019</div>
+          <div style={{position:"fixed", bottom: 0, right: 0, padding: 10, fontSize: 10}}>© 2019 aiplayers.com</div>
         </div>
       </PlayLogContext.Provider>
   );
