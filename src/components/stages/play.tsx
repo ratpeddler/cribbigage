@@ -48,7 +48,7 @@ export const Play: GameComponent = props => {
         ev.stopPropagation();
         const playedCard = parseInt(ev.dataTransfer.getData("text/plain"));
 
-        if(isNaN(playedCard)){
+        if (isNaN(playedCard)) {
             throw "played card was NAN";
         }
 
@@ -122,7 +122,7 @@ export const Play: GameComponent = props => {
             onDrop={onDrop}
         >
             {!stageIsOver && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
-            {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
+            {stageIsOver || isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
             {!isYourTurn && !SlowAdvanceToYourTurn && <Button
                 onClick={() => { setGameState(playAI(game, false, logContext), false) }}>

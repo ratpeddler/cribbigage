@@ -17,12 +17,13 @@ export interface LayoutProps {
     setSelectedCards?: (newValue: SelectedCards) => void,
     maxSelectedCards?: number,
     onReorderHand?: (newHand: number[]) => void,
+    hideScores?: boolean;
 }
 
 // This layout is designed for 2 players with the board on the side optimised for desktops (Landscape)
 // Opponent is always TOP, the user is always BOTTOM
 export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
-    const { game, selectedCards, setSelectedCards, maxSelectedCards, onReorderHand } = props;
+    const { game, selectedCards, setSelectedCards, maxSelectedCards, onReorderHand, hideScores } = props;
     const { players, playedCards = [] } = game;
 
     if (players.length > 3) { throw "2-3 player only layout for now!" }
@@ -75,22 +76,25 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             {/* Opposite opponent hand area (this could fit 1-2 hands and played cards probably.) */}
             <Row spaceBetween={!!opponent2} justified={!opponent2}>
                 {opponent1 && <Row padding={10} border={currentPlayer == opponent1 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
-                    <h3 style={{ color: opponent1.color }}>
-                        {opponent1.name}
-                        {dealer == opponent1 && <div>Dealer</div>}
-                        {currentPlayer == opponent1 && <div>Playing</div>}
-                    </h3>
                     {/* Opponent 1 */}
-                    {opponent1Hand.length > 0 && <HandAndScore cards={opponent1Hand} stacked cut={showOpponentHands ? game.cut : undefined} showScore={showOpponentHands} />}
-                    {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
-                    {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
-                    {opponent1Hand && showOpponentHands && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
-                    <ScoreIcon player={opponent1} />
+                    <Column centered>
+                        <h3 style={{ color: opponent1.color }}>
+                            {opponent1.name}
+                            {dealer == opponent1 && " (has crib)"}
+                        </h3>
+                        <Row>
+                            {opponent1Hand.length > 0 && <HandAndScore cards={opponent1Hand} stacked cut={showOpponentHands ? game.cut : undefined} showScore={showOpponentHands} />}
+                            {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
+                            {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
+                            {opponent1Hand && showOpponentHands && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
+                            {hideScores && <ScoreIcon player={opponent1} />}
+                        </Row>
+                    </Column>
                 </Row>}
 
                 {opponent2 && <Row padding={10} border={currentPlayer == opponent2 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
                     {/* Opponent 2 */}
-                    <ScoreIcon player={opponent2} />
+                    {hideScores && <ScoreIcon player={opponent2} />}
                     {opponent2Hand && showOpponentHands && <HandScore hand={opponent2Hand} cut={showOpponentHands ? game.cut : undefined} />}
                     {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
                     {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
@@ -113,7 +117,8 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                     </Column>}
                 {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd>
                     <Hand cards={user.playedCards} />
-                    <ScoreIcon player={user} /></Row>}
+                    {hideScores && <ScoreIcon player={user} />}
+                </Row>}
             </Row>
 
             <Column fill justified centered>

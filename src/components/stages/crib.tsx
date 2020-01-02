@@ -19,6 +19,7 @@ export const Crib: GameComponent = props => {
     }, []);
 
     return <Layout
+        hideScores
         game={game}
         userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: "auto", textAlign: "center" }}>

@@ -27,12 +27,14 @@ export const ScoreStage: GameComponent = props => {
     }, []);
 
     return <Layout
+        hideScores
         game={props.game}
         userActions={() =>
             <Button onClick={() => {
                 props.setGameState(game, true);
             }}>
                 Next
-            </Button>}
+            </Button>
+        }
     />;
 }
