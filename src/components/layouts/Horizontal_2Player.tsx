@@ -8,6 +8,7 @@ import { Hand, HandAndScore } from "../hand";
 import { ScoreIcon } from "../scoreIcon";
 import { HandScore } from "../handScore";
 import { PlayLog } from "../playLog";
+import { GameDragEvent } from "../card";
 
 export type SelectedCards = { [card: number]: boolean };
 export interface LayoutProps {
@@ -18,6 +19,8 @@ export interface LayoutProps {
     maxSelectedCards?: number,
     onReorderHand?: (newHand: number[]) => void,
     hideScores?: boolean;
+    onDragOverPlayedCards?: GameDragEvent,
+    onDropOverPlayedCards?: GameDragEvent,
 }
 
 // This layout is designed for 2 players with the board on the side optimised for desktops (Landscape)
@@ -109,13 +112,13 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             </Row>
 
             {/* Row for your played cards and ALL previous played cards */}
-            <Row >
+            <Row onDragOver={props.onDragOverPlayedCards} onDrop={props.onDropOverPlayedCards}>
                 {game.previousPlayedCards && game.previousPlayedCards.length > 0 &&
                     <Column padding={5}>
                         <h3>Previously played cards</h3>
                         <Hand cards={game.previousPlayedCards} stacked />
                     </Column>}
-                {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd>
+                {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd onDragOver={props.onDragOverPlayedCards} onDrop={props.onDropOverPlayedCards}>
                     <Hand cards={user.playedCards} />
                     {!hideScores && <ScoreIcon player={user} />}
                 </Row>}
@@ -160,18 +163,28 @@ interface FlexProps {
     alignEnd?: boolean;
     border?: string;
     overflow?: string;
+    onDragOver?: GameDragEvent;
+    onDrop?: GameDragEvent;
 }
 
 export const Column: React.FC<FlexProps> = props => {
-    return <div style={{ flexDirection: "column", ...styles(props) }}>{props.children}</div>
+    return <div style={{ flexDirection: "column", ...styles(props) }} {...divProps(props)}>{props.children}</div>
 }
 
 export const Row: React.FC<FlexProps> = props => {
-    return <div style={{ flexDirection: "row", ...styles(props) }}>{props.children}</div>
+    return <div style={{ flexDirection: "row", ...styles(props) }} {...divProps(props)}>{props.children}</div>
 }
 
 export const Fill: React.FC<FlexProps> = props => {
-    return <div style={{ flex: "auto" }}>{props.children}</div>
+    return <div style={{ flex: "auto" }} {...divProps(props)}>{props.children}</div>
+}
+
+function divProps(props: FlexProps) {
+    console.log(props.onDragOver);
+    return {
+        onDragOver: props.onDragOver,
+        onDrop: props.onDrop,
+    }
 }
 
 function styles(props: FlexProps) {
