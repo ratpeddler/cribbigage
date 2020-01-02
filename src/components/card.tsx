@@ -16,9 +16,9 @@ type CardProps = {
     superStacked?: boolean;
     disabled?: boolean;
     dragProps?: {
-        onDragOver: (ev: React.DragEvent<HTMLDivElement>) => void,
-        onDragStart: (ev: React.DragEvent<HTMLDivElement>) => void,
-        onDrop: (ev: React.DragEvent<HTMLDivElement>) => void
+        onDragOver?: (ev: React.DragEvent<HTMLDivElement>) => void,
+        onDragStart?: (ev: React.DragEvent<HTMLDivElement>) => void,
+        onDrop?: (ev: React.DragEvent<HTMLDivElement>) => void
     }
 };
 
@@ -32,8 +32,16 @@ export const SuperStackedTopMargin = -1;
 export const Card: React.FC<CardProps> = props => {
     const { card, selected, onClick, stacked, disabled, dragProps, superStacked, index } = props;
 
+    const onDragStart = React.useCallback((ev: React.DragEvent<HTMLDivElement>) => {
+        ev.persist();
+        console.log("setting data", card.toString());
+        ev.dataTransfer.setData("text/plain", card.toString());
+        ev.dataTransfer.dropEffect = "move";
+    }, [card]);
+
     return <div
-        draggable={!!dragProps}
+        draggable
+        onDragStart={onDragStart}
         {...dragProps}
         style={{
             maxHeight: CardWidth * 1.45,

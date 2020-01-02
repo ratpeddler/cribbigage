@@ -111,7 +111,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                         <h3>Previously played cards</h3>
                         <Hand cards={game.previousPlayedCards} stacked />
                     </Column>}
-                {user.playedCards && user.playedCards.length > 0 && <Row justified fill>
+                {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd>
                     <Hand cards={user.playedCards} />
                     <ScoreIcon player={user} /></Row>}
             </Row>
@@ -152,6 +152,7 @@ interface FlexProps {
     spaceBetween?: boolean;
     centered?: boolean;
     alignStart?: boolean;
+    alignEnd?: boolean;
     border?: string;
     overflow?: string;
 }
@@ -189,5 +190,9 @@ function justifyContent(props: FlexProps) {
 }
 
 function alignItems(props: FlexProps) {
-    return props.centered ? "center" : (props.alignStart ? "flex-start" : undefined);
+    if (props.centered) return "center";
+    if (props.alignStart) return "flex-start";
+    if (props.alignEnd) return "flex-end";
+
+    return undefined;
 }

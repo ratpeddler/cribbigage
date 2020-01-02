@@ -57,7 +57,7 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
         .filter(l => l.score && l.playerName == props.player.name && l.time > (Date.now() - 4000))
         .slice(0, 4).map(l => ({ time: l.time, text: createScoreMessage(l.score!) }));
 
-    return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24 }}>
+    return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24, display: "flex", justifyContent: "center", flexDirection: "column", height: "100%" }}>
         {userLogs.map(ul => <div className="oldLog" key={ul.time}>
             {ul.text}
         </div>)}

@@ -67,12 +67,11 @@ export const Hand: React.FC<HandProps> = props => {
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginLeft: stacked ? -1 * StackedMargin : undefined }}>
             {cards.map((card, i) => {
                 // TODO: Need to optimize this!
-                const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
-                    ev.preventDefault();
-                    ev.dataTransfer.dropEffect = "move";
-                }
+                const onDragOver = onDragOverMovableArea;
 
                 const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.persist();
+                    console.log("setting data", card.toString());
                     ev.dataTransfer.setData("text/plain", card.toString());
                     ev.dataTransfer.dropEffect = "move";
                 };
@@ -109,4 +108,9 @@ export const Hand: React.FC<HandProps> = props => {
                 />
             })}
         </div>);
+}
+
+export const onDragOverMovableArea = (ev: React.DragEvent<HTMLDivElement>) => {
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = "move";
 }
