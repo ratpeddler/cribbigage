@@ -4,11 +4,13 @@ const play_card = require("./cards/play_card.mp3");
 
 export const playShuffleSound = () => {
     var audio = new Audio(shuffle_cards);
+    audio.volume = .5;
     audio.play();
 }
 
 export const playDealSound = () => {
     var audio = new Audio(deal_card);
+    audio.volume = .25;
     audio.play();
 }
 
@@ -51,18 +53,26 @@ export const playScoreSound = (score: number) => {
             audio = new Audio(score_5);
             break;
     }
+    if (audio) audio.volume = .25;
 
     audio?.play();
 }
 
-const knock = require("./scores/knock.wav");
+const knock = require("./misc/knock.wav");
 export const playKnockSound = () => {
     var audio = new Audio(knock);
     audio.play();
 }
 
-const check = require("./scores/check.wav");
+const check = require("./misc/check.wav");
 export const playCheckSound = () => {
     var audio = new Audio(check);
+    audio.play();
+}
+
+const tap = require("./misc/tap.wav");
+export const playTapSound = () => {
+    var audio = new Audio(tap);
+    audio.volume = .5;
     audio.play();
 }
