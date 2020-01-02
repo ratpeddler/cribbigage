@@ -19,8 +19,12 @@ export interface LayoutProps {
     maxSelectedCards?: number,
     onReorderHand?: (newHand: number[]) => void,
     hideScores?: boolean;
+
+    // Drag and Drop
     onDragOverPlayedCards?: GameDragEvent,
     onDropOverPlayedCards?: GameDragEvent,
+    onDragOverDeck?: GameDragEvent,
+    onDropOverDeck?: GameDragEvent,
 }
 
 // This layout is designed for 2 players with the board on the side optimised for desktops (Landscape)
@@ -62,15 +66,17 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
+    const deck = <DeckAndCut game={cutGame} onDrop={props.onDropOverDeck} onDragOver={props.onDragOverDeck} />;
+
     return <Row fill>
         {/* LEFT Board and Deck area */}
         <Column justified border="1px solid lightgrey">
             {/* Deck should be on the side of the dealer (TOP: Opponent, BOTTOM: You) */}
-            {!yourCrib && <DeckAndCut game={cutGame} />}
+            {!yourCrib && deck}
             <Row justified>
                 <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
             </Row>
-            {yourCrib && <DeckAndCut game={cutGame} />}
+            {yourCrib && deck}
             <PlayLog />
         </Column>
 
