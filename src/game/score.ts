@@ -43,7 +43,7 @@ export function addPlayerScore(player: PlayerState, points: number, game: GameSt
 export function anyPlayerHasWon(game: GameState) {
     for (let player of game.players) {
         // HACK for now, should be stored in game state
-        if (player.score > (game.rules.pointsToWin || 120)) {
+        if (player.score > game.rules.pointsToWin) {
             return true;
         }
     }
