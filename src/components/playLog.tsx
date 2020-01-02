@@ -6,7 +6,7 @@ export const PlayLogContext = React.createContext<IPlayLogContext>({ log: [], ad
 
 export interface IPlayLogContext {
     log: string[];
-    addPlayLog: (player: PlayerState, message: string) => void;
+    addPlayLog: (player: PlayerState | null, message: string) => void;
 }
 
 export const PlayLog: React.FC = props => {

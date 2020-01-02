@@ -11,6 +11,9 @@ import { playAI } from "../../ai/AI_play";
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
 const SlowAIDelay = 1200; // 1.2 seconds
+const fastAIDelay = 500; // 1.2 seconds
+
+const AutoAdvancePlayerDuring31 = false;
 
 export const Play: GameComponent = props => {
     const Layout = props.layout;
@@ -39,33 +42,31 @@ export const Play: GameComponent = props => {
             : pass(game, scoreContext, logContext), false);
     }
 
+    React.useEffect(()=> logContext.addPlayLog(players[0], "starts"), []);
+
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
         // special case for "GO" OR "31"
         if (sumCards(game.playedCards || []) == 31) {
             if (isYourTurn) {
-                setTimeout(() => {
-                    passYourTurn();
-                }, SlowAIDelay);
+                //setTimeout(() => {
+                //    passYourTurn();
+                //}, SlowAIDelay);
             }
             else {
                 // Add some time out here
                 setTimeout(() => {
-                    console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
                     setGameState(playAI(game, false, scoreContext, logContext), false);
-                }, SlowAIDelay);
+                }, fastAIDelay);
             }
         }
 
-        else if (AutoAdvanceToYourTurn) {
-            if (!isYourTurn) {
-                setGameState(playAI(game, true, scoreContext, logContext), false);
-            }
+        else if (AutoAdvanceToYourTurn && !isYourTurn) {
+            setGameState(playAI(game, true, scoreContext, logContext), false);
         }
         else if (SlowAdvanceToYourTurn && !isYourTurn) {
             // Add some time out here
             setTimeout(() => {
-                console.log("slowly advancing for " + players[ensureNextPlayer(game)].name);
                 setGameState(playAI(game, false, scoreContext, logContext), false);
             }, SlowAIDelay);
         }

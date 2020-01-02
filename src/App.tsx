@@ -15,8 +15,8 @@ const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
   const [playLog, setPlayLog] = React.useState(["Game started. Have fun!"]);
 
-  const addPlayLog = React.useCallback((player: PlayerState, newLog: string)=> {
-    setPlayLog([player.name + " " + newLog, ...playLog])
+  const addPlayLog = React.useCallback((player: PlayerState | null, newLog: string)=> {
+    setPlayLog([(player ? player?.name + " " : "") + newLog, ...playLog])
   }, [playLog, setPlayLog]);
 
   const PlayLogContextValue = React.useMemo<IPlayLogContext>(()=>({
