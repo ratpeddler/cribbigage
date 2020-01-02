@@ -53,13 +53,26 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
     const logContext = React.useContext(PlayLogContext);
 
     // get all logs for the player and check their times!
-    let userLogs = logContext.log
-        .filter(l => l.score && l.playerName == props.player.name && l.time > (Date.now() - 4000))
-        .slice(0, 4).map(l => ({ time: l.time, text: createScoreMessage(l.score!) }));
+    let userLogs = React.useMemo(() => logContext.log
+        .filter(l => l.score
+            && l.playerName == props.player.name
+            && l.time > (Date.now() - 4000))
+        .slice(0, 4),
+        [logContext.log]);
 
-    return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24, display: "flex", justifyContent: "center", flexDirection: "column", height: "100%" }}>
+    let style = React.useMemo<React.CSSProperties>(() => ({
+        fontWeight: 700,
+        color: props.player.color,
+        fontSize: 24,
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        height: "100%"
+    }), [props.player.color]);
+
+    return <div style={style}>
         {userLogs.map(ul => <div className="oldLog" key={ul.time}>
-            {ul.text}
+            {createScoreMessage(ul.score!)}
         </div>)}
     </div>;
 }
