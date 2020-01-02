@@ -29,11 +29,11 @@ const App: React.FC = () => {
   }), [playLog, addLog]);
 
   React.useEffect(() => {
-    if (anyPlayerHasWon(gameState)) {
-      setGameState(initGameState());
+    if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
+      setGameState({...gameState, stage: "GameOver"});
       setPlayLog([]);
     }
-  }, [gameState, gameState.players]);
+  }, [gameState, gameState.players, gameState.stage]);
 
   //console.log(JSON.stringify(gameState));
 

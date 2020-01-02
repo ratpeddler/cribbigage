@@ -4,25 +4,32 @@ import { Button } from "../button";
 import { scoreHand, addPlayerScore } from "../../game/score";
 import { getCurrentDealer } from "../../game/play";
 import { PlayLogContext } from "../playLog";
+import _ from "lodash";
 
 export const ScoreStage: GameComponent = props => {
     const Layout = props.layout;
     const logContext = React.useContext(PlayLogContext);
-
-    let game = { ...props.game };
+    let game = _.cloneDeep(props.game);
     let dealer = getCurrentDealer(game);
+
+    const [hasCounted, setHasCounted] = React.useState(false);
 
     React.useEffect(() => {
         setTimeout(() => {
-            props.setGameState({
-                ...props.game,
-                players: props.game.players.map((p, i) => {
-                    const score = scoreHand(p.hand, props.game.cut!);
-                    const newScore = p.score + score.score;
-                    if (newScore >= 120) { alert(`${p.name} won!`) }
-                    return { ...p, score: newScore, lastScore: p.score };
-                })
-            }, false);
+            // this is in correct order
+            for (let p of game.players) {
+                const score = scoreHand(p.hand, props.game.cut!);
+                const newScore = p.score + score.score;
+                addPlayerScore(p, score.score, game);
+
+                if (newScore > game.rules.pointsToWin) {
+                    // a player has won, stop counting and update the game
+                    break;
+                }
+            }
+
+            props.setGameState(game, false);
+            setHasCounted(true);
         }, 500);
     }, []);
 
@@ -30,10 +37,10 @@ export const ScoreStage: GameComponent = props => {
         hideScores
         game={props.game}
         userActions={() =>
-            <Button onClick={() => {
+            <Button disabled={!hasCounted} onClick={() => {
                 props.setGameState(game, true);
             }}>
-                Next
+                {hasCounted ? "Next" : "Scoring hands..."}
             </Button>
         }
     />;

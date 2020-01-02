@@ -1,7 +1,8 @@
 import { Card, parseCard } from "./card";
 import { GameState } from "./game";
+import { IPlayLogContext } from "../components/playLog";
 
-export function RunDeal(game: GameState): GameState {
+export function RunDeal(game: GameState, logContext: IPlayLogContext): GameState {
     const { players, rules } = game;
     const { hands, crib, cut } = deal(players.length, undefined, rules.dealSize, rules.dealerExtra, rules.cribExtra, rules.cutSize);
 

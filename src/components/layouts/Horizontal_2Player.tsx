@@ -87,14 +87,14 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                             {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
                             {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
                             {opponent1Hand && showOpponentHands && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
-                            {hideScores && <ScoreIcon player={opponent1} />}
+                            {!hideScores && <ScoreIcon player={opponent1} />}
                         </Row>
                     </Column>
                 </Row>}
 
                 {opponent2 && <Row padding={10} border={currentPlayer == opponent2 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
                     {/* Opponent 2 */}
-                    {hideScores && <ScoreIcon player={opponent2} />}
+                    {!hideScores && <ScoreIcon player={opponent2} />}
                     {opponent2Hand && showOpponentHands && <HandScore hand={opponent2Hand} cut={showOpponentHands ? game.cut : undefined} />}
                     {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
                     {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
@@ -117,7 +117,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                     </Column>}
                 {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd>
                     <Hand cards={user.playedCards} />
-                    {hideScores && <ScoreIcon player={user} />}
+                    {!hideScores && <ScoreIcon player={user} />}
                 </Row>}
             </Row>
 
