@@ -61,19 +61,43 @@ interface HandProps {
 }
 
 export const Hand: React.FC<HandProps> = props => {
-    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled,superStacked } = props;
+    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled, superStacked } = props;
+
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginLeft: stacked ? -1 * StackedMargin : undefined }}>
             {cards.map((card, i) => {
-                let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
-                return <Card
-                    onMove={onReorder ? (card, droppedCard) => {
-                        //console.log(`${droppedCard} was dropped on ${card}`);
-                        // let move the dropped card and place it before where it was dropped?
+                // TODO: Need to optimize this!
+                const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.preventDefault();
+                    ev.dataTransfer.dropEffect = "move";
+                }
+
+                const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.dataTransfer.setData("text/plain", card.toString());
+                    ev.dataTransfer.dropEffect = "move";
+                };
+
+                const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.persist();
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
+                    if (droppedCard !== card) {
                         let newCards = [...cards].filter(c => c !== droppedCard);
                         newCards.splice(newCards.indexOf(card), 0, droppedCard);
-                        onReorder(newCards);
-                    } : undefined}
+                        props.onReorder && props.onReorder(newCards);
+                    }
+                }
+
+                const dragProps = onReorder ? {
+                    onDragStart,
+                    onDragOver,
+                    onDrop,
+                } : undefined;
+
+                let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
+                return <Card
+                    dragProps={dragProps}
                     disabled={disabled || allDisabled}
                     stacked={stacked}
                     superStacked={superStacked}

@@ -1,4 +1,4 @@
-import { Card } from "./card";
+import { Card, parseCard } from "./card";
 import { GameState } from "./game";
 
 export function RunDeal(game: GameState): GameState {
@@ -96,5 +96,5 @@ export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cr
     }
 
     // Return the player hands, the initial crib and the remaining deck (This will need to be cut)
-    return { hands, crib, cut };
+    return { hands: hands.map(hand => hand.sort((a, b) => parseCard(a).rank - parseCard(b).rank)), crib, cut };
 }

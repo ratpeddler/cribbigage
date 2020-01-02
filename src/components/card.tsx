@@ -15,7 +15,11 @@ type CardProps = {
     stacked?: boolean;
     superStacked?: boolean;
     disabled?: boolean;
-    onMove?: (thisCard: number, droppedCard: number) => void;
+    dragProps?: {
+        onDragOver: (ev: React.DragEvent<HTMLDivElement>) => void,
+        onDragStart: (ev: React.DragEvent<HTMLDivElement>) => void,
+        onDrop: (ev: React.DragEvent<HTMLDivElement>) => void
+    }
 };
 
 const padding = 5;
@@ -26,37 +30,10 @@ export const SuperStackedMargin = -1 * (CardWidth + (2 * CardMargin) + (2 * padd
 export const SuperStackedTopMargin = -1;
 
 export const Card: React.FC<CardProps> = props => {
-    const { card, selected, onClick, stacked, disabled, onMove, superStacked, index } = props;
-
-    const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = "move";
-    }
-
-    const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
-        ev.dataTransfer.setData("text/plain", card.toString());
-        ev.dataTransfer.dropEffect = "move";
-    };
-
-    const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
-        ev.persist();
-        ev.preventDefault();
-        ev.stopPropagation();
-        const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
-        if (droppedCard !== card) {
-            onMove && onMove(card, droppedCard);
-        }
-    }
-
-    const dragProps = onMove ? {
-        "data-is-focusable": true,
-        draggable: true,
-        onDragStart,
-        onDragOver,
-        onDrop,
-    } : {};
+    const { card, selected, onClick, stacked, disabled, dragProps, superStacked, index } = props;
 
     return <div
+        draggable={!!dragProps}
         {...dragProps}
         style={{
             maxHeight: CardWidth * 1.45,

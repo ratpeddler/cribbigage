@@ -37,7 +37,21 @@ export const Throw: GameComponent = props => {
             user.hand = newHand;
             setGameState({ ...game }, false);
         }}
-        userActions={() => <>
+        userActions={() => <div
+        style={{textAlign: "center"}}
+            onDragOver={(ev: React.DragEvent<HTMLDivElement>) => {
+                ev.preventDefault();
+                ev.dataTransfer.dropEffect = "move";
+            }}
+            onDrop={(ev: React.DragEvent<HTMLDivElement>) => {
+                ev.persist();
+                ev.preventDefault();
+                ev.stopPropagation();
+                const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
+                console.log("dropped!")
+                setKeepCards({...keepCards, [droppedCard]: true});
+            }}
+        >
             <h3 style={{ textAlign: "center" }}>
                 Select which cards you will keep and which you will discard to <span style={{ color: dealer.color }}>{yourCrib ? "your" : dealer.name + "'s"} crib</span>.
             <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
@@ -69,5 +83,5 @@ export const Throw: GameComponent = props => {
                 }}>
                 {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`}
             </Button>
-        </>} />;
+        </div>} />;
 }
