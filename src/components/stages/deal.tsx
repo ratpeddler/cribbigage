@@ -20,7 +20,7 @@ export const Deal: GameComponent = props => {
             }, 1000);
         }
 
-        logContext.addPlayLog(dealer, "is dealer");
+        logContext.addLog(dealer, "is dealer");
     }, []);
 
     // TODO: Animate dealing

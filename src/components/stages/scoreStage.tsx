@@ -13,16 +13,10 @@ export const ScoreStage: GameComponent = props => {
     let dealer = getCurrentDealer(game);
 
     React.useEffect(() => {
-        logContext.addPlayLog(null, "Scoring cards...");
         setTimeout(() => {
             props.setGameState({
                 ...props.game,
                 players: props.game.players.map((p, i) => {
-                    // race conditions!
-                    setTimeout(() => {
-                        logContext.addPlayLog(p, "scored " + score.score);
-                    }, (500 * i));
-
                     const score = scoreHand(p.hand, props.game.cut!);
                     const newScore = p.score + score.score;
                     if (newScore >= 120) { alert(`${p.name} won!`) }

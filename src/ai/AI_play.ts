@@ -1,5 +1,4 @@
 import { GameState } from "../game/game";
-import { IScoreContext } from "../components/scoreIcon";
 import { IPlayLogContext } from "../components/playLog";
 import { ensureNextPlayer, getCurrentPlayer, getPlayableHand, cantPlayAtAll, pass, sumCards, canPlay, playCard } from "../game/play";
 import { IsYou } from "../components/stages/chooseGameMode";
@@ -7,14 +6,13 @@ import { parseCard } from "../game/card";
 import _ from "lodash";
 
 /** Play the AI players NOT A PURE FUNCTION */
-export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
+export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logContext: IPlayLogContext): GameState {
     game = _.cloneDeep(game);
     // Start at the next person who needs to play
     game.nextToPlay = ensureNextPlayer(game);
 
     let keepRunning = true;
     while (!IsYou(getCurrentPlayer(game)) && keepRunning) {
-        console.log("playing ai " + getCurrentPlayer(game).name);
         if (!autoAdvanceUntilPlayer) { keepRunning = false; }
         game.nextToPlay = ensureNextPlayer(game); // Not sure if needed anymore..
 
@@ -24,8 +22,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
         const { playedCards = [], previousPlayedCards = [] } = game;
 
         if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
-            console.log(player.name + " said GO");
-            game = pass(game, scoreContext, logContext);
+            game = pass(game, logContext);
             continue;
         }
 
@@ -37,13 +34,13 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
         for (let card of hand) {  
             const cp = parseCard(card);
             if (currentCount + cp.count === 15 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
-                game = playCard(game, card, scoreContext, logContext);
+                game = playCard(game, card, logContext);
                 cardPlayed = true;
                 console.log("Greedy 15 play")
                 break;
             }
             if (currentCount + cp.count === 31 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
-                game = playCard(game, card, scoreContext, logContext);
+                game = playCard(game, card, logContext);
                 cardPlayed = true;
                 console.log("Greedy 31 play")
                 break;
@@ -69,7 +66,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
                 continue; // Avoid 2 card sequences
             }
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card, scoreContext, logContext);
+                game = playCard(game, card, logContext);
                 cardPlayed = true;
                 break;
             }
@@ -80,7 +77,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, scoreCon
        console.log("fallback and play a card");
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card, scoreContext, logContext);
+                game = playCard(game, card, logContext);
                 break;
             }
         } 
