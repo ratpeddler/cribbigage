@@ -11,15 +11,8 @@ export interface IScore {
     knobs?: number,
     thirtyOne?: number,
     go?: number,
+    lastCard?: number,
 }
-
-export type ScoreLookup = { [player: string]: IScore };
-export interface IScoreContext {
-    lookup: ScoreLookup;
-    addPlayerScore: (player: PlayerState, score: IScore) => void;
-}
-
-export const ScoreContext = React.createContext<IScoreContext>({ lookup: {}, addPlayerScore: () => { } });
 
 export function createScoreMessage(score: IScore) {
     let scoreStrings = [];
@@ -42,8 +35,14 @@ export function createScoreMessage(score: IScore) {
         if (score.flush) {
             scoreStrings.push("Flush for " + score.flush);
         }
+        if (score.lastCard) {
+            scoreStrings.push("Last card for " + score.lastCard);
+        }
         if (score.go) {
             scoreStrings.push("Go for " + score.go);
+        }
+        if (score.go === 0) {
+            scoreStrings.push("GO");
         }
     }
 
@@ -51,23 +50,16 @@ export function createScoreMessage(score: IScore) {
 }
 
 export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
-    const scoreContext = React.useContext(ScoreContext);
     const logContext = React.useContext(PlayLogContext);
-    const score = scoreContext?.lookup[props.player.name];
 
-    let scoreString = createScoreMessage(score);
-
-    let logString: string | null = null;
-
-    // If the last log was the player we can show that instead?
-    if (logContext.log[0].startsWith(props.player.name)) {
-        if (!logContext.log[0].includes("played")) {
-            // don't show just plays
-            logString = logContext.log[0];
-        }
-    }
+    // get all logs for the player and check their times!
+    let userLogs = logContext.log
+        .filter(l => l.score && l.playerName == props.player.name && l.time > (Date.now() - 4000))
+        .slice(0, 4).map(l => ({ time: l.time, text: createScoreMessage(l.score!) }));
 
     return <div style={{ fontWeight: 700, color: props.player.color, fontSize: 24 }}>
-        {score && score.score > 0 ? scoreString + "!" : logString}
+        {userLogs.map(ul => <div className="oldLog" key={ul.time}>
+            {ul.text}
+        </div>)}
     </div>;
 }

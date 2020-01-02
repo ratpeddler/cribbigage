@@ -3,7 +3,7 @@ import { Card, parseCard, parseRank } from "./card";
 import { GameState } from "./game";
 import { addPlayerScore } from "./score";
 import { PlayerState } from "./players";
-import { IScoreContext, IScore } from "./../components/scoreIcon";
+import { IScore } from "./../components/scoreIcon";
 import { IPlayLogContext } from "../components/playLog";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
@@ -82,7 +82,7 @@ export function getCurrentDealer(game: GameState): PlayerState {
     return game.players[game.players.length - 1];
 }
 
-export function playCard(game: GameState, card: Card, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
+export function playCard(game: GameState, card: Card, logContext: IPlayLogContext): GameState {
     let { playedCards = [] } = game;
     const player = getCurrentPlayer(game);
 
@@ -95,13 +95,6 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
     // SCORE
     const playScore = scorePlay(playedCards, card);
     addPlayerScore(player, playScore.score, game);
-    if (scoreContext) {
-        scoreContext.addPlayerScore(player, playScore);
-    }
-
-    if (!playScore || !playScore.score) {
-        logContext && logContext.addPlayLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit);
-    }
 
     // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
@@ -110,7 +103,11 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
     // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
         addPlayerScore(player, SCORE_LAST_CARD, game);
+        playScore.lastCard = 1;
+        playScore.score++;
     }
+    
+    logContext.addLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
 
     return {
         ...game,
@@ -118,9 +115,8 @@ export function playCard(game: GameState, card: Card, scoreContext?: IScoreConte
     }
 }
 
-export function pass(game: GameState, scoreContext?: IScoreContext, logContext?: IPlayLogContext): GameState {
+export function pass(game: GameState, logContext: IPlayLogContext): GameState {
     const player = getCurrentPlayer(game);
-    logContext && logContext.addPlayLog(player, "said GO");
 
     // pass to the next player and check if there has been a GO
     if (game.lastToPlay != undefined && game.nextToPlay === game.lastToPlay) {
@@ -128,7 +124,7 @@ export function pass(game: GameState, scoreContext?: IScoreContext, logContext?:
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            scoreContext && scoreContext.addPlayerScore(player, { score: SCORE_GO, go: SCORE_GO });
+            logContext.addLog(player, "scored for go", { score: SCORE_GO, go: SCORE_GO });
             addPlayerScore(player, SCORE_GO, game);
         }
 
@@ -138,7 +134,7 @@ export function pass(game: GameState, scoreContext?: IScoreContext, logContext?:
         game.players.forEach(player => player.playedCards = []);
     }
     else {
-        scoreContext && scoreContext.addPlayerScore(player, { score: 0 });
+        logContext.addLog(player, "said GO", { score: 0, go: 0 });
     }
 
     // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 

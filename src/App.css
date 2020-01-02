@@ -13,6 +13,20 @@
   }
 }
 
+.oldLog {
+  animation: Log-fade-out 1 4s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes Log-fade-out {
+  from {
+    opacity: 100;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

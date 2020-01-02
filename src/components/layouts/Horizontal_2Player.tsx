@@ -1,7 +1,7 @@
 import React from "react";
 import { GameState } from "../../game/game";
 import { ScoreBoard } from "../scoreboard";
-import { getCurrentDealer, getPlayableHand, sumCards, ensureNextPlayer, getCurrentPlayer } from "../../game/play";
+import { getCurrentDealer, getPlayableHand, sumCards, ensureNextPlayer, getCurrentPlayer, playStageOver } from "../../game/play";
 import { IsYou } from "../stages/chooseGameMode";
 import { DeckAndCut } from "../deckAndCut";
 import { Hand, HandAndScore } from "../hand";
@@ -57,7 +57,6 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     // Stage specifics
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
-
 
     return <Row fill>
         {/* LEFT Board and Deck area */}
@@ -118,7 +117,6 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             </Row>
 
             <Column fill justified centered>
-                {currentCount !== undefined && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
                 {props.userActions?.()}
             </Column>
 
