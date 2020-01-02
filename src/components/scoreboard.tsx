@@ -1,8 +1,5 @@
 import React from "react";
-import arrow_left from "../arrow_left.png";
-import arrow_right from "../arrow_right.png";
 import { PlayerState, getPlayerByName } from "../game/players";
-import { Game } from "./game";
 import _ from "lodash";
 
 const boardColor = "sandybrown";
@@ -102,12 +99,12 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
 const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: number }> = props => {
     const diameter = 5;
-    const border = 3;
+    const border = 2;
     return <div
         className="ScoreDot"
         title={props.index.toString()}
         style={{
-            margin: 2,
+            margin: 1,
             width: diameter,
             height: diameter,
             borderRadius: diameter,
@@ -123,7 +120,15 @@ const Board: React.FC<{ players: PlayerState[], total: number, lines: number, ve
     if (total / lines !== perRow) { throw "Bad choice of line numbers! doesn't divide evenly!" }
     const body: JSX.Element[] = [];
     for (let i = 0; i < lines; i++) {
-        body.push(<ScoreRow key={i} players={players} dots={perRow} from={perRow * i + 1} reverse={i % 2 !== 0} vertical={vertical} />)
+        body.push(<ScoreRow
+            key={i}
+            players={players}
+            dots={i == lines - 1 ? perRow + 1 : perRow}
+            from={perRow * i + 1}
+            reverse={i % 2 !== 0}
+            vertical={vertical}
+            pad={i !== 0 && i !== lines - 1}
+        />)
     }
 
     return <div className="board" style={{ display: "flex", flexDirection: vertical ? "row" : "column", backgroundColor: boardColor }}>
@@ -131,12 +136,22 @@ const Board: React.FC<{ players: PlayerState[], total: number, lines: number, ve
     </div>
 }
 
-const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
+const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean, pad?: boolean }> = props => {
+    const { from, vertical, pad } = props;
+
+    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5, justifyContent: "center" }}>
+        {from == 1 ? <StraightSegment {...props} from={0} dots={1} /> : (pad && <div style={{ height: 17 }}></div>)}
+        <StraightSegment {...props} />
+    </div>;
+}
+
+const StraightSegment: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
     const players = [...props.players].sort(byPlayerName);
     const { dots, from, reverse, vertical } = props;
     const body: JSX.Element[] = [];
 
     for (let i = reverse ? dots + from - 1 : from; reverse ? i >= from : i < dots + from; reverse ? i-- : i++) {
+        const borderColor = (i !== 0 && (i === 90 || i === 60)) ? "1px solid yellow" : (i % 5 === 0 ? "1px solid black" : "1px solid transparent");
         body.push(<div
             className="ScoreRowInner"
             key={i}
@@ -144,11 +159,13 @@ const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, r
                 display: "flex",
                 flexDirection: vertical ? "row" : "column",
                 marginTop: 1,
-                outline: i % 30 === 0 ? "2px solid yellow" : i % 5 === 0 ? "1px solid black" : undefined
+                borderBottom: !reverse && vertical ? borderColor : undefined,
+                borderTop: reverse && vertical ? borderColor : undefined,
+                borderRight: !vertical ? borderColor : undefined,
             }}>
             {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score === i || p.lastScore === i} playerColor={p.color} />)}
         </div>);
     }
 
-    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5 }}>{body}</div>;
+    return <>{body}</>;
 }
