@@ -24,11 +24,10 @@ export const Play: GameComponent = props => {
     const { game } = props;
     const { players, previousPlayedCards = [], playedCards = [] } = game;
 
+    const stageIsOver = playStageOver(game);
     const user = players.filter(IsYou)[0];
 
-    // need to filter out the already played cards
     const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
-
     const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
 
     const passYourTurn = () => {
@@ -44,6 +43,11 @@ export const Play: GameComponent = props => {
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
+        if(stageIsOver){
+            // you can stop now. No need to have other say "GO"
+            return;
+        }
+
         // special case for "GO" OR "31"
         if (sumCards(game.playedCards || []) == 31) {
             if (isYourTurn) {
@@ -90,6 +94,7 @@ export const Play: GameComponent = props => {
         }}
         maxSelectedCards={1}
         userActions={() => <>
+            {!stageIsOver && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
             {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
             {!isYourTurn && !SlowAdvanceToYourTurn && <Button
@@ -97,7 +102,7 @@ export const Play: GameComponent = props => {
                 AI's turn
                 </Button>}
 
-            {!cantPlay && isYourTurn && !playStageOver(game) &&
+            {!cantPlay && isYourTurn && !stageIsOver &&
                 <Button
                     disabled={disabled}
                     onClick={() => {
@@ -112,13 +117,13 @@ export const Play: GameComponent = props => {
                     {disabled ? "Select a card to play" : "Play selected card"}
                 </Button>}
 
-            {cantPlay && isYourTurn && !playStageOver(game) &&
+            {cantPlay && isYourTurn && !stageIsOver &&
                 <Button disabled={!cantPlay} onClick={passYourTurn}>
                     Pass
                 </Button>}
 
-            {playStageOver(game) && <Button
-                disabled={!playStageOver(game)}
+            {stageIsOver && <Button
+                disabled={!stageIsOver}
                 onClick={() => {
                     props.setGameState({
                         ...props.game,
