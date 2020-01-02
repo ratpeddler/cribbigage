@@ -4,7 +4,7 @@ const play_card = require("./cards/play_card.mp3");
 
 export const playShuffleSound = () => {
     var audio = new Audio(shuffle_cards);
-    audio.volume = .5;
+    audio.volume = .25;
     audio.play();
 }
 
