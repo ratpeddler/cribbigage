@@ -56,7 +56,7 @@ export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
     let userLogs = React.useMemo(() => logContext.log
         .filter(l => l.score
             && l.playerName == props.player.name
-            && l.time > (Date.now() - 4000))
+            && l.time > (Date.now() - 2000))
         .slice(0, 4),
         [logContext.log]);
 

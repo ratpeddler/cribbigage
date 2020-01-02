@@ -6,6 +6,8 @@ import red from "./../cards/bike_red.jpg";
 import dragon from "./../cards/bike_dragon.jpg";
 import clam from "./../cards/clam.jpg";
 
+export type GameDragEvent = (ev: React.DragEvent<HTMLDivElement>) => void;
+
 type CardProps = {
     back?: Back;
     card: number;
@@ -16,9 +18,9 @@ type CardProps = {
     superStacked?: boolean;
     disabled?: boolean;
     dragProps?: {
-        onDragOver?: (ev: React.DragEvent<HTMLDivElement>) => void,
-        onDragStart?: (ev: React.DragEvent<HTMLDivElement>) => void,
-        onDrop?: (ev: React.DragEvent<HTMLDivElement>) => void
+        onDragOver?: GameDragEvent,
+        onDragStart?: GameDragEvent,
+        onDrop?: GameDragEvent
     }
 };
 
@@ -32,7 +34,7 @@ export const SuperStackedTopMargin = -1;
 export const Card: React.FC<CardProps> = props => {
     const { card, selected, onClick, stacked, disabled, dragProps, superStacked, index } = props;
 
-    const onDragStart = React.useCallback((ev: React.DragEvent<HTMLDivElement>) => {
+    const onDragStart = React.useCallback<GameDragEvent>(ev => {
         ev.persist();
         console.log("setting data", card.toString());
         ev.dataTransfer.setData("text/plain", card.toString());

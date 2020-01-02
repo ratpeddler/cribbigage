@@ -8,6 +8,7 @@ import { Hand, HandAndScore } from "../hand";
 import { ScoreIcon } from "../scoreIcon";
 import { HandScore } from "../handScore";
 import { PlayLog } from "../playLog";
+import { GameDragEvent } from "../card";
 
 export type SelectedCards = { [card: number]: boolean };
 export interface LayoutProps {
@@ -18,6 +19,12 @@ export interface LayoutProps {
     maxSelectedCards?: number,
     onReorderHand?: (newHand: number[]) => void,
     hideScores?: boolean;
+
+    // Drag and Drop
+    onDragOverPlayedCards?: GameDragEvent,
+    onDropOverPlayedCards?: GameDragEvent,
+    onDragOverDeck?: GameDragEvent,
+    onDropOverDeck?: GameDragEvent,
 }
 
 // This layout is designed for 2 players with the board on the side optimised for desktops (Landscape)
@@ -59,15 +66,17 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
+    const deck = <DeckAndCut game={cutGame} onDrop={props.onDropOverDeck} onDragOver={props.onDragOverDeck} />;
+
     return <Row fill>
         {/* LEFT Board and Deck area */}
         <Column justified border="1px solid lightgrey">
             {/* Deck should be on the side of the dealer (TOP: Opponent, BOTTOM: You) */}
-            {!yourCrib && <DeckAndCut game={cutGame} />}
+            {!yourCrib && deck}
             <Row justified>
                 <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
             </Row>
-            {yourCrib && <DeckAndCut game={cutGame} />}
+            {yourCrib && deck}
             <PlayLog />
         </Column>
 
@@ -87,14 +96,14 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                             {opponent1PreviousPlayed.length > 0 && <Hand cards={opponent1PreviousPlayed} stacked />}
                             {opponent1.playedCards && opponent1.playedCards.length > 0 && <Hand cards={opponent1.playedCards} stacked />}
                             {opponent1Hand && showOpponentHands && <HandScore hand={opponent1Hand} cut={props.game.cut} />}
-                            {hideScores && <ScoreIcon player={opponent1} />}
+                            {!hideScores && <ScoreIcon player={opponent1} />}
                         </Row>
                     </Column>
                 </Row>}
 
                 {opponent2 && <Row padding={10} border={currentPlayer == opponent2 ? `2px solid ${currentPlayer.color}` : `2px solid transparent`}>
                     {/* Opponent 2 */}
-                    {hideScores && <ScoreIcon player={opponent2} />}
+                    {!hideScores && <ScoreIcon player={opponent2} />}
                     {opponent2Hand && showOpponentHands && <HandScore hand={opponent2Hand} cut={showOpponentHands ? game.cut : undefined} />}
                     {opponent2.playedCards && opponent2.playedCards.length > 0 && <Hand cards={opponent2.playedCards} stacked />}
                     {opponent2PreviousPlayed && opponent2PreviousPlayed.length > 0 && <Hand cards={opponent2PreviousPlayed} stacked />}
@@ -109,15 +118,15 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             </Row>
 
             {/* Row for your played cards and ALL previous played cards */}
-            <Row >
+            <Row onDragOver={props.onDragOverPlayedCards} onDrop={props.onDropOverPlayedCards}>
                 {game.previousPlayedCards && game.previousPlayedCards.length > 0 &&
                     <Column padding={5}>
                         <h3>Previously played cards</h3>
                         <Hand cards={game.previousPlayedCards} stacked />
                     </Column>}
-                {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd>
+                {user.playedCards && user.playedCards.length > 0 && <Row justified fill alignEnd onDragOver={props.onDragOverPlayedCards} onDrop={props.onDropOverPlayedCards}>
                     <Hand cards={user.playedCards} />
-                    {hideScores && <ScoreIcon player={user} />}
+                    {!hideScores && <ScoreIcon player={user} />}
                 </Row>}
             </Row>
 
@@ -160,18 +169,28 @@ interface FlexProps {
     alignEnd?: boolean;
     border?: string;
     overflow?: string;
+    onDragOver?: GameDragEvent;
+    onDrop?: GameDragEvent;
 }
 
 export const Column: React.FC<FlexProps> = props => {
-    return <div style={{ flexDirection: "column", ...styles(props) }}>{props.children}</div>
+    return <div style={{ flexDirection: "column", ...styles(props) }} {...divProps(props)}>{props.children}</div>
 }
 
 export const Row: React.FC<FlexProps> = props => {
-    return <div style={{ flexDirection: "row", ...styles(props) }}>{props.children}</div>
+    return <div style={{ flexDirection: "row", ...styles(props) }} {...divProps(props)}>{props.children}</div>
 }
 
 export const Fill: React.FC<FlexProps> = props => {
-    return <div style={{ flex: "auto" }}>{props.children}</div>
+    return <div style={{ flex: "auto" }} {...divProps(props)}>{props.children}</div>
+}
+
+function divProps(props: FlexProps) {
+    console.log(props.onDragOver);
+    return {
+        onDragOver: props.onDragOver,
+        onDrop: props.onDrop,
+    }
 }
 
 function styles(props: FlexProps) {

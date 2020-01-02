@@ -98,6 +98,8 @@ export const Play: GameComponent = props => {
     }, [game.nextToPlay, isYourTurn]);
 
     return <Layout
+        onDragOverPlayedCards={onDragOverMovableArea}
+        onDropOverPlayedCards={onDrop}
         game={props.game}
         selectedCards={keepCard}
         setSelectedCards={newKeptCards => {
@@ -117,7 +119,7 @@ export const Play: GameComponent = props => {
         }}
         maxSelectedCards={1}
         userActions={() => <div
-            style={{ textAlign: "center" }}
+            style={{ textAlign: "center", height: "100%", width: "100%", flex: "auto", alignItems: "center", display: "flex", flexDirection: "column", justifyContent: "center" }}
             onDragOver={onDragOverMovableArea}
             onDrop={onDrop}
         >

@@ -20,6 +20,7 @@ export function addPlayerScore(player: PlayerState, points: number, game: GameSt
         player.lastScore = player.score;
         player.score += points;
 
+        /* This should be handled for most things? DEAL, PLAY, SCORE, CRIB
         if (player.score > game.rules.pointsToWin) {
             let messages = [player.name + " won!"];
             //skunk = 90 / 120 = 3/4
@@ -35,13 +36,14 @@ export function addPlayerScore(player: PlayerState, points: number, game: GameSt
 
             alert(messages.join(", "));
         }
+        */
     }
 }
 
 export function anyPlayerHasWon(game: GameState) {
     for (let player of game.players) {
         // HACK for now, should be stored in game state
-        if (player.score > (game.rules.pointsToWin || 120)) {
+        if (player.score > game.rules.pointsToWin) {
             return true;
         }
     }
@@ -56,7 +58,7 @@ export function anyPlayerHasWon(game: GameState) {
  * @param isCrib whether this is a crib or not (May affect some rules related to flush)
  * TODO: Update rules based on whether it is a crib or not
  */
-export function scoreHand(hand: Hand, cut: Hand, isCrib = false) {
+export function scoreHand(hand: Hand, cut: Hand = [], isCrib = false) {
     const cards = [...hand, ...cut];
 
     const fifteen = scoreFifteens(cards);

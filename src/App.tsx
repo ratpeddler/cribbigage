@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { PlayLogContext, IPlayLogContext, ILog } from './components/playLog';
 import { PlayerState } from './game/players';
 import { IScore } from './components/scoreIcon';
+import { playTapSound } from './sounds/playSound';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
@@ -29,11 +30,11 @@ const App: React.FC = () => {
   }), [playLog, addLog]);
 
   React.useEffect(() => {
-    if (anyPlayerHasWon(gameState)) {
-      setGameState(initGameState());
+    if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
+      setGameState({...gameState, stage: "GameOver"});
       setPlayLog([]);
     }
-  }, [gameState, gameState.players]);
+  }, [gameState, gameState.players, gameState.stage]);
 
   //console.log(JSON.stringify(gameState));
 
@@ -47,11 +48,13 @@ const App: React.FC = () => {
               let game = newGame;
               if (advance) {
                 game = AdvanceGameState(game);
+                playTapSound();
               }
 
               setGameState(_.cloneDeep(game));
             }}
           />
+          <div style={{position:"fixed", bottom: 0, right: 0, padding: 10, fontSize: 10}}>© 2019 aiplayers.com</div>
         </div>
       </PlayLogContext.Provider>
   );

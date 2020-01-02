@@ -38,4 +38,5 @@ export const GameModes: GameRules[] = [
     createGame("3 Player CribBIGage", 3, 6, 5, 1, 1),
     createGame("2 Player regular cribbage", 2, 6, 4),
     createGame("3 Player regular cribbage", 3, 5, 4, 1),
+    createGame("Super Short 40", 2, 7, 5, 0, 1, 1, 40),
 ];

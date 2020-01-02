@@ -1,7 +1,6 @@
 import React from "react";
-import arrow_left from "../arrow_left.png";
-import arrow_right from "../arrow_right.png";
 import { PlayerState, getPlayerByName } from "../game/players";
+import _ from "lodash";
 
 const boardColor = "sandybrown";
 
@@ -12,32 +11,32 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
 };
 
 export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number, vertical?: boolean, lines?: number }> = props => {
-    const players = [...props.players].sort(byPlayerName);
-    const [lastScores, setLastScores] = React.useState(players.map(p => ({ name: p.name, lastScore: p.lastScore } as PlayerState)));
-    const [currentScores, setCurrentScores] = React.useState(players.map(p => ({ name: p.name, score: p.score } as PlayerState)));
+    const turnOrderPlayers = _.cloneDeep(props.players);
+    const boardOrderPlayers = _.cloneDeep(props.players).sort(byPlayerName);
+    const [lastScores, setLastScores] = React.useState(boardOrderPlayers.map(p => ({ name: p.name, lastScore: p.lastScore } as PlayerState)));
+    const [currentScores, setCurrentScores] = React.useState(boardOrderPlayers.map(p => ({ name: p.name, score: p.score } as PlayerState)));
     const [isMoving, setIsMoving] = React.useState<PlayerState | null>(null);
 
-    let fakedPlayers = players.map(p => ({
+    let fakedPlayers = boardOrderPlayers.map(p => ({
         ...p,
         lastScore: getPlayerByName(p.name, lastScores).lastScore,
         score: getPlayerByName(p.name, currentScores).score,
-    }));
+    } as PlayerState));
 
     React.useEffect(() => {
+        // Run updates in turn order of players
         let anyUpdates = false;
-        // slowly update scores and check if there are any updates needed
-        for (let pi = 0; pi < players.length; pi++) {
-            const p = players[pi];
-            if (p.lastScore > fakedPlayers[pi].lastScore) {
+        for (let p of turnOrderPlayers) {
+            if (p.lastScore > fakedPlayers.find(fp => fp.name == p.name)!.lastScore) {
                 //console.log(`player last score was ${p.lastScore} old last score was ${fakedPlayers[pi].lastScore}`)
                 // TODO: how to "leap frog" the scores?
                 // count last score -> new last score, then score to score?
                 anyUpdates = true;
                 setIsMoving(p);
                 setTimeout(() => {
-                    setLastScores(fakedPlayers.map((lp, li) => {
+                    setLastScores(fakedPlayers.map((lp) => {
                         lp = { ...lp };
-                        if (li === pi) {
+                        if (lp.name === p.name) {
                             // update
                             lp.lastScore++;
                         }
@@ -48,16 +47,16 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
                 break;
             }
-            else if (p.score > fakedPlayers[pi].score) {
+            else if (p.score > fakedPlayers.find(fp => fp.name == p.name)!.score) {
                 //console.log(`player score was ${p.score} old score was ${fakedPlayers[pi].score}`)
                 anyUpdates = true;
                 // TODO: how to "leap frog" the scores?
                 // count last score -> new last score, then score to score?
                 setIsMoving(p);
                 setTimeout(() => {
-                    setCurrentScores(fakedPlayers.map((cp, ci) => {
+                    setCurrentScores(fakedPlayers.map(cp => {
                         cp = { ...cp };
-                        if (ci === pi) {
+                        if (cp.name === p.name) {
                             // update
                             cp.score++;
                         }
@@ -76,7 +75,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
             }, 250);
         }
 
-    }, [lastScores, currentScores, setLastScores, setCurrentScores, players]);
+    }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
     return <div style={{ display: "flex", flexDirection: "column" }}>
         <div className="BoardWrapper"
@@ -90,7 +89,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
         </div>
 
         <div style={{ textAlign: "center" }}>
-            {players.map((p, pi) => <span key={pi}
+            {boardOrderPlayers.map((p, pi) => <span key={pi}
                 style={{ color: p.color, fontWeight: props.players.indexOf(p) == props.players.length - 1 ? 700 : 400, margin: 5 }}>
                 {p.name}: {p.score}
             </span>)}
@@ -100,12 +99,12 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
 const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: number }> = props => {
     const diameter = 5;
-    const border = 3;
+    const border = 2;
     return <div
         className="ScoreDot"
         title={props.index.toString()}
         style={{
-            margin: 2,
+            margin: 1,
             width: diameter,
             height: diameter,
             borderRadius: diameter,
@@ -121,7 +120,15 @@ const Board: React.FC<{ players: PlayerState[], total: number, lines: number, ve
     if (total / lines !== perRow) { throw "Bad choice of line numbers! doesn't divide evenly!" }
     const body: JSX.Element[] = [];
     for (let i = 0; i < lines; i++) {
-        body.push(<ScoreRow key={i} players={players} dots={perRow} from={perRow * i} reverse={i % 2 !== 0} vertical={vertical} />)
+        body.push(<ScoreRow
+            key={i}
+            players={players}
+            dots={i == lines - 1 ? perRow + 1 : perRow}
+            from={perRow * i + 1}
+            reverse={i % 2 !== 0}
+            vertical={vertical}
+            pad={i !== 0 && i !== lines - 1}
+        />)
     }
 
     return <div className="board" style={{ display: "flex", flexDirection: vertical ? "row" : "column", backgroundColor: boardColor }}>
@@ -129,12 +136,22 @@ const Board: React.FC<{ players: PlayerState[], total: number, lines: number, ve
     </div>
 }
 
-const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
+const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean, pad?: boolean }> = props => {
+    const { from, vertical, pad } = props;
+
+    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5, justifyContent: "center" }}>
+        {from == 1 ? <StraightSegment {...props} from={0} dots={1} /> : (pad && <div style={{ height: 17 }}></div>)}
+        <StraightSegment {...props} />
+    </div>;
+}
+
+const StraightSegment: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
     const players = [...props.players].sort(byPlayerName);
     const { dots, from, reverse, vertical } = props;
     const body: JSX.Element[] = [];
 
     for (let i = reverse ? dots + from - 1 : from; reverse ? i >= from : i < dots + from; reverse ? i-- : i++) {
+        const borderColor = (i !== 0 && (i === 90 || i === 60)) ? "1px solid yellow" : (i % 5 === 0 ? "1px solid black" : "1px solid transparent");
         body.push(<div
             className="ScoreRowInner"
             key={i}
@@ -142,11 +159,13 @@ const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, r
                 display: "flex",
                 flexDirection: vertical ? "row" : "column",
                 marginTop: 1,
-                outline: i % 30 === 0 ? "2px solid yellow" : i % 5 === 0 ? "1px solid black" : undefined
+                borderBottom: !reverse && vertical ? borderColor : undefined,
+                borderTop: reverse && vertical ? borderColor : undefined,
+                borderRight: !vertical ? borderColor : undefined,
             }}>
             {players.map((p, pi) => <ScoreDot key={pi} index={i} hasPlayer={p.score === i || p.lastScore === i} playerColor={p.color} />)}
         </div>);
     }
 
-    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5 }}>{body}</div>;
+    return <>{body}</>;
 }

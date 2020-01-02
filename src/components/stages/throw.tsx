@@ -1,12 +1,13 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { HandAndScore } from "../hand";
+import { onDragOverMovableArea } from "../hand";
 import { Button } from "../button";
 import { IsYou } from "./chooseGameMode";
 import { getCurrentDealer } from "../../game/play";
 import { scoreHand } from "../../game/score";
 import { throwAI } from "../../ai/AI_throw";
 import _ from "lodash";
+import { GameDragEvent } from "../card";
 
 export const Throw: GameComponent = props => {
     const Layout = props.layout;
@@ -19,13 +20,21 @@ export const Throw: GameComponent = props => {
     const dealer = getCurrentDealer(game);
     const yourCrib = IsYou(dealer);
 
-    // TODO Only select the cards you will DISCARD not the ones you will keep
-    const mustDiscard = user.hand.length - keepSize;
 
     const selectedLength = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
     const disabled = selectedLength !== keepSize;
 
     const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
+
+    const onDragOver = onDragOverMovableArea;
+    const onDrop = React.useCallback<GameDragEvent>(ev => {
+        ev.persist();
+        ev.preventDefault();
+        ev.stopPropagation();
+        const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
+        console.log("dropped!")
+        setKeepCards({...keepCards, [droppedCard]: true});
+    }, []);
 
     // TODO: This should either let you pick all hands or just your own
     return <Layout
@@ -33,24 +42,16 @@ export const Throw: GameComponent = props => {
         selectedCards={keepCards}
         setSelectedCards={setKeepCards}
         maxSelectedCards={keepSize}
+        onDragOverDeck={onDragOver}
+        onDropOverDeck={onDrop}
         onReorderHand={newHand => {
             user.hand = newHand;
             setGameState({ ...game }, false);
         }}
         userActions={() => <div
         style={{textAlign: "center"}}
-            onDragOver={(ev: React.DragEvent<HTMLDivElement>) => {
-                ev.preventDefault();
-                ev.dataTransfer.dropEffect = "move";
-            }}
-            onDrop={(ev: React.DragEvent<HTMLDivElement>) => {
-                ev.persist();
-                ev.preventDefault();
-                ev.stopPropagation();
-                const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
-                console.log("dropped!")
-                setKeepCards({...keepCards, [droppedCard]: true});
-            }}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
         >
             <h3 style={{ textAlign: "center" }}>
                 Select which cards you will keep and which you will discard to <span style={{ color: dealer.color }}>{yourCrib ? "your" : dealer.name + "'s"} crib</span>.
