@@ -4,6 +4,7 @@ import _ from "lodash";
 import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
 import { aroundTheBack } from "../boards/tracks/aroundTheBack";
 import { TrifoldBoard, QuadfoldBoard } from "../boards/tracks/trifold";
+import { OldSchoolBoard } from "../boards/tracks/oldschool";
 
 const boardColor = "sandybrown";
 let x = createStraightSegment(1, 1, 1);

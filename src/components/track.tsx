@@ -267,29 +267,29 @@ export function create180Segment(length: number, width: number, players: number,
 
 export const SimpleDot: React.FC<{ dot: Dot }> = props => {
     const {dot} = props;
-    const {fake} = dot;
+    const {fake, playerPresentAndColor} = dot;
     const diameter = 3;
     const radius = diameter / 2;
-    if (props.dot.playerPresentAndColor) {
-        console.log("had player color", props.dot.playerPresentAndColor);
+    if (playerPresentAndColor) {
+        console.log("had player color", playerPresentAndColor);
     }
     return <>
         {<div style={{
             position: "absolute",
-            zIndex: 10000,
-            bottom: props.dot.x,
-            left: props.dot.y,
-            border: fake ? undefined : `2px solid ${props.dot.playerPresentAndColor || "transparent"}`, // + ([props.dot.fake ? "red" : "black"]),
-            backgroundColor: fake ? undefined : props.dot.playerPresentAndColor || "rgba(0,0,0,.80)",
+            zIndex: playerPresentAndColor ? 10000: 10,
+            bottom: dot.x,
+            left: dot.y,
+            border: fake ? undefined : `2px solid ${playerPresentAndColor || "transparent"}`, // + ([dot.fake ? "red" : "black"]),
+            backgroundColor: fake ? undefined : playerPresentAndColor || "rgba(0,0,0,.80)",
             width: diameter,
             height: diameter,
             borderRadius: diameter,
             marginBottom: -1 * radius,
             marginLeft: -1 * radius
         }}
-            title={props.dot.pointIndex + "," + props.dot.playerIndex}
+            title={dot.pointIndex + "," + dot.playerIndex}
         >
-            {props.dot.content}
+            {dot.content}
         </div>}
     </>
 }
