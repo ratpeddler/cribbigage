@@ -1,9 +1,9 @@
 import { GameState } from "../game/game";
 import { IPlayLogContext } from "../components/playLog";
-import { ensureNextPlayer, getCurrentPlayer, getPlayableHand, cantPlayAtAll, pass, sumCards, canPlay, playCard } from "../game/play";
-import { IsYou } from "../components/stages/chooseGameMode";
+import {  getPlayableHand, cantPlayAtAll, pass, sumCards, canPlay, playCard } from "../game/play";
 import { parseCard } from "../game/card";
 import _ from "lodash";
+import { ensureNextPlayer, IsYou, getCurrentPlayer } from "../game/players";
 
 /** Play the AI players NOT A PURE FUNCTION */
 export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logContext: IPlayLogContext): GameState {

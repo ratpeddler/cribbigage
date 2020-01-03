@@ -1,10 +1,12 @@
 import React from "react";
-import { PlayerState, getPlayerByName } from "../game/players";
+import { PlayerState, getPlayerByName, IsYou, getCurrentDealer } from "../game/players";
 import _ from "lodash";
 import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
 import { aroundTheBack } from "../boards/tracks/aroundTheBack";
 import { TrifoldBoard, QuadfoldBoard } from "../boards/tracks/trifold";
 import { OldSchoolBoard } from "../boards/tracks/oldschool";
+import { GameState } from "../game/game";
+import { Boards } from "./stages/createGame";
 
 const boardColor = "sandybrown";
 let x = createStraightSegment(1, 1, 1);
@@ -15,9 +17,12 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
     return -1;
 };
 
-export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number, vertical?: boolean, lines?: number }> = props => {
-    const turnOrderPlayers = _.cloneDeep(props.players);
-    const boardOrderPlayers = _.cloneDeep(props.players).sort(byPlayerName);
+export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = props => {
+    const { game } = props;
+    const user = game.players.find(IsYou);
+    const dealer = getCurrentDealer(game);
+    const turnOrderPlayers = _.cloneDeep(game.players);
+    const boardOrderPlayers = _.cloneDeep(game.players).sort(byPlayerName);
     const [lastScores, setLastScores] = React.useState(boardOrderPlayers.map(p => ({ name: p.name, lastScore: p.lastScore } as PlayerState)));
     const [currentScores, setCurrentScores] = React.useState(boardOrderPlayers.map(p => ({ name: p.name, score: p.score } as PlayerState)));
     const [isMoving, setIsMoving] = React.useState<PlayerState | null>(null);
@@ -80,19 +85,19 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
             }, 250);
         }
 
-    }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
+    }, [lastScores, currentScores, setLastScores, setCurrentScores, game.players]);
 
-    const track = TrifoldBoard;
+    const track = Boards.find(board => board.name == game.customization.boardName)!;
 
     // add players
     // players start 
     let dots = [];
-    for(let dot of track.dots){
-        dot = {...dot};
+    for (let dot of track.dots) {
+        dot = { ...dot };
         dots.push(dot);
-        if(dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
+        if (dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
         const playerForTrack = boardOrderPlayers[dot.playerIndex];
-        if(playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)){
+        if (playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)) {
             dot.playerPresentAndColor = playerForTrack.color;
         }
     }
@@ -105,15 +110,16 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
                 border: `5px solid ${isMoving ? isMoving.color : "transparent"}`,
                 padding: 5
             }}>
-                <Track 
-                    track={{...track, dots}}
-                />
+            <Track
+            height={400}
+                track={{ ...track, dots }}
+            />
             {/*<Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />*/}
         </div>
 
         <div style={{ textAlign: "center" }}>
             {boardOrderPlayers.map((p, pi) => <span key={pi}
-                style={{ color: p.color, fontWeight: props.players.indexOf(p) == props.players.length - 1 ? 700 : 400, margin: 5 }}>
+                style={{ color: p.color, fontWeight: game.players.indexOf(p) == game.players.length - 1 ? 700 : 400, margin: 5 }}>
                 {p.name}: {p.score}
             </span>)}
         </div>

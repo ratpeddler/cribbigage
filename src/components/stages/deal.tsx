@@ -2,10 +2,9 @@ import React from "react";
 import { GameComponent } from "../game";
 import { RunDeal } from "../../game/deal";
 import { Button } from "../button";
-import { IsYou } from "./chooseGameMode";
-import { getCurrentDealer } from "../../game/play";
 import { PlayLogContext } from "../playLog";
 import { playShuffleSound, playDealSound, Repeat } from "../../sounds/playSound";
+import { getCurrentDealer, IsYou } from "../../game/players";
 
 export const Deal: GameComponent = props => {
     const Layout = props.layout;

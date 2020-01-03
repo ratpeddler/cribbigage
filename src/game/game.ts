@@ -2,6 +2,12 @@ import { Stage, NonGameStages } from "./turns";
 import { Hand, shuffle } from "./deal";
 import { GameRules } from "./rules";
 import { PlayerState, PlayerInfo } from "./players";
+import { Back } from "../components/card";
+
+export interface GameCustomization {
+    boardName: string;
+    deckName: Back;
+}
 
 export interface GameState {
     rules: GameRules;
@@ -35,17 +41,20 @@ export interface GameState {
 
     // Cards from previous plays (sets of 31)
     previousPlayedCards?: Hand;
+
+    customization: GameCustomization;
 }
 
 export function initGameState(): GameState {
     return {
-        stage: "ChooseGameMode",
+        stage: "CreateGame",
         players: [] as PlayerInfo[],
+        customization: {}
     } as GameState;
 }
 
 const colors = ["red", "green", "blue", "gold"];
-export function startGame(players: PlayerInfo[], rules: GameRules): GameState {
+export function startGame(players: PlayerInfo[], rules: GameRules, customization: GameCustomization): GameState {
     return {
         rules,
         turnNumber: 0,
@@ -54,5 +63,6 @@ export function startGame(players: PlayerInfo[], rules: GameRules): GameState {
         crib: [],
         cut: [],
         playedCards: [],
+        customization,
     }
 }

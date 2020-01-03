@@ -2,9 +2,9 @@ import React from "react";
 import { GameComponent } from "../game";
 import { parseCard } from "../../game/card";
 import { addPlayerScore } from "../../game/score";
-import { getCurrentDealer } from "../../game/play";
 import { PlayLogContext } from "../playLog";
 import { WasOrWere } from "./gameover";
+import { getCurrentDealer } from "../../game/players";
 
 const SCORE_PER_JACK_CUT = 2;
 

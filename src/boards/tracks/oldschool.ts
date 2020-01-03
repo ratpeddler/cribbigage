@@ -35,7 +35,7 @@ const startArea = [
     stepBack,
 ]
 
-export const OldSchoolBoard = createTrack(1, 2, [
+export const OldSchoolBoard = createTrack("Old School", 120, 1, 2, [
     ...startArea,
     ...onceAround,
     ...joint,

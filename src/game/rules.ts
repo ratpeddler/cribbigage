@@ -33,10 +33,16 @@ function createGame(name: string, players: number, dealSize: number, keepSize: n
     }
 }
 
+export const CribBIGage_2Hand = createGame("2 hand CribBIGage", 2, 7, 5, 0, 1);
+export const CribBIGage_3Hand = createGame("3 hand CribBIGage", 3, 6, 5, 1, 1);
+
+export const cribbage_2Hand = createGame("2 Player regular cribbage", 2, 6, 4);
+export const cribbage_3Hand = createGame("3 Player regular cribbage", 3, 5, 4, 1);
+
 export const GameModes: GameRules[] = [
-    createGame("2 Player CribBIGage", 2, 7, 5, 0, 1),
-    createGame("3 Player CribBIGage", 3, 6, 5, 1, 1),
-    createGame("2 Player regular cribbage", 2, 6, 4),
-    createGame("3 Player regular cribbage", 3, 5, 4, 1),
-    createGame("Super Short 40", 2, 7, 5, 0, 1, 1, 40),
+    CribBIGage_2Hand,
+    CribBIGage_3Hand,
+    cribbage_2Hand,
+    cribbage_3Hand,
+    createGame("60 pt", 2, 7, 5, 0, 1, 1, 40),
 ];

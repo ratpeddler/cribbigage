@@ -6,9 +6,9 @@ import { Play } from "./stages/play";
 import { Crib } from "./stages/crib";
 import { ScoreStage } from "./stages/scoreStage";
 import { GameState } from "../game/game";
-import { ChooseGameMode } from "./stages/chooseGameMode";
 import { LayoutProps } from "./layouts/Horizontal_2Player";
 import { GameOver } from "./stages/gameover";
+import { CreateGame } from "./stages/createGame";
 
 export interface GameComponentProps {
     game: GameState,
@@ -22,8 +22,8 @@ export const Game: GameComponent = props => {
     switch (props.game.stage) {
         case "GameOver":
             return <GameOver {...props} />;
-        case "ChooseGameMode":
-            return <ChooseGameMode {...props} />;
+        case "CreateGame":
+            return <CreateGame {...props} />;
         case "Deal":
             return <Deal {...props} />;
         case "Throw":

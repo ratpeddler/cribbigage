@@ -32,7 +32,7 @@ const DownLine = [
     ...Down,
 ];
 
-export const TrifoldBoard = createTrack(1, 3, [
+export const TrifoldBoard = createTrack("Trifold", 120, 1, 3, [
     createStraightSegment(15, 50, 3, 1),
     breaker,
     straight,
@@ -63,7 +63,7 @@ downBreaker,
 ...Down,
 ...Down,
 ];
-export const QuadfoldBoard = createTrack(1, 3, [
+export const QuadfoldBoard = createTrack("Quadfold", 120, 1, 3, [
     createStraightSegment(15, 50, 3, 1),
     ...QuadLine,
     create180Segment(70, 50, 3),
