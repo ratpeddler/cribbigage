@@ -1,14 +1,47 @@
 import React from "react";
 import { PlayerState, getPlayerByName } from "../game/players";
 import _ from "lodash";
+import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds } from "./track";
 
 const boardColor = "sandybrown";
+let x = createStraightSegment(1, 1, 1);
 
 const byPlayerName = (a: PlayerState, b: PlayerState) => {
     if (a.name > b.name) { return 1; }
     if (a.name === b.name) { return 0; }
     return -1;
 };
+
+const testplayers = 3;
+
+const def = [
+    createStraightSegment(50, 50, testplayers, 3),
+    createSpacer(5, Math.PI / 17),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, Math.PI / 17),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, Math.PI / 17),
+    createStraightSegment(70, 50, testplayers),
+    create180Segment(70, 50, testplayers),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, -1 * Math.PI / 17),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, -1 * Math.PI / 17),
+    create180Segment(70, 50, testplayers, true),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, Math.PI / 17),
+    createStraightSegment(70, 50, testplayers),
+    createSpacer(5, Math.PI / 17),
+    create90Segment(70, 50, testplayers, true),
+    createSpacer(15, 0),
+    create90Segment(70, 50, testplayers, true),
+    createStraightSegment(70, 50, testplayers),
+    createStraightSegment(35, 50, 1, 1),
+];
+
+const dots = createTrack(def);
+
+console.log(getTrackBounds(dots));
 
 export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number, vertical?: boolean, lines?: number }> = props => {
     const turnOrderPlayers = _.cloneDeep(props.players);
@@ -77,7 +110,8 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
     }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
-    return <div style={{ display: "flex", flexDirection: "column" }}>
+    return <div style={{ display: "flex", flexDirection: "column", position: "relative" }}>
+        {dots.map(dot => <SimpleDot dot={dot} />)}
         <div className="BoardWrapper"
             style={{
                 display: "flex",
