@@ -137,15 +137,5 @@ export const Play: GameComponent = props => {
             }}>
             Play is done. Go to score hands
         </Button>}
-
-        {/*!playStageOver(game) && <Button onClick={() => props.setGameState({
-            ...props.game,
-            previousPlayedCards: [],
-            playedCards: [],
-            nextToPlay: 0,
-            lastToPlay: undefined,
-        }, true)}>
-            SKIP to Score hands
-    </Button>*/}
     </div>;
 }
