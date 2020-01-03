@@ -1,12 +1,12 @@
 import React from "react";
 import { GameComponent } from "../game";
 import { Button } from "../button";
-import { GameModes, CribBIGage_2Hand, GameRules, CribBIGage_3Hand, cribbage_2Hand, cribbage_3Hand } from "../../game/rules";
+import { CribBIGage_2Hand, GameRules, CribBIGage_3Hand, cribbage_2Hand, cribbage_3Hand } from "../../game/rules";
 import { startGame } from "../../game/game";
 import logo from "./../../cribbigage.png";
 import { Track, TrackDefinition } from "../track";
 import { OldSchoolBoard } from "../../boards/tracks/oldschool";
-import { TrifoldBoard, QuadfoldBoard } from "../../boards/tracks/trifold";
+import { TrifoldBoard } from "../../boards/tracks/trifold";
 import { Back, Backs, CardBack } from "../card";
 import { aroundTheBack } from "../../boards/tracks/aroundTheBack";
 
@@ -22,10 +22,10 @@ export const Boards = [
 ];
 
 const ChooseDeck: React.FC<IPicker<Back>> = props => {
-    return <div style={{ flexDirection: "row", display: "flex", justifyContent: "space-around" }}>
+    return <div style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
         {Backs.map(back =>
             <div
-                style={{ border: props.selected == back ? "10px solid lightblue" : "10px solid transparent" }}
+                style={{ margin: 20, border: props.selected === back ? "10px solid lightblue" : "10px solid transparent" }}
                 onClick={() => props.onSelect(back)}
             >
                 <CardBack back={back} width={100} />
@@ -39,11 +39,12 @@ interface IBoardPicker extends IPicker<TrackDefinition> {
 }
 
 const ChooseBoard: React.FC<IBoardPicker> = props => {
-    return <div style={{ flexDirection: "row", display: "flex", justifyContent: "space-around" }}>
+    return <div style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
         {Boards.map(board =>
             <div
                 style={{
-                    border: props.selected == board ? "10px solid lightblue" : "10px solid transparent",
+                    margin: 20,
+                    border: props.selected === board ? "10px solid lightblue" : "10px solid transparent",
                     filter: board.players < props.players || board.pointsToEnd < props.points ? "grayscale(100%)" : undefined
                 }}
                 onClick={board.players < props.players || board.pointsToEnd < props.points ? undefined : () => props.onSelect(board)}
@@ -66,16 +67,16 @@ export const CreateGame: GameComponent = props => {
         <Button
             onClick={() => {
                 let mode = {} as GameRules;
-                if (players == 2 && rules == "CribBIGage") {
+                if (players === 2 && rules === "CribBIGage") {
                     mode = CribBIGage_2Hand
                 }
-                if (players == 3 && rules == "CribBIGage") {
+                if (players === 3 && rules === "CribBIGage") {
                     mode = CribBIGage_3Hand
                 }
-                if (players == 2 && rules == "cribbage") {
+                if (players === 2 && rules === "cribbage") {
                     mode = cribbage_2Hand
                 }
-                if (players == 3 && rules == "cribbage") {
+                if (players === 3 && rules === "cribbage") {
                     mode = cribbage_3Hand
                 }
 
