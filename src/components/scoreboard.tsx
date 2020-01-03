@@ -96,7 +96,7 @@ export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = pro
         dot = { ...dot };
         dots.push(dot);
         if (dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
-        const playerForTrack = boardOrderPlayers[dot.playerIndex];
+        const playerForTrack = fakedPlayers[dot.playerIndex];
         if (playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)) {
             dot.playerPresentAndColor = playerForTrack.color;
         }
