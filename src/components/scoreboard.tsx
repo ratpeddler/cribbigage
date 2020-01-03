@@ -1,8 +1,12 @@
 import React from "react";
 import { PlayerState, getPlayerByName } from "../game/players";
 import _ from "lodash";
+import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
+import { aroundTheBack } from "../boards/tracks/aroundTheBack";
+import { TrifoldBoard, QuadfoldBoard } from "../boards/tracks/trifold";
 
 const boardColor = "sandybrown";
+let x = createStraightSegment(1, 1, 1);
 
 const byPlayerName = (a: PlayerState, b: PlayerState) => {
     if (a.name > b.name) { return 1; }
@@ -77,7 +81,22 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
     }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
-    return <div style={{ display: "flex", flexDirection: "column" }}>
+    const track = TrifoldBoard;
+
+    // add players
+    // players start 
+    let dots = [];
+    for(let dot of track.dots){
+        dot = {...dot};
+        dots.push(dot);
+        if(dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
+        const playerForTrack = boardOrderPlayers[dot.playerIndex];
+        if(playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)){
+            dot.playerPresentAndColor = playerForTrack.color;
+        }
+    }
+
+    return <div style={{ display: "flex", flexDirection: "column", position: "relative" }}>
         <div className="BoardWrapper"
             style={{
                 display: "flex",
@@ -85,7 +104,10 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
                 border: `5px solid ${isMoving ? isMoving.color : "transparent"}`,
                 padding: 5
             }}>
-            <Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />
+                <Track 
+                    track={{...track, dots}}
+                />
+            {/*<Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />*/}
         </div>
 
         <div style={{ textAlign: "center" }}>
