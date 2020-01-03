@@ -14,6 +14,7 @@ interface SelectableHandProps {
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
     allDisabled?: boolean,
+    stacked?: boolean,
 }
 
 export function ExtractKeptCard(keepCard: KeepCard): number {
@@ -53,27 +54,52 @@ interface HandProps {
     keepCards?: KeepCard,
     onClick?: (card: number) => void,
     stacked?: boolean,
+    superStacked?: boolean,
     currentCount?: number;
     onReorder?: (newHand: number[]) => void,
     allDisabled?: boolean,
 }
 
 export const Hand: React.FC<HandProps> = props => {
-    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled } = props;
+    const { maxKeep, keepCards, stacked, cards, onClick, currentCount, onReorder, allDisabled, superStacked } = props;
+
     return (
         <div key="hand" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginLeft: stacked ? -1 * StackedMargin : undefined }}>
             {cards.map((card, i) => {
-                let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
-                return <Card
-                    onMove={onReorder ? (card, droppedCard) => {
-                        console.log(`${droppedCard} was dropped on ${card}`);
-                        // let move the dropped card and place it before where it was dropped?
+                // TODO: Need to optimize this!
+                const onDragOver = onDragOverMovableArea;
+
+                const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.persist();
+                    console.log("setting data", card.toString());
+                    ev.dataTransfer.setData("text/plain", card.toString());
+                    ev.dataTransfer.dropEffect = "move";
+                };
+
+                const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
+                    ev.persist();
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
+                    if (droppedCard !== card) {
                         let newCards = [...cards].filter(c => c !== droppedCard);
                         newCards.splice(newCards.indexOf(card), 0, droppedCard);
-                        onReorder(newCards);
-                    } : undefined}
+                        props.onReorder && props.onReorder(newCards);
+                    }
+                }
+
+                const dragProps = onReorder ? {
+                    onDragStart,
+                    onDragOver,
+                    onDrop,
+                } : undefined;
+
+                let disabled = !!currentCount && parseCard(card).count + currentCount > 31;
+                return <Card
+                    dragProps={dragProps}
                     disabled={disabled || allDisabled}
                     stacked={stacked}
+                    superStacked={superStacked}
                     card={card}
                     index={i}
                     key={i}
@@ -82,4 +108,9 @@ export const Hand: React.FC<HandProps> = props => {
                 />
             })}
         </div>);
+}
+
+export const onDragOverMovableArea = (ev: React.DragEvent<HTMLDivElement>) => {
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = "move";
 }

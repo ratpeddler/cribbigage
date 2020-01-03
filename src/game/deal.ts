@@ -1,7 +1,8 @@
-import { Card } from "./card";
+import { Card, parseCard } from "./card";
 import { GameState } from "./game";
+import { IPlayLogContext } from "../components/playLog";
 
-export function RunDeal(game: GameState): GameState {
+export function RunDeal(game: GameState, logContext: IPlayLogContext): GameState {
     const { players, rules } = game;
     const { hands, crib, cut } = deal(players.length, undefined, rules.dealSize, rules.dealerExtra, rules.cribExtra, rules.cutSize);
 
@@ -41,8 +42,12 @@ export function checkDeck(deck: number[]) {
 }
 
 export function shuffleDeck(deck: number[]): Deck {
-    const shuffle = deck.map(card => ({ card, random: Math.random() }));
-    const newDeck = [...shuffle].sort((a, b) => {
+    return shuffle(deck);
+}
+
+export function shuffle<T>(items: T[]): T[] {
+    const shuffle = items.map(item => ({ item, random: Math.random() }));
+    const newItems = [...shuffle].sort((a, b) => {
         if (a.random > b.random) {
             return 1;
         }
@@ -52,7 +57,7 @@ export function shuffleDeck(deck: number[]): Deck {
         return -1;
     });
 
-    return newDeck.map(wrapper => wrapper.card);
+    return newItems.map(wrapper => wrapper.item);
 }
 
 export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cribExtra = 0, cutCount = 1) {
@@ -92,5 +97,5 @@ export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cr
     }
 
     // Return the player hands, the initial crib and the remaining deck (This will need to be cut)
-    return { hands, crib, cut };
+    return { hands: hands.map(hand => hand.sort((a, b) => parseCard(a).rank - parseCard(b).rank)), crib, cut };
 }

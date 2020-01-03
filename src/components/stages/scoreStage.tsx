@@ -1,40 +1,47 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { HandScore } from "../handScore";
-import { Hand } from "../hand";
 import { Button } from "../button";
-import { scoreHand } from "../../game/score";
+import { scoreHand, addPlayerScore } from "../../game/score";
+import { getCurrentDealer } from "../../game/play";
+import { PlayLogContext } from "../playLog";
+import _ from "lodash";
 
 export const ScoreStage: GameComponent = props => {
-    return <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "row" }}>
-        <div style={{ flex: "none", padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 20 }}>
-            <h3>Cut:</h3>
-            <Hand cards={props.game.cut!} />
-            <div>
-                <Button onClick={() => {
-                    props.setGameState({
-                        ...props.game,
-                        players: props.game.players.map((p, pi) => {
-                            const score = scoreHand(p.hand, props.game.cut!);
-                            const newScore = p.score + score.score;
-                            if (newScore >= 120) { alert(`${p.name} won!`) }
-                            return { ...p, score: newScore, lastScore: p.score };
-                        })
-                    }, true);
-                }}>Next</Button>
-            </div>
-        </div>
-        <div style={{ flex: "auto" }}>
-            {props.game.players.map(p => <div key={p.name}>
-                <h3>{p.name}:</h3>
-                <div style={{ display: "flex", flexDirection: "row" }}>
-                    <div><Hand cards={p.hand} /></div>
-                    <div><HandScore key={p.name} hand={p.hand} cut={props.game.cut} /></div>
-                </div>
+    const Layout = props.layout;
+    const logContext = React.useContext(PlayLogContext);
+    let game = _.cloneDeep(props.game);
+    let dealer = getCurrentDealer(game);
 
+    const [hasCounted, setHasCounted] = React.useState(false);
 
-            </div>)}
-        </div>
+    React.useEffect(() => {
+        setTimeout(() => {
+            // this is in correct order
+            for (let p of game.players) {
+                const score = scoreHand(p.hand, props.game.cut!);
+                const newScore = p.score + score.score;
+                addPlayerScore(p, score.score, game);
 
-    </div>;
+                if (newScore > game.rules.pointsToWin) {
+                    // a player has won, stop counting and update the game
+                    break;
+                }
+            }
+
+            props.setGameState(game, false);
+            setHasCounted(true);
+        }, 500);
+    }, []);
+
+    return <Layout
+        hideScores
+        game={props.game}
+        userActions={() =>
+            <Button disabled={!hasCounted} onClick={() => {
+                props.setGameState(game, true);
+            }}>
+                {hasCounted ? "Next" : "Scoring hands..."}
+            </Button>
+        }
+    />;
 }

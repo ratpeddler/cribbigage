@@ -11,7 +11,7 @@ export type Suit = "Clubs" | "Diamonds" | "Hearts" | "Spades";
 /** Parse a card number as the relevant value, suit and count (for 15s) */
 export function parseCard(card: Card) {
     const value = parseValue(card);
-    return { value, suit: parseSuit(card), count: getCountFromValue(value) };
+    return { value, suit: parseSuit(card), count: getCountFromValue(value), rank: parseRank(card) };
 }
 
 function getCountFromValue(value: Value): number {
@@ -30,14 +30,14 @@ function getCountFromValue(value: Value): number {
  *  Get the raw numberical value 1 (ACE) to 13 (KING)
  *  NOTE: Use @see parseCard for the named rank values
  *  */
-export function parseNumericalValue(card: Card){
+export function parseRank(card: Card){
     return (card % 13) + 1;
 }
 
 // AKA the card's Rank Value
 function parseValue(card: Card): Value {
     // Card is 1-53
-    const rawValue = parseNumericalValue(card);
+    const rawValue = parseRank(card);
     switch (rawValue) {
         case 1:
             return "Ace";

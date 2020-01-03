@@ -1,141 +1,174 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { Hand, KeepCard, HandAndScore, ExtractKeptCard } from "../hand";
+import { KeepCard, ExtractKeptCard, onDragOverMovableArea } from "../hand";
 import { Button } from "../button";
-import { scorePlay, sumCards, canPlay, cantPlayAtAll, playAI, filterHand, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
+import { sumCards, canPlay, cantPlayAtAll, playStageOver, playCard, pass, ensureNextPlayer } from "../../game/play";
 import { IsYou } from "./chooseGameMode";
+import { PlayLogContext } from "../playLog";
+import { playAI } from "../../ai/AI_play";
+import { parseCard } from "../../game/card";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
 const SlowAIDelay = 1200; // 1.2 seconds
+const fastAIDelay = 500; // 1.2 seconds
+
+const AutoAdvancePlayerDuring31 = false;
 
 export const Play: GameComponent = props => {
+    const Layout = props.layout;
+    const logContext = React.useContext(PlayLogContext);
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
 
     const { setGameState } = props;
     const { game } = props;
-    const { players, previousPlayedCards = [], playedCards = [], cut } = game;
+    const { players, previousPlayedCards = [], playedCards = [] } = game;
 
+    const stageIsOver = playStageOver(game);
     const user = players.filter(IsYou)[0];
 
-    // need to filter out the already played cards
     const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
-
     const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
+
+    const passYourTurn = () => {
+        // Reset the current selection
+        setKeepCard({});
+        // always advance on pass?
+        setGameState(AutoAdvanceToYourTurn
+            ? playAI(pass(game, logContext), true, logContext)
+            : pass(game, logContext), false);
+    }
+
+    React.useEffect(() => logContext.addLog(players[0], "starts"), [logContext, players]);
+
+    const onDrop = React.useCallback((ev: React.DragEvent<HTMLDivElement>) => {
+        ev.persist();
+        ev.preventDefault();
+        ev.stopPropagation();
+        const playedCard = parseInt(ev.dataTransfer.getData("text/plain"));
+
+        if (isNaN(playedCard)) {
+            throw "played card was NAN";
+        }
+
+        if (canPlay(playedCards, playedCard)) {
+            console.log("played", playedCard);
+            // Reset the current selection
+            setKeepCard({});
+            // only have PLAYAI if you want to auto advance!
+            setGameState(AutoAdvanceToYourTurn
+                ? playAI(playCard(game, playedCard, logContext), false, logContext)
+                : playCard(game, playedCard, logContext), false);
+        }
+    }, [game, logContext, playedCards, setGameState]);
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
-        if (AutoAdvanceToYourTurn) {
-            console.log("checking if user should play", game.nextToPlay)
-            let nextToPlay = game.nextToPlay || 0;
-            if (!IsYou(players[nextToPlay])) {
-                console.log("user was NOT next, so having ai play");
-                setGameState(playAI(game, true), false);
+        if (stageIsOver) {
+            // you can stop now. No need to have other say "GO"
+            return;
+        }
+
+        // special case for "GO" OR "31"
+        if (sumCards(game.playedCards || []) == 31) {
+            if (isYourTurn) {
+                // Don't do this right now, it is kind of weird
+                //setTimeout(() => {
+                //    passYourTurn();
+                //}, SlowAIDelay);
             }
+            else {
+                // Add some time out here
+                setTimeout(() => {
+                    setGameState(playAI(game, false, logContext), false);
+                }, fastAIDelay);
+            }
+        }
+
+        else if (AutoAdvanceToYourTurn && !isYourTurn) {
+            setGameState(playAI(game, true, logContext), false);
         }
         else if (SlowAdvanceToYourTurn && !isYourTurn) {
             // Add some time out here
             setTimeout(() => {
-                setGameState(playAI(game, false), false);
+                setGameState(playAI(game, false, logContext), false);
             }, SlowAIDelay);
         }
-    }, [game, game.nextToPlay, isYourTurn, players, setGameState]);
+    }, [game, game.nextToPlay, isYourTurn, logContext, setGameState, stageIsOver]);
 
-    return <div style={{ height: "100%", width: "100%" }}>
-        <h3>{isYourTurn ? "It's your turn to play!" : `${players[ensureNextPlayer(game)].name} is playing...`}</h3>
+    return <Layout
+        onDragOverPlayedCards={onDragOverMovableArea}
+        onDropOverPlayedCards={onDrop}
+        game={props.game}
+        selectedCards={keepCard}
+        setSelectedCards={newKeptCards => {
+            let card = ExtractKeptCard(newKeptCards);
+            if (card) {
+                // ENFORCE play rules
+                if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
+                    setKeepCard(newKeptCards);
+                }
+                else {
+                    alert("cant play that!");
+                }
+            }
+            else {
+                setKeepCard(newKeptCards);
+            }
+        }}
+        maxSelectedCards={1}
+        userActions={() => <div
+            style={{ textAlign: "center", height: "100%", width: "100%", flex: "auto", alignItems: "center", display: "flex", flexDirection: "column", justifyContent: "center" }}
+            onDragOver={onDragOverMovableArea}
+            onDrop={onDrop}
+        >
+            {!stageIsOver && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
+            {stageIsOver || isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
-                Cut:
-                <Hand cards={cut!} />
-            </div>
-            {previousPlayedCards && previousPlayedCards.length > 0 && <div style={{ padding: "0px 10px", borderRight: "1px solid lightgrey", marginRight: 10 }}>
-                Previous cards:
-                {previousPlayedCards && <Hand cards={previousPlayedCards} keepCards={{}} stacked={true} />}
-            </div>}
-            <div style={{ marginLeft: 15 }}>
-                Played cards:
-                {playedCards && <Hand cards={playedCards} keepCards={{}} />}
-            </div>
+            {!isYourTurn && !SlowAdvanceToYourTurn && <Button
+                onClick={() => { setGameState(playAI(game, false, logContext), false) }}>
+                AI's turn
+                </Button>}
+
+            {!cantPlay && isYourTurn && !stageIsOver &&
+                <Button
+                    disabled={disabled}
+                    onClick={() => {
+                        let playedCard = ExtractKeptCard(keepCard);
+                        // Reset the current selection
+                        setKeepCard({});
+                        // only have PLAYAI if you want to auto advance!
+                        setGameState(AutoAdvanceToYourTurn
+                            ? playAI(playCard(game, playedCard, logContext), false, logContext)
+                            : playCard(game, playedCard, logContext), false);
+                    }}>
+                    {disabled ? "Select a card to play" : "Play selected card"}
+                </Button>}
+
+            {cantPlay && isYourTurn && !stageIsOver &&
+                <Button disabled={!cantPlay} onClick={passYourTurn}>
+                    Pass
+                </Button>}
+
+            {stageIsOver && <Button
+                disabled={!stageIsOver}
+                onClick={() => {
+                    props.setGameState({
+                        ...props.game,
+                        previousPlayedCards: [],
+                        playedCards: [],
+                        nextToPlay: 0,
+                        lastToPlay: undefined,
+                        players: game.players.map(player => {
+                            player.playedCards = [];
+                            return player;
+                        })
+                    }, true)
+                }}>
+                Play is done. Go to score hands
+                </Button>}
         </div>
-        <h3>Current count: {playedCards && sumCards(playedCards)}</h3>
-
-        Your Hand:
-        {players.map((p, index) => {
-            const remainingCards = filterHand(p.hand, game.playedCards, game.previousPlayedCards);
-            return IsYou(p) && <HandAndScore
-                allDisabled={!isYourTurn}
-                cards={remainingCards}
-                key={index}
-                maxKeep={1}
-                currentCount={playedCards ? sumCards(playedCards) : 0}
-                keepCards={keepCard}
-                setKeepCards={newKeptCards => {
-                    let card = ExtractKeptCard(newKeptCards);
-                    if (card) {
-                        // ENFORCE play rules
-                        if (canPlay(playedCards, ExtractKeptCard(newKeptCards))) {
-                            setKeepCard(newKeptCards);
-                        }
-                        else {
-                            console.log("cant play that!");
-                        }
-                    }
-                    else {
-                        setKeepCard(newKeptCards);
-                    }
-                }}
-            />
-        })}
-
-        {isYourTurn && !playStageOver(game) && <div>
-            SCORE: {playedCards && Object.keys(keepCard).filter(c => !!keepCard[c as any]).length && scorePlay(playedCards!, ExtractKeptCard(keepCard))}
-        </div>}
-
-        {isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
-
-        {!isYourTurn && !SlowAdvanceToYourTurn && <Button
-            onClick={() => { setGameState(playAI(game, false), false) }}>
-            AI's turn
-        </Button>}
-
-        {isYourTurn && !playStageOver(game) && <Button
-            disabled={disabled}
-            onClick={() => {
-                let playedCard = ExtractKeptCard(keepCard);
-
-                // Reset the current selection
-                setKeepCard({});
-                // only have PLAYAI if you want to auto advance!
-                setGameState(AutoAdvanceToYourTurn ? playAI(playCard(game, playedCard)) : playCard(game, playedCard), false);
-            }}>
-            Play selected card
-        </Button>}
-
-        {isYourTurn && !playStageOver(game) && <Button disabled={!cantPlay} onClick={() => {
-            // Reset the current selection
-            setKeepCard({});
-            // always advance on pass?
-            setGameState(AutoAdvanceToYourTurn ? playAI(pass(game), true) : pass(game), false);
-        }}>
-            Pass
-        </Button>}
-
-        {playStageOver(game) && <Button
-            disabled={!playStageOver(game)}
-            onClick={() => {
-                // TODO: This needs to handle LAST CARD
-                // NEEDS TO CHECK IF it ended on 31 too!
-                props.setGameState({
-                    ...props.game,
-                    previousPlayedCards: [],
-                    playedCards: [],
-                    nextToPlay: 0,
-                    lastToPlay: undefined,
-                }, true)
-            }}>
-            Play is done. Go to score hands
-        </Button>}
-    </div>;
+        }
+    />;
 }

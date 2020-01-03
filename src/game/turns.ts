@@ -8,18 +8,6 @@ export type NonGameStages = "ChooseGameMode" | "GameOver";
 
 export const StageOrder: Readonly<Stage[]> = ["Deal", "Throw", "Cut", "Play", "Score", "Crib"];
 
-export interface PlayerInfo {
-    name: string;
-
-    // Can add things like USERID etc here in the future or leave as is
-}
-
-export interface PlayerState extends PlayerInfo {
-    score: number;
-    lastScore: number;
-    hand: Hand;
-}
-
 export function isGameStage(game: GameState) {
     return StageOrder.indexOf(game.stage as Stage) >= 0;
 }
@@ -30,11 +18,15 @@ export function AdvanceGameState(game: GameState): GameState {
         throw `Cant use advance game stage from non-game loop stage: ${game.stage}`;
     }
 
-    const newStage = (currentStage + + 1) % StageOrder.length;
+    const newStage = (currentStage + 1) % StageOrder.length;
     const stage = StageOrder[newStage];
 
     if (newStage == 0) {
-        let [first, ...rest] = game.players;
+        let [first, ...rest] = game.players.map(player => {
+            player.playedCards = [];
+            player.hand = [];
+            return player;
+        });
         return {
             ...game,
             stage,

@@ -1,5 +1,7 @@
-import { parseCard, parseNumericalValue, Suit } from "./card";
+import { parseCard, parseRank, Suit } from "./card";
 import { Hand } from "./deal";
+import { PlayerState } from "./players";
+import { GameState } from "./game";
 
 const SCORE_FIFTEEN = 2;
 const SCORE_PAIR = 2;
@@ -13,6 +15,41 @@ const MINIMUM_RUN_LENGTH = 3;
 /** Min number of cards to count for a flush. This should probably be hand size */
 const MINIMUM_FLUSH_LENGTH = 4;
 
+export function addPlayerScore(player: PlayerState, points: number, game: GameState) {
+    if (points > 0) {
+        player.lastScore = player.score;
+        player.score += points;
+
+        /* This should be handled for most things? DEAL, PLAY, SCORE, CRIB
+        if (player.score > game.rules.pointsToWin) {
+            let messages = [player.name + " won!"];
+            //skunk = 90 / 120 = 3/4
+            // TODO: handle skunk better
+            game.players.forEach(p => {
+                if (p.score < game.rules.pointsToWin * .5) {
+                    messages.push(`${p.name} was DOUBLE skunked!`);
+                }
+                else if (p.score < game.rules.pointsToWin * .75) {
+                    messages.push(`${p.name} was skunked!`);
+                }
+            })
+
+            alert(messages.join(", "));
+        }
+        */
+    }
+}
+
+export function anyPlayerHasWon(game: GameState) {
+    for (let player of game.players) {
+        // HACK for now, should be stored in game state
+        if (player.score > game.rules.pointsToWin) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 /**
  * Scores a normal hand
@@ -21,7 +58,7 @@ const MINIMUM_FLUSH_LENGTH = 4;
  * @param isCrib whether this is a crib or not (May affect some rules related to flush)
  * TODO: Update rules based on whether it is a crib or not
  */
-export function scoreHand(hand: Hand, cut: Hand, isCrib = false) {
+export function scoreHand(hand: Hand, cut: Hand = [], isCrib = false) {
     const cards = [...hand, ...cut];
 
     const fifteen = scoreFifteens(cards);
@@ -29,6 +66,7 @@ export function scoreHand(hand: Hand, cut: Hand, isCrib = false) {
     const pairs = scorePairs(cards);
     const flush = scoreFlush(hand, cut, isCrib);
     const knobs = scoreKnobs(hand, cut);
+    // TODO - Recognize the UI scoring event of CRIBBIGAGE  
 
     return {
         score: fifteen + pairs + knobs + runs + flush,
@@ -134,7 +172,7 @@ function scoreRuns(hand: Hand) {
     let score = 0;
 
     // sort the hand by raw numerical value. This is by rank and ignores suit.
-    cards = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    cards = cards.map(parseRank).sort((a, b) => a - b);
 
     // Look for contiguous sections
     let run: number[] = [];

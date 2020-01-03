@@ -1,8 +1,11 @@
 import { Hand } from "./deal";
-import { Card, parseCard, parseNumericalValue } from "./card";
+import { Card, parseCard, parseRank } from "./card";
 import { GameState } from "./game";
-import { IsYou } from "../components/stages/chooseGameMode";
-import { PlayerState } from "./turns";
+import { addPlayerScore } from "./score";
+import { PlayerState } from "./players";
+import { IScore } from "./../components/scoreIcon";
+import { IPlayLogContext } from "../components/playLog";
+import { playCardSound, playScoreSound, playCheckSound, playKnockSound } from "../sounds/playSound";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -12,6 +15,13 @@ const SCORE_MAX_COUNT = 2;
 const SCORE_PER_FIFTEEN = 2;
 const SCORE_PER_PAIR = 2;
 const SCORE_PER_RUN_CARD = 1;
+const SCORE_GO = 1;
+const SCORE_LAST_CARD = 1;
+
+export function getPlayableHand(player: PlayerState, game: GameState) {
+    const { playedCards, previousPlayedCards } = game;
+    return filterHand(player.hand, playedCards, previousPlayedCards);
+}
 
 export function filterHand(hand: Hand, playedCards: Hand = [], previousPlayedCards: Hand = []) {
     return hand.filter(c => playedCards.indexOf(c) < 0).filter(c => previousPlayedCards.indexOf(c) < 0);
@@ -53,117 +63,97 @@ export function playStageOver(game: GameState) {
     return true;
 }
 
+export function incrementNextPlayer(game: GameState): number {
+    return (ensureNextPlayer(game) + 1) % game.players.length;
+}
+
 export function ensureNextPlayer(game: GameState): number {
     if (!game.nextToPlay) {
-        console.log("reseting next to play to 0")
         return 0;
     }
 
     return game.nextToPlay % game.players.length;
 }
 
-export function playAI(game: GameState, autoAdvanceUntilPlayer = false): GameState {
-    console.log("ai is playing", game.nextToPlay);
-
-    // Start at the next person who needs to play
-    game = { ...game };
-    game.nextToPlay = ensureNextPlayer(game);
-
-    let keepRunning = true;
-    // WHILE will run all AI players until your turn, IF will run 1 AI player
-    while (!IsYou(game.players[ensureNextPlayer(game)]) && keepRunning) {
-        if (autoAdvanceUntilPlayer) { keepRunning = false; }
-        const { players, playedCards = [], previousPlayedCards = [] } = game;
-        game.nextToPlay = ensureNextPlayer(game);
-        const player = players[game.nextToPlay];
-        const hand = filterHand(player.hand, playedCards, previousPlayedCards);
-        console.log("checking if ai can play", hand);
-
-        if (cantPlayAtAll(player, playedCards, previousPlayedCards)) {
-            console.log("Ai said GO");
-            game = pass(game);
-            continue;
-        }
-
-        for (let card of hand) {
-            if (canPlay(playedCards, card)) {
-                game = playCard(game, card);
-                break;
-            }
-        }
-    }
-
-    return game;
+export function getCurrentPlayer(game: GameState): PlayerState {
+    return game.players[ensureNextPlayer(game)];
 }
 
+export function getCurrentDealer(game: GameState): PlayerState {
+    return game.players[game.players.length - 1];
+}
 
-export function playCard(game: GameState, card: Card): GameState {
-    let { players, playedCards = [] } = game;
-    let nextToPlay = ensureNextPlayer(game);
-    const player = players[nextToPlay];
+export function playCard(game: GameState, card: Card, logContext: IPlayLogContext): GameState {
+    let { playedCards = [] } = game;
+    const player = getCurrentPlayer(game);
 
     if (!canPlay(playedCards, card)) {
         throw `Can't play that! ${card}`;
     }
 
-    game.lastToPlay = nextToPlay;
-
-    console.log("ai can play", card)
+    game.lastToPlay = ensureNextPlayer(game);
 
     // SCORE
     const playScore = scorePlay(playedCards, card);
+    addPlayerScore(player, playScore.score, game);
+    
+
+    // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
-    if (playScore) {
-        player.lastScore = player.score;
-        player.score += playScore;
-    }
+    player.playedCards = [...player.playedCards || [], card];
 
-    // check if the round is over. If so you get 1 point for last card IF the count is not 31
+    // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        console.log("LAST CARD!", player.name);
-        player.lastScore = player.score;
-        player.score++;
+        addPlayerScore(player, SCORE_LAST_CARD, game);
+        playScore.lastCard = 1;
+        playScore.score++;
     }
+    
+    playScore.score ? playScoreSound(playScore.score) : playCardSound();
+    
+    logContext.addLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
 
-
-    nextToPlay++;
-    nextToPlay %= players.length;
 
     return {
         ...game,
-        nextToPlay,
+        nextToPlay: incrementNextPlayer(game),
     }
 }
 
-export function pass(game: GameState): GameState {
+export function pass(game: GameState, logContext: IPlayLogContext): GameState {
+    const player = getCurrentPlayer(game);
+
     // pass to the next player and check if there has been a GO
     if (game.lastToPlay != undefined && game.nextToPlay === game.lastToPlay) {
-        // WE should ensure that that player cannot play either!
-        console.log("we have gone around and no one could play!");
         const { previousPlayedCards = [], playedCards = [] } = game;
 
-        // check for 31 since you do not get a go for 31
+        // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            // ADD 1 to the score of the last to play player.
-            game.players[game.lastToPlay].lastScore = game.players[game.lastToPlay].score;
-            game.players[game.lastToPlay].score++;
+            logContext.addLog(player, "scored for go", { score: SCORE_GO, go: SCORE_GO });
+            addPlayerScore(player, SCORE_GO, game);
+            playScoreSound(SCORE_GO);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];
         game.previousPlayedCards = newPrevious;
         game.playedCards = [];
+        game.players.forEach(player => player.playedCards = []);
+    }
+    else {
+        logContext.addLog(player, "said GO", { score: 0, go: 0 });
+        playKnockSound();
     }
 
-    // After a go, the next to play person is the person AFTER the last to play person. which in this case is the same logic (next person)
-    game.nextToPlay = ensureNextPlayer(game);
-    game.nextToPlay++;
-    game.nextToPlay %= game.players.length;
-    return game;
+    // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 
+    return {
+        ...game,
+        nextToPlay: incrementNextPlayer(game)
+    };
 }
 
 export function isPlayStageRun(cards: Hand) {
     // order doesn't matter
-    let sorted = cards.map(parseNumericalValue).sort((a, b) => a - b);
+    let sorted = cards.map(parseRank).sort((a, b) => a - b);
     let last: number | undefined = undefined;
     for (let card of sorted) {
         if (last === undefined || card === last + 1) {
@@ -177,31 +167,38 @@ export function isPlayStageRun(cards: Hand) {
     return true;
 }
 
-export function scorePlay(playedCards: Hand, newCard: Card): number {
+export function scorePlay(playedCards: Hand, newCard: Card): IScore {
     let score = 0;
     const currentCount = sumCards(playedCards);
     const newCardParsed = parseCard(newCard);
     if (!canPlay(playedCards, newCard)) { throw `Invalid play! Can't play ${newCardParsed.count} when count is already ${currentCount}` }
 
     // 15
+    let fifteen = 0;
     if (currentCount + newCardParsed.count === 15) {
         score += SCORE_PER_FIFTEEN;
+        fifteen += SCORE_PER_FIFTEEN;
     }
 
     // 31
+    let thirtyOne = 0;
     if (currentCount + newCardParsed.count === MAX_PLAY_COUNT) {
         score += SCORE_MAX_COUNT;
+        thirtyOne += SCORE_MAX_COUNT;
     }
 
     // Pairs
     const parsedPlayedCards = playedCards.map(parseCard);
     const playedValues = parsedPlayedCards.map(card => card.value);
-    let pairs = 0;
+    let pairCount = 0;
+    let pairScore = 0;
     while (playedValues.pop() === newCardParsed.value) {
-        pairs++;
-        score += pairs * SCORE_PER_PAIR;
+        pairCount++;
+        score += pairCount * SCORE_PER_PAIR;
+        pairScore += pairCount * SCORE_PER_PAIR;
     }
 
+    let runs = 0;
     // Runs (In play phase is an unorder contiguous list with no duplicates)
     if (playedCards && playedCards.length > 1) {
         let runLength = 0;
@@ -216,13 +213,12 @@ export function scorePlay(playedCards: Hand, newCard: Card): number {
         }
 
         if (runLength >= 3) {
+            console.log(`Run of ${runLength}`);
             score += runLength * SCORE_PER_RUN_CARD;
+            runs += runLength * SCORE_PER_RUN_CARD;
         }
-
-        console.log(`Run of ${runLength}`);
     }
 
-
     // There are no flushes in pegging
-    return score;
+    return { score, runs, fifteen, thirtyOne, pairs: pairScore };
 }

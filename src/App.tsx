@@ -1,39 +1,62 @@
 import React from 'react';
-import { ScoreBoard } from './components/scoreboard';
-import { AdvanceGameState, isGameStage } from './game/turns';
+import { AdvanceGameState } from './game/turns';
 import { Game } from './components/game';
-import logo from "./cribbigage.png";
 import { initGameState } from './game/game';
+import { anyPlayerHasWon } from './game/score';
+import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
+import _ from 'lodash';
+import { PlayLogContext, IPlayLogContext, ILog } from './components/playLog';
+import { PlayerState } from './game/players';
+import { IScore } from './components/scoreIcon';
+import { playTapSound } from './sounds/playSound';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
+  const [playLog, setPlayLog] = React.useState<ILog[]>([]);
+
+  const addLog = React.useCallback((player: PlayerState | null, message: string, score?: IScore)=> {
+    setPlayLog([{
+      time: Date.now(),
+      playerName: player?.name || "GAME",
+      message,
+      score,
+    },
+     ...playLog])
+  }, [playLog, setPlayLog]);
+
+  const PlayLogContextValue = React.useMemo<IPlayLogContext>(()=>({
+    log: playLog,
+    addLog,
+  }), [playLog, addLog]);
+
+  React.useEffect(() => {
+    if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
+      setGameState({...gameState, stage: "GameOver"});
+      setPlayLog([]);
+    }
+  }, [gameState, gameState.players, gameState.stage]);
+
   //console.log(JSON.stringify(gameState));
 
   return (
-    <div style={{ position: "absolute", height: "100%", width: "100%" }}>
-
-      <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
-
-        {isGameStage(gameState) && <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: 10 }}>
-          <ScoreBoard players={gameState.players} />
-        </div>}
-
-        <div style={{ minHeight: 300, display: "flex", flex: "auto", alignItems: "center", justifyContent: "center", overflow: "auto" }}>
+      <PlayLogContext.Provider value={PlayLogContextValue}>
+        <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
           <Game
+            layout={Horizontal2PlayerLayout}
             game={gameState}
             setGameState={(newGame, advance) => {
               let game = newGame;
               if (advance) {
                 game = AdvanceGameState(game);
-                console.log("advancing", game);
+                playTapSound();
               }
 
-              setGameState(game);
+              setGameState(_.cloneDeep(game));
             }}
           />
+          <div style={{position:"fixed", bottom: 0, right: 0, padding: 10, fontSize: 10}}>© 2019 aiplayers.com</div>
         </div>
-      </div>
-    </div>
+      </PlayLogContext.Provider>
   );
 }
 
