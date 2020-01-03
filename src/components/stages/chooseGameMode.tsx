@@ -34,5 +34,6 @@ export const ChooseGameMode: GameComponent = props => {
                 {mode.name}
             </Button>
         </div>)}
+        <p>Copyright &copy; 2020 AIPlayersOnline.com</p>
     </div>
-}
+   }
