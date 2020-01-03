@@ -186,7 +186,6 @@ export const Fill: React.FC<FlexProps> = props => {
 }
 
 function divProps(props: FlexProps) {
-    console.log(props.onDragOver);
     return {
         onDragOver: props.onDragOver,
         onDrop: props.onDrop,
