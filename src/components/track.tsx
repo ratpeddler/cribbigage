@@ -263,7 +263,7 @@ export function create180Segment(length: number, width: number, players: number,
 export const SimpleDot: React.FC<{ dot: Dot }> = props => {
     const {dot} = props;
     const {fake, playerPresentAndColor} = dot;
-    let diameter = 3;
+    let diameter = 1;
     if(playerPresentAndColor){
         diameter = 6;
     }
@@ -278,7 +278,7 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
             backgroundColor: fake ? undefined : playerPresentAndColor || "rgba(0,0,0,.75)",
             width: diameter,
             height: diameter,
-            borderRadius: diameter,
+            borderRadius: diameter * 3,
             marginBottom: -1 * radius,
             marginLeft: -1 * radius
         }}
