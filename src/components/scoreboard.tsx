@@ -1,7 +1,8 @@
 import React from "react";
 import { PlayerState, getPlayerByName } from "../game/players";
 import _ from "lodash";
-import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds } from "./track";
+import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
+import { aroundTheBack } from "../boards/tracks/aroundTheBack";
 
 const boardColor = "sandybrown";
 let x = createStraightSegment(1, 1, 1);
@@ -11,40 +12,6 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
     if (a.name === b.name) { return 0; }
     return -1;
 };
-
-const testplayers = 3;
-
-const startArea = createStraightSegment(50, 50, testplayers, 3);
-const block = createStraightSegment(70, 50, testplayers);
-const weirdcurveR = createSpacer(5, Math.PI / 17);
-const weirdcurveL = createSpacer(5, Math.PI / -17);
-
-const def = [
-    startArea,
-    weirdcurveL,
-    block,
-    weirdcurveR,
-    block,
-    create180Segment(70, 50, testplayers),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, -1 * Math.PI / 17),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, -1 * Math.PI / 17),
-    create180Segment(70, 50, testplayers, true),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, Math.PI / 17),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, Math.PI / 17),
-    create90Segment(70, 50, testplayers, true),
-    createSpacer(15, 0),
-    create90Segment(70, 50, testplayers, true),
-    createStraightSegment(70, 50, testplayers),
-    createStraightSegment(35, 50, 1, 1),
-];
-
-const dots = createTrack(def);
-
-console.log(getTrackBounds(dots));
 
 export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number, vertical?: boolean, lines?: number }> = props => {
     const turnOrderPlayers = _.cloneDeep(props.players);
@@ -113,6 +80,21 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
     }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
+    const track = aroundTheBack;
+
+    // add players
+    // players start 
+    let dots = [];
+    for(let dot of track.track){
+        dot = {...dot};
+        dots.push(dot);
+        if(dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
+        const playerForTrack = boardOrderPlayers[dot.playerIndex];
+        if(playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)){
+            dot.playerPresentAndColor = playerForTrack.color;
+        }
+    }
+
     return <div style={{ display: "flex", flexDirection: "column", position: "relative" }}>
         <div className="BoardWrapper"
             style={{
@@ -121,7 +103,10 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
                 border: `5px solid ${isMoving ? isMoving.color : "transparent"}`,
                 padding: 5
             }}>
-            <Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />
+                <Track 
+                    dots={dots}
+                />
+            {/*<Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />*/}
         </div>
 
         <div style={{ textAlign: "center" }}>
