@@ -15,7 +15,7 @@ const middleSegment = createStraightSegment(width, width, players, 1);
 const joint = [
     stepBack,
     rightTurn,
-    middleSegment,
+    createSpacer(width), //middleSegment,
     rightTurn,
     stepBack,
 ]
@@ -24,7 +24,6 @@ const onceAround = [
     ...side,
     ...joint,
     ...side,
-    ...joint,
 ];
 
 const startArea = [
@@ -36,8 +35,12 @@ const startArea = [
     stepBack,
 ]
 
-export const OldSchoolBoard = createTrack(1, 2, [
+export const OldSchoolBoard = createTrack("Old School", 120, 1, 2, [
     ...startArea,
     ...onceAround,
+    ...joint,
     ...onceAround,
+    stepBack,
+    rightTurn,
+    middleSegment,
 ], "pine");

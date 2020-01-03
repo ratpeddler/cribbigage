@@ -76,9 +76,13 @@ const CardFace: React.FC<{ card: number, width: number, disabled?: boolean }> = 
     />;
 }
 
+export const CardBackContext = React.createContext<Back>("red");
 export type Back = "old" | "dragon" | "red" | "clam";
-const CardBack: React.FC<{ back?: Back, width: number }> = props => {
-    const { back = "red", width } = props;
+export const Backs: Back[] = ["old" , "dragon" , "red" , "clam"];
+
+export const CardBack: React.FC<{ back?: Back, width: number }> = props => {
+    const backContext = React.useContext(CardBackContext);
+    const { back = backContext, width } = props;
     let backCard = red;
     switch (back) {
         case "clam":

@@ -1,20 +1,14 @@
 import React from "react";
 import { PlayerState } from "../game/players";
 
-export const Path: React.FC<{ players: PlayerState[] }> = props => {
-
-    return <>
-        test
-    </>;
-}
-
-
 export type BoardBackground = "oak" | "pine" | "hardwood" | "sandybrown";
 
 export interface TrackDefinition {
+    name: string,
     background: BoardBackground,
     dots: Dot[],
     players: number,
+    pointsToEnd: number,
     startOffset: number, // this is for the starting area and it's length
 }
 
@@ -88,7 +82,7 @@ export function getTrackBounds(dots: Dot[]): { max: Coord, min: Coord } {
     return { min, max };
 }
 
-export function createTrack(startOffset: number, players: number, segments: SegmentDefinition[], background: BoardBackground = "sandybrown", horizontal?: boolean): TrackDefinition {
+export function createTrack(name: string, pointsToEnd: number, startOffset: number, players: number, segments: SegmentDefinition[], background: BoardBackground = "sandybrown", horizontal?: boolean): TrackDefinition {
     let x = 0;
     let y = 0;
     let angle = horizontal ? (Math.PI / 2) : 0;
@@ -102,7 +96,6 @@ export function createTrack(startOffset: number, players: number, segments: Segm
                 .map(dot => {
                     lastMax = Math.max(lastMax, dot.pointIndex || 0);
                     const pointIndex = dot.pointIndex !== undefined ? dot.pointIndex + curIndex : undefined
-                    console.log("adding dot with point index: ", pointIndex, dot.playerIndex)
                     return {
                         ...dot,
                         pointIndex
@@ -124,6 +117,8 @@ export function createTrack(startOffset: number, players: number, segments: Segm
     }
 
     return {
+        name,
+        pointsToEnd,
         background,
         dots: dots.map((dot, i) => ({
             ...dot,
@@ -267,29 +262,29 @@ export function create180Segment(length: number, width: number, players: number,
 
 export const SimpleDot: React.FC<{ dot: Dot }> = props => {
     const {dot} = props;
-    const {fake} = dot;
-    const diameter = 3;
-    const radius = diameter / 2;
-    if (props.dot.playerPresentAndColor) {
-        console.log("had player color", props.dot.playerPresentAndColor);
+    const {fake, playerPresentAndColor} = dot;
+    let diameter = 1;
+    if(playerPresentAndColor){
+        diameter = 6;
     }
+    const radius = diameter / 2;
     return <>
         {<div style={{
             position: "absolute",
-            zIndex: 10000,
-            bottom: props.dot.x,
-            left: props.dot.y,
-            border: fake ? undefined : `2px solid ${props.dot.playerPresentAndColor || "transparent"}`, // + ([props.dot.fake ? "red" : "black"]),
-            backgroundColor: fake ? undefined : props.dot.playerPresentAndColor || "rgba(0,0,0,.80)",
+            zIndex: playerPresentAndColor ? 10000: 10,
+            bottom: dot.x,
+            left: dot.y,
+            border: fake ? undefined : `2px solid ${playerPresentAndColor || "transparent"}`, // + ([dot.fake ? "red" : "black"]),
+            backgroundColor: fake ? undefined : playerPresentAndColor || "rgba(0,0,0,.75)",
             width: diameter,
             height: diameter,
-            borderRadius: diameter,
+            borderRadius: diameter * 3,
             marginBottom: -1 * radius,
             marginLeft: -1 * radius
         }}
-            title={props.dot.pointIndex + "," + props.dot.playerIndex}
+            title={dot.pointIndex + "," + dot.playerIndex}
         >
-            {props.dot.content}
+            {dot.content}
         </div>}
     </>
 }
@@ -307,8 +302,12 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
     // move all dots so they are positive
     dots = dots.map(dot => translate(dot, min.x * -1, min.y * -1));
 
-    // scale to percents
-    if (props.height) dots = dots.map(dot => scale(dot, 100 / (newMax.x), 100 / (newMax.y)));
+    // TODO: factor in width as WELL
+    if (props.height){
+        const scaleFactor = props.height / max.x;
+        dots = dots.map(dot => scale(dot, scaleFactor));
+        newMax = scale(newMax, scaleFactor);
+    } 
 
     const image = getBackground(background);
 

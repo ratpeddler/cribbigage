@@ -2,9 +2,9 @@ import React from "react";
 import { GameComponent } from "../game";
 import { Button } from "../button";
 import { scoreHand, addPlayerScore } from "../../game/score";
-import { getCurrentDealer } from "../../game/play";
 import { PlayLogContext } from "../playLog";
 import _ from "lodash";
+import { getCurrentDealer } from "../../game/players";
 
 export const ScoreStage: GameComponent = props => {
     const Layout = props.layout;

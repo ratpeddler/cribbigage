@@ -2,12 +2,11 @@ import React from "react";
 import { GameComponent } from "../game";
 import { onDragOverMovableArea } from "../hand";
 import { Button } from "../button";
-import { IsYou } from "./chooseGameMode";
-import { getCurrentDealer } from "../../game/play";
 import { scoreHand } from "../../game/score";
 import { throwAI } from "../../ai/AI_throw";
 import _ from "lodash";
 import { GameDragEvent } from "../card";
+import { IsYou, getCurrentDealer } from "../../game/players";
 
 export const Throw: GameComponent = props => {
     const Layout = props.layout;

@@ -1,10 +1,8 @@
-import { Deck, Hand, createDeck } from "./deal";
 import { GameState } from "./game";
-import { GameRules } from "./rules";
 
 export type Stage = "Deal" | "Throw" | "Cut" | "Play" | "Score" | "Crib";
 
-export type NonGameStages = "ChooseGameMode" | "GameOver";
+export type NonGameStages = "CreateGame" | "GameOver";
 
 export const StageOrder: Readonly<Stage[]> = ["Deal", "Throw", "Cut", "Play", "Score", "Crib"];
 

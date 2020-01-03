@@ -1,10 +1,8 @@
 import { GameState } from "../game/game"
 import _ from "lodash";
-import { PlayerState } from "../game/players";
+import { PlayerState, IsYou, getCurrentDealer } from "../game/players";
 import { Hand } from "../game/deal";
-import { IsYou } from "../components/stages/chooseGameMode";
 import { scoreHand } from "../game/score";
-import { getCurrentDealer } from "../game/play";
 
 export function throwAI(player: PlayerState, game: GameState) {
     if (IsYou(player)) throw "Called AI to throw hand on player!";

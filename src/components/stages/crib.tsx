@@ -4,7 +4,7 @@ import { HandScore } from "../handScore";
 import { Hand } from "../hand";
 import { Button } from "../button";
 import { scoreHand, addPlayerScore } from "../../game/score";
-import { getCurrentDealer } from "../../game/play";
+import { getCurrentDealer } from "../../game/players";
 
 export const Crib: GameComponent = props => {
     const Layout = props.layout;

@@ -6,8 +6,8 @@ const length = 50;
 const width = 50;
 
 const straight = createStraightSegment(length, width, players);
-const breaker = createSpacer(5, 0, <div style={{width: 40, height: 0, border: "1px solid white", marginTop: -4, marginLeft: -18}}></div>);
-const downBreaker = createSpacer(5, 0, <div style={{width: 40, height: 0, border: "1px solid white", marginTop: 1, marginLeft: -18}}></div>);
+const breaker = createSpacer(5, 0, <div style={{width: 30, height: 0, border: "1px solid white", marginTop: -4, marginLeft: -13}}></div>);
+const downBreaker = createSpacer(5, 0, <div style={{width: 30, height: 0, border: "1px solid white", marginTop: 0, marginLeft: -13}}></div>);
 
 const Normal = [ straight, breaker];
 const Down = [ straight, downBreaker];
@@ -32,7 +32,7 @@ const DownLine = [
     ...Down,
 ];
 
-export const TrifoldBoard = createTrack(1, 3, [
+export const TrifoldBoard = createTrack("Trifold", 120, 1, 3, [
     createStraightSegment(15, 50, 3, 1),
     breaker,
     straight,
@@ -63,7 +63,7 @@ downBreaker,
 ...Down,
 ...Down,
 ];
-export const QuadfoldBoard = createTrack(1, 3, [
+export const QuadfoldBoard = createTrack("Quadfold", 120, 1, 3, [
     createStraightSegment(15, 50, 3, 1),
     ...QuadLine,
     create180Segment(70, 50, 3),

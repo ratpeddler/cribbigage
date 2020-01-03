@@ -19,24 +19,6 @@ export function addPlayerScore(player: PlayerState, points: number, game: GameSt
     if (points > 0) {
         player.lastScore = player.score;
         player.score += points;
-
-        /* This should be handled for most things? DEAL, PLAY, SCORE, CRIB
-        if (player.score > game.rules.pointsToWin) {
-            let messages = [player.name + " won!"];
-            //skunk = 90 / 120 = 3/4
-            // TODO: handle skunk better
-            game.players.forEach(p => {
-                if (p.score < game.rules.pointsToWin * .5) {
-                    messages.push(`${p.name} was DOUBLE skunked!`);
-                }
-                else if (p.score < game.rules.pointsToWin * .75) {
-                    messages.push(`${p.name} was skunked!`);
-                }
-            })
-
-            alert(messages.join(", "));
-        }
-        */
     }
 }
 

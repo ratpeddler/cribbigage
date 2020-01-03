@@ -9,29 +9,30 @@ import { PlayLogContext, IPlayLogContext, ILog } from './components/playLog';
 import { PlayerState } from './game/players';
 import { IScore } from './components/scoreIcon';
 import { playTapSound } from './sounds/playSound';
+import { CardBackContext } from './components/card';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
   const [playLog, setPlayLog] = React.useState<ILog[]>([]);
 
-  const addLog = React.useCallback((player: PlayerState | null, message: string, score?: IScore)=> {
+  const addLog = React.useCallback((player: PlayerState | null, message: string, score?: IScore) => {
     setPlayLog([{
       time: Date.now(),
       playerName: player?.name || "GAME",
       message,
       score,
     },
-     ...playLog])
+    ...playLog])
   }, [playLog, setPlayLog]);
 
-  const PlayLogContextValue = React.useMemo<IPlayLogContext>(()=>({
+  const PlayLogContextValue = React.useMemo<IPlayLogContext>(() => ({
     log: playLog,
     addLog,
   }), [playLog, addLog]);
 
   React.useEffect(() => {
     if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
-      setGameState({...gameState, stage: "GameOver"});
+      setGameState({ ...gameState, stage: "GameOver" });
       setPlayLog([]);
     }
   }, [gameState, gameState.players, gameState.stage]);
@@ -39,7 +40,9 @@ const App: React.FC = () => {
   //console.log(JSON.stringify(gameState));
 
   return (
-      <PlayLogContext.Provider value={PlayLogContextValue}>
+    <PlayLogContext.Provider value={PlayLogContextValue}>
+      <CardBackContext.Provider value={gameState.customization.deckName}>
+
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
           <Game
             layout={Horizontal2PlayerLayout}
@@ -54,9 +57,10 @@ const App: React.FC = () => {
               setGameState(_.cloneDeep(game));
             }}
           />
-          <div style={{position:"fixed", bottom: 0, right: 0, padding: 10, fontSize: 10}}>© 2019 aiplayers.com</div>
+          <div style={{ position: "fixed", bottom: 0, right: 0, padding: 10, fontSize: 10 }}>© 2019 aiplayers.com</div>
         </div>
-      </PlayLogContext.Provider>
+      </CardBackContext.Provider>
+    </PlayLogContext.Provider>
   );
 }
 

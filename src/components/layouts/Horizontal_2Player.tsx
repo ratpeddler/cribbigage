@@ -1,14 +1,14 @@
 import React from "react";
 import { GameState } from "../../game/game";
 import { ScoreBoard } from "../scoreboard";
-import { getCurrentDealer, getPlayableHand, sumCards, ensureNextPlayer, getCurrentPlayer, playStageOver } from "../../game/play";
-import { IsYou } from "../stages/chooseGameMode";
+import { getPlayableHand, sumCards, playStageOver } from "../../game/play";
 import { DeckAndCut } from "../deckAndCut";
 import { Hand, HandAndScore } from "../hand";
 import { ScoreIcon } from "../scoreIcon";
 import { HandScore } from "../handScore";
 import { PlayLog } from "../playLog";
 import { GameDragEvent } from "../card";
+import { IsYou, getCurrentDealer, getCurrentPlayer } from "../../game/players";
 
 export type SelectedCards = { [card: number]: boolean };
 export interface LayoutProps {
@@ -74,7 +74,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             {/* Deck should be on the side of the dealer (TOP: Opponent, BOTTOM: You) */}
             {!yourCrib && deck}
             <Row justified>
-                <ScoreBoard vertical players={players} pointsToWin={game.rules.pointsToWin} lines={4} />
+                <ScoreBoard game={game} vertical />
             </Row>
             {yourCrib && deck}
             <PlayLog />

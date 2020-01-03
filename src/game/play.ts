@@ -2,7 +2,7 @@ import { Hand } from "./deal";
 import { Card, parseCard, parseRank } from "./card";
 import { GameState } from "./game";
 import { addPlayerScore } from "./score";
-import { PlayerState } from "./players";
+import { PlayerState, ensureNextPlayer, getCurrentPlayer } from "./players";
 import { IScore } from "./../components/scoreIcon";
 import { IPlayLogContext } from "../components/playLog";
 import { playCardSound, playScoreSound, playCheckSound, playKnockSound } from "../sounds/playSound";
@@ -67,21 +67,6 @@ export function incrementNextPlayer(game: GameState): number {
     return (ensureNextPlayer(game) + 1) % game.players.length;
 }
 
-export function ensureNextPlayer(game: GameState): number {
-    if (!game.nextToPlay) {
-        return 0;
-    }
-
-    return game.nextToPlay % game.players.length;
-}
-
-export function getCurrentPlayer(game: GameState): PlayerState {
-    return game.players[ensureNextPlayer(game)];
-}
-
-export function getCurrentDealer(game: GameState): PlayerState {
-    return game.players[game.players.length - 1];
-}
 
 export function playCard(game: GameState, card: Card, logContext: IPlayLogContext): GameState {
     let { playedCards = [] } = game;
