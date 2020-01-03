@@ -8,8 +8,12 @@ export const Path: React.FC<{ players: PlayerState[] }> = props => {
     </>;
 }
 
+
+export type BoardBackground = "oak" | "pine" | "hardwood" | "sandybrown";
+
 export interface TrackDefinition {
-    track: Dot[],
+    background: BoardBackground,
+    dots: Dot[],
     players: number,
     startOffset: number, // this is for the starting area and it's length
 }
@@ -39,6 +43,8 @@ interface SegmentDefinition {
 
     /** relative location of dots */
     dots: Dot[];
+
+    decorative?: boolean;
 }
 
 export function translate(dot: Dot, x: number, y: number): Dot {
@@ -82,14 +88,14 @@ export function getTrackBounds(dots: Dot[]): { max: Coord, min: Coord } {
     return { min, max };
 }
 
-export function createTrack(startOffset: number, players: number, segments: SegmentDefinition[], horizontal?: boolean): TrackDefinition {
+export function createTrack(startOffset: number, players: number, segments: SegmentDefinition[], background: BoardBackground = "sandybrown", horizontal?: boolean): TrackDefinition {
     let x = 0;
     let y = 0;
     let angle = horizontal ? (Math.PI / 2) : 0;
     let dots: Dot[] = [];
     let curIndex = 1 - startOffset;
     for (let segment of segments) {
-        if(segment.dots.length > 0){
+        if (segment.dots.length > 0) {
             let lastMax = 0;
             dots.push(...segment.dots
                 // Adjust the start offsets!
@@ -106,10 +112,11 @@ export function createTrack(startOffset: number, players: number, segments: Segm
                 .map(dot => rotate(dot, angle))
                 // translate
                 .map(dot => translate(dot, x, y)));
-    
-            curIndex += lastMax + 1;
+
+            // Dont count decorative segments!
+            curIndex += segment.decorative ? 0 : lastMax + 1;
         }
-        
+
         let rotated = rotate(segment.length, angle);
         x += rotated.x;
         y += rotated.y;
@@ -117,7 +124,8 @@ export function createTrack(startOffset: number, players: number, segments: Segm
     }
 
     return {
-        track: dots.map((dot, i) => ({
+        background,
+        dots: dots.map((dot, i) => ({
             ...dot,
         })),
         startOffset,
@@ -127,9 +135,10 @@ export function createTrack(startOffset: number, players: number, segments: Segm
 
 export function createSpacer(length: number, angle: number = 0, content?: React.ReactNode): SegmentDefinition {
     return {
+        decorative: true,
         length: { x: length, y: 0 },
         angle,
-        dots: content ? [] : [],
+        dots: content ? [{x:0, y:0, fake: true, content}] : [],
     }
 }
 
@@ -257,28 +266,28 @@ export function create180Segment(length: number, width: number, players: number,
 }
 
 export const SimpleDot: React.FC<{ dot: Dot }> = props => {
+    const {dot} = props;
+    const {fake} = dot;
     const diameter = 3;
     const radius = diameter / 2;
-    if(props.dot.playerPresentAndColor){
+    if (props.dot.playerPresentAndColor) {
         console.log("had player color", props.dot.playerPresentAndColor);
     }
     return <>
-        {!props.dot.fake && false &&
-            <div style={{ zIndex: 100, position: "absolute", bottom: props.dot.x, left: props.dot.y, border: "1px solid " + ([props.dot.fake ? "red" : "black"]), backgroundColor: "white", width: 10, height: 10, borderRadius: 10, marginBottom: -5, marginLeft: -5 }}></div>}
         {<div style={{
             position: "absolute",
             zIndex: 10000,
             bottom: props.dot.x,
             left: props.dot.y,
-            border: `2px solid ${props.dot.playerPresentAndColor || "transparent"}`, // + ([props.dot.fake ? "red" : "black"]),
-            backgroundColor: props.dot.playerPresentAndColor || "rgba(0,0,0,.80)",
+            border: fake ? undefined : `2px solid ${props.dot.playerPresentAndColor || "transparent"}`, // + ([props.dot.fake ? "red" : "black"]),
+            backgroundColor: fake ? undefined : props.dot.playerPresentAndColor || "rgba(0,0,0,.80)",
             width: diameter,
             height: diameter,
             borderRadius: diameter,
             marginBottom: -1 * radius,
             marginLeft: -1 * radius
         }}
-            title={props.dot.pointIndex +","+props.dot.playerIndex}
+            title={props.dot.pointIndex + "," + props.dot.playerIndex}
         >
             {props.dot.content}
         </div>}
@@ -286,9 +295,12 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
 }
 
 const pine = require("./../boards/textures/pine.jpg");
+const hardwood = require("./../boards/textures/hardwood.jpg");
+const oak = require("./../boards/textures/oak.jpg");
 
-export const Track: React.FC<{ dots: Dot[], height?: number, width?: number }> = props => {
-    let { dots } = props;
+export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: number }> = props => {
+    const { track, height, width } = props;
+    let { dots, background } = track;
     const { min, max } = getTrackBounds(dots);
     let newMax = translate(max, -1 * min.x, -1 * min.y);
 
@@ -298,9 +310,32 @@ export const Track: React.FC<{ dots: Dot[], height?: number, width?: number }> =
     // scale to percents
     if (props.height) dots = dots.map(dot => scale(dot, 100 / (newMax.x), 100 / (newMax.y)));
 
-    return <div style={{ backgroundImage: `url(${pine})`, padding: 10, flex: "none", display: "inline-block" }}>
+    const image = getBackground(background);
+
+    return <div
+     style={{ 
+         backgroundColor: image ? undefined : background, 
+         backgroundImage: image && `url(${image})`,
+          padding: 10,
+           flex: "none", 
+           display: "inline-block" ,
+           boxShadow: "5px 5px 10px grey",
+           }}>
         <div style={{ position: "relative", height: props.height || newMax.x, width: props.width || newMax.y, margin: 10, }}>
             {dots.map((dot, i) => <SimpleDot dot={dot} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />)}
         </div>
     </div>;
+}
+
+function getBackground(bg: BoardBackground) {
+    switch (bg) {
+        case "oak":
+            return oak;
+        case "pine":
+            return pine;
+        case "hardwood":
+            return hardwood;
+    }
+
+    return undefined;
 }

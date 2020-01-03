@@ -34,4 +34,4 @@ export const aroundTheBack = createTrack(3, 3, [
     straight,
     breaker,
     createStraightSegment(35, 50, 1, 1),
-]);
+], "oak");

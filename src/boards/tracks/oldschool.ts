@@ -36,8 +36,8 @@ const startArea = [
     stepBack,
 ]
 
-export const OldSchool = createTrack(1, 2, [
+export const OldSchoolBoard = createTrack(1, 2, [
     ...startArea,
     ...onceAround,
     ...onceAround,
-])
+], "pine");

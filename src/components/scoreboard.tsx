@@ -3,6 +3,7 @@ import { PlayerState, getPlayerByName } from "../game/players";
 import _ from "lodash";
 import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
 import { aroundTheBack } from "../boards/tracks/aroundTheBack";
+import { TrifoldBoard, QuadfoldBoard } from "../boards/tracks/trifold";
 
 const boardColor = "sandybrown";
 let x = createStraightSegment(1, 1, 1);
@@ -80,12 +81,12 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
 
     }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
-    const track = aroundTheBack;
+    const track = TrifoldBoard;
 
     // add players
     // players start 
     let dots = [];
-    for(let dot of track.track){
+    for(let dot of track.dots){
         dot = {...dot};
         dots.push(dot);
         if(dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
@@ -104,7 +105,7 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
                 padding: 5
             }}>
                 <Track 
-                    dots={dots}
+                    track={{...track, dots}}
                 />
             {/*<Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />*/}
         </div>

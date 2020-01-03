@@ -6,7 +6,7 @@ import { startGame } from "../../game/game";
 import logo from "./../../cribbigage.png";
 import { PlayerInfo } from "../../game/players";
 import { Track } from "../track";
-import { OldSchool } from "../../boards/tracks/oldschool";
+import { OldSchoolBoard } from "../../boards/tracks/oldschool";
 
 // Total hack for now
 export const IsYou = (player: PlayerInfo): boolean => {
@@ -17,7 +17,7 @@ export const ChooseGameMode: GameComponent = props => {
     return <div style={{ height: "100%", width: "100%", textAlign: "center" }}>
         <img alt="CribBIGage!" src={logo} style={{ maxWidth: "70%", flex: "auto", maxHeight: "30%" }} />
         <h1>Choose a game mode</h1>
-        <Track dots={OldSchool.track} />
+        <Track track={OldSchoolBoard} />
         {GameModes.map(mode => <div key={mode.name}>
             <Button
                 big={mode.name.indexOf("BIG") >= 0}
