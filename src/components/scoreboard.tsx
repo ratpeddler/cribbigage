@@ -14,14 +14,17 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
 
 const testplayers = 3;
 
+const startArea = createStraightSegment(50, 50, testplayers, 3);
+const block = createStraightSegment(70, 50, testplayers);
+const weirdcurveR = createSpacer(5, Math.PI / 17);
+const weirdcurveL = createSpacer(5, Math.PI / -17);
+
 const def = [
-    createStraightSegment(50, 50, testplayers, 3),
-    createSpacer(5, Math.PI / 17),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, Math.PI / 17),
-    createStraightSegment(70, 50, testplayers),
-    createSpacer(5, Math.PI / 17),
-    createStraightSegment(70, 50, testplayers),
+    startArea,
+    weirdcurveL,
+    block,
+    weirdcurveR,
+    block,
     create180Segment(70, 50, testplayers),
     createStraightSegment(70, 50, testplayers),
     createSpacer(5, -1 * Math.PI / 17),
@@ -111,7 +114,6 @@ export const ScoreBoard: React.FC<{ players: PlayerState[], pointsToWin?: number
     }, [lastScores, currentScores, setLastScores, setCurrentScores, props.players]);
 
     return <div style={{ display: "flex", flexDirection: "column", position: "relative" }}>
-        {dots.map(dot => <SimpleDot dot={dot} />)}
         <div className="BoardWrapper"
             style={{
                 display: "flex",

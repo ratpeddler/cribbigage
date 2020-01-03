@@ -202,3 +202,12 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
         <div style={{ position: "absolute", zIndex: 10000, bottom: props.dot.x, left: props.dot.y, border: "1px solid " + ([props.dot.fake ? "red" : "black"]), backgroundColor: props.dot.fake ? "grey" : "white", width: 5, height: 5, borderRadius: 10, marginBottom: -2.5, marginLeft: -2.5 }}></div>
     </>
 }
+
+export const Track: React.FC<{dots: Dot[]}> = props => {
+    const {dots} = props;
+    const {min, max} = getTrackBounds(dots);
+    // scale and fit everything to fit!
+    return <div style={{position: "relative", width: max.y, height: max.x, marginLeft: -2 * min.y}}>
+        {dots.map(dot => <SimpleDot dot={dot} />)}
+    </div>
+}
