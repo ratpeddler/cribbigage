@@ -16,6 +16,7 @@ const ChooseDeck: React.FC<IPicker<Back>> = props => {
     return <div style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
         {Backs.map(back =>
             <div
+                key={back}
                 style={{ margin: 20, border: props.selected === back ? "10px solid lightblue" : "10px solid transparent" }}
                 onClick={() => props.onSelect(back)}
             >
@@ -33,6 +34,7 @@ const ChooseBoard: React.FC<IBoardPicker> = props => {
     return <div style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
         {Boards.map(board =>
             <div
+                key={board.name}
                 style={{
                     margin: 20,
                     border: props.selected === board ? "10px solid lightblue" : "10px solid transparent",

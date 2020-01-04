@@ -295,20 +295,23 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
 export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: number }> = props => {
     const { track, height, width } = props;
     let { dots, background } = track;
-    const { min, max } = getTrackBounds(dots);
+    let bounds = getTrackBounds(dots);
+    //console.log("initial bounds " + track.name, bounds.min.x, bounds.min.y);
 
     // move all dots so they are positive
-    let newMax = translate(max, -1 * min.x, -1 * min.y);
-    dots = dots.map(dot => translate(dot, min.x * -1, min.y * -1));
+    dots = dots.map(dot => translate(dot, bounds.min.x * -1, bounds.min.y * -1));
+    bounds = getTrackBounds(dots);
+    //console.log("min bounds after making positive " + track.name, bounds.min.x, bounds.min.y);
 
     // TODO: factor in width as WELL
-    if (props.height){
-        const scaleFactor = props.height / max.x;
+    if (height){
+        const scaleFactor = height / bounds.max.x;
         dots = dots.map(dot => scale(dot, scaleFactor));
-        newMax = scale(newMax, scaleFactor);
+        bounds = getTrackBounds(dots);
     } 
 
     const image = getBackground(background);
+    //console.log("goal height: " + height + ". max bounds after scaling down " + track.name, bounds.max.x, bounds.max.y);
 
     return <div
      style={{ 
@@ -319,7 +322,7 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
            display: "inline-block" ,
            boxShadow: "5px 5px 10px grey",
            }}>
-        <div style={{ position: "relative", height: props.height || newMax.x, width: props.width || newMax.y, margin: 10, }}>
+        <div style={{ position: "relative", height: props.height || bounds.max.x, width: props.width || bounds.max.y, margin: 10, }}>
             {dots.map((dot, i) => <SimpleDot dot={dot} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />)}
         </div>
     </div>;
