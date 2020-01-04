@@ -5,18 +5,21 @@ const length = 70;
 const width = 50;
 const players = 3;
 const straight = createStraightSegment(length, width, players);
+const long = createStraightSegment(100, width, players);
 
 export const SCurve = createTrack("S Curve", 120, 1, 3, [
     createStraightSegment(width, width, players, 1),
-    straight,
-    straight,
+    long,
+    long,
     create180Segment(length, width,players,true),
+    straight,
     straight,
     straight,
     create90Segment(length, width,players,true),
     create90Segment(length, width,players,true),
 
     createSpacer(10),
+    straight,
     straight,
     straight,
     createSpacer(10),
@@ -28,6 +31,7 @@ export const SCurve = createTrack("S Curve", 120, 1, 3, [
     createSpacer(10),
     straight,
     straight,
+    straight,
     createSpacer(10),
 
     
@@ -35,9 +39,10 @@ export const SCurve = createTrack("S Curve", 120, 1, 3, [
     create90Segment(length, width,players),
     straight,
     straight,
+    straight,
     create180Segment(length, width,players),
-    straight,
-    straight,
+    long,
+    long,
 
     createStraightSegment(width, width, 1, 1),
 ], "walnut");
