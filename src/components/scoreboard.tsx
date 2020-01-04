@@ -78,7 +78,7 @@ export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = pro
             }, 250);
         }
 
-    }, [lastScores, currentScores, setLastScores, setCurrentScores, game.players, turnOrderPlayers, fakedPlayers]);
+    }, [lastScores, currentScores, setLastScores, setCurrentScores, game.players]);
 
     const track = Boards.find(board => board.name == game.customization.boardName)!;
 
@@ -104,7 +104,7 @@ export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = pro
                 padding: 5
             }}>
             <Track
-            height={400}
+                height={400}
                 track={{ ...track, dots }}
             />
             {/*<Board players={fakedPlayers} total={props.pointsToWin || 120} lines={props.lines || 3} vertical={props.vertical} />*/}

@@ -11,7 +11,7 @@ export const Crib: GameComponent = props => {
     let game = { ...props.game };
     let dealer = getCurrentDealer(game);
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         setTimeout(() => {
             addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
             props.setGameState(game, false);
@@ -23,7 +23,7 @@ export const Crib: GameComponent = props => {
         game={game}
         userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: "auto", textAlign: "center" }}>
-                <h3>Crib for <span style={{color: dealer.color}}>{dealer.name}</span>:</h3>
+                <h3>Crib for <span style={{ color: dealer.color }}>{dealer.name}</span>:</h3>
                 <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
                     <div><Hand cards={game.crib!} /></div>
                     <div><HandScore hand={game.crib!} cut={game.cut} /></div>
