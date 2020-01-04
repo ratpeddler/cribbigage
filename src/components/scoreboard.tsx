@@ -1,15 +1,10 @@
 import React from "react";
-import { PlayerState, getPlayerByName, IsYou, getCurrentDealer } from "../game/players";
+import { PlayerState, getPlayerByName } from "../game/players";
 import _ from "lodash";
-import { createStraightSegment, createTrack, create90Segment, SimpleDot, create180Segment, createSpacer, getTrackBounds, Track } from "./track";
-import { aroundTheBack } from "../boards/tracks/aroundTheBack";
-import { TrifoldBoard, QuadfoldBoard } from "../boards/tracks/trifold";
-import { OldSchoolBoard } from "../boards/tracks/oldschool";
+import { Track, Boards } from "./track";
 import { GameState } from "../game/game";
-import { Boards } from "./stages/createGame";
 
 const boardColor = "sandybrown";
-let x = createStraightSegment(1, 1, 1);
 
 const byPlayerName = (a: PlayerState, b: PlayerState) => {
     if (a.name > b.name) { return 1; }
@@ -19,8 +14,6 @@ const byPlayerName = (a: PlayerState, b: PlayerState) => {
 
 export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = props => {
     const { game } = props;
-    const user = game.players.find(IsYou);
-    const dealer = getCurrentDealer(game);
     const turnOrderPlayers = _.cloneDeep(game.players);
     const boardOrderPlayers = _.cloneDeep(game.players).sort(byPlayerName);
     const [lastScores, setLastScores] = React.useState(boardOrderPlayers.map(p => ({ name: p.name, lastScore: p.lastScore } as PlayerState)));
@@ -85,7 +78,7 @@ export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = pro
             }, 250);
         }
 
-    }, [lastScores, currentScores, setLastScores, setCurrentScores, game.players]);
+    }, [lastScores, currentScores, setLastScores, setCurrentScores, game.players, turnOrderPlayers, fakedPlayers]);
 
     const track = Boards.find(board => board.name == game.customization.boardName)!;
 
@@ -142,37 +135,7 @@ const ScoreDot: React.FC<{ hasPlayer: boolean, playerColor: string, index: numbe
         }}></div>;
 }
 
-const Board: React.FC<{ players: PlayerState[], total: number, lines: number, vertical?: boolean }> = props => {
-    const { total, lines, players, vertical } = props;
 
-    const perRow = Math.floor(total / lines);
-    if (total / lines !== perRow) { throw "Bad choice of line numbers! doesn't divide evenly!" }
-    const body: JSX.Element[] = [];
-    for (let i = 0; i < lines; i++) {
-        body.push(<ScoreRow
-            key={i}
-            players={players}
-            dots={i == lines - 1 ? perRow + 1 : perRow}
-            from={perRow * i + 1}
-            reverse={i % 2 !== 0}
-            vertical={vertical}
-            pad={i !== 0 && i !== lines - 1}
-        />)
-    }
-
-    return <div className="board" style={{ display: "flex", flexDirection: vertical ? "row" : "column", backgroundColor: boardColor }}>
-        {body}
-    </div>
-}
-
-const ScoreRow: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean, pad?: boolean }> = props => {
-    const { from, vertical, pad } = props;
-
-    return <div className="ScoreRow" style={{ display: "flex", flexDirection: vertical ? "column" : "row", margin: 5, justifyContent: "center" }}>
-        {from == 1 ? <StraightSegment {...props} from={0} dots={1} /> : (pad && <div style={{ height: 17 }}></div>)}
-        <StraightSegment {...props} />
-    </div>;
-}
 
 const StraightSegment: React.FC<{ players: PlayerState[], dots: number, from: number, reverse?: boolean, vertical?: boolean }> = props => {
     const players = [...props.players].sort(byPlayerName);

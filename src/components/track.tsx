@@ -1,7 +1,9 @@
 import React from "react";
 import { PlayerState } from "../game/players";
-
-export type BoardBackground = "oak" | "pine" | "hardwood" | "sandybrown";
+import { OldSchoolBoard } from "../boards/tracks/oldschool";
+import { TrifoldBoard } from "../boards/tracks/trifold";
+import { aroundTheBack } from "../boards/tracks/aroundTheBack";
+import { SCurve } from "../boards/tracks/sCurve";
 
 export interface TrackDefinition {
     name: string,
@@ -289,17 +291,14 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
     </>
 }
 
-const pine = require("./../boards/textures/pine.jpg");
-const hardwood = require("./../boards/textures/hardwood.jpg");
-const oak = require("./../boards/textures/oak.jpg");
 
 export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: number }> = props => {
     const { track, height, width } = props;
     let { dots, background } = track;
     const { min, max } = getTrackBounds(dots);
-    let newMax = translate(max, -1 * min.x, -1 * min.y);
 
     // move all dots so they are positive
+    let newMax = translate(max, -1 * min.x, -1 * min.y);
     dots = dots.map(dot => translate(dot, min.x * -1, min.y * -1));
 
     // TODO: factor in width as WELL
@@ -315,7 +314,7 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
      style={{ 
          backgroundColor: image ? undefined : background, 
          backgroundImage: image && `url(${image})`,
-          padding: 10,
+            padding: 10,
            flex: "none", 
            display: "inline-block" ,
            boxShadow: "5px 5px 10px grey",
@@ -326,8 +325,27 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
     </div>;
 }
 
+export const Boards = [
+    OldSchoolBoard,
+    TrifoldBoard,
+    aroundTheBack,
+    SCurve,
+];
+
+const pine = require("./../boards/textures/pine.jpg");
+const hardwood = require("./../boards/textures/hardwood.jpg");
+const oak = require("./../boards/textures/oak.jpg");
+const walnut = require("./../boards/textures/walnut.jpg");
+const darkwalnut = require("./../boards/textures/darkwalnut.jpg");
+
+export type BoardBackground = "oak" | "pine" | "hardwood" | "walnut" | "darkwalnut" | "sandybrown";
+
 function getBackground(bg: BoardBackground) {
     switch (bg) {
+        case "walnut":
+            return walnut;
+        case "darkwalnut":
+            return darkwalnut;
         case "oak":
             return oak;
         case "pine":

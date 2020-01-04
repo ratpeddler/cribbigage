@@ -4,23 +4,14 @@ import { Button } from "../button";
 import { CribBIGage_2Hand, GameRules, CribBIGage_3Hand, cribbage_2Hand, cribbage_3Hand } from "../../game/rules";
 import { startGame } from "../../game/game";
 import logo from "./../../cribbigage.png";
-import { Track, TrackDefinition } from "../track";
-import { OldSchoolBoard } from "../../boards/tracks/oldschool";
+import { Track, TrackDefinition, Boards } from "../track";
 import { TrifoldBoard } from "../../boards/tracks/trifold";
 import { Back, Backs, CardBack } from "../card";
-import { aroundTheBack } from "../../boards/tracks/aroundTheBack";
 
 interface IPicker<T> {
     selected: T,
     onSelect: (item: T) => void,
 }
-
-export const Boards = [
-    OldSchoolBoard,
-    TrifoldBoard,
-    aroundTheBack
-];
-
 const ChooseDeck: React.FC<IPicker<Back>> = props => {
     return <div style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
         {Backs.map(back =>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { GameComponent } from "../game";
 import { KeepCard, ExtractKeptCard, onDragOverMovableArea } from "../hand";
@@ -39,7 +40,7 @@ export const Play: GameComponent = props => {
             : pass(game, logContext), false);
     }
 
-    React.useEffect(() => logContext.addLog(players[0], "starts"), [logContext, players]);
+    React.useEffect(() => logContext.addLog(players[0], "starts"), []);
 
     const onDrop = React.useCallback((ev: React.DragEvent<HTMLDivElement>) => {
         ev.persist();
@@ -60,7 +61,7 @@ export const Play: GameComponent = props => {
                 ? playAI(playCard(game, playedCard, logContext), false, logContext)
                 : playCard(game, playedCard, logContext), false);
         }
-    }, [game, logContext, playedCards, setGameState]);
+    }, [game, logContext, setGameState, setKeepCard]);
 
     // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
     React.useEffect(() => {
@@ -94,7 +95,7 @@ export const Play: GameComponent = props => {
                 setGameState(playAI(game, false, logContext), false);
             }, SlowAIDelay);
         }
-    }, [game, game.nextToPlay, isYourTurn, logContext, setGameState, stageIsOver]);
+    }, [game.nextToPlay, isYourTurn]);
 
     return <Layout
         onDragOverPlayedCards={onDragOverMovableArea}
