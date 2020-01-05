@@ -194,7 +194,6 @@ export function create90Segment(length: number, width: number, players: number, 
     let initialPlayerOffset = width / -2;
 
     // create our dots on a line, then rotate based on the player offset and then shift to the right
-
     for (let i = 0; i < 5; i++) {
         let newDots: Dot[] = [];
         // each dot is on a line, and then we rotate it
@@ -202,7 +201,8 @@ export function create90Segment(length: number, width: number, players: number, 
             newDots.push({
                 x: 0,
                 y: -1 * length + .5 * interval + initialPlayerOffset + (playeroffset * p),
-                playerIndex: p - 1,
+                // we need to FLIP player index if LEFT
+                playerIndex: left ? p - 1 : players - (p - 1),
                 pointIndex: i,
             });
         }
@@ -249,7 +249,8 @@ export function create180Segment(length: number, width: number, players: number,
             newDots.push({
                 x: 0,
                 y: -.5 * length + initialPlayerOffset + (playeroffset * p),
-                playerIndex: p - 1,
+                // we need to FLIP player index if LEFT
+                playerIndex: left ? p - 1 : players - (p - 1),
                 pointIndex: i,
             });
         }
