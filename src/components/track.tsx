@@ -202,7 +202,7 @@ export function create90Segment(length: number, width: number, players: number, 
                 x: 0,
                 y: -1 * length + .5 * interval + initialPlayerOffset + (playeroffset * p),
                 // we need to FLIP player index if LEFT
-                playerIndex: left ? p - 1 : players - (p - 1),
+                playerIndex: !left ? p - 1 : players - (p),
                 pointIndex: i,
             });
         }
@@ -250,7 +250,7 @@ export function create180Segment(length: number, width: number, players: number,
                 x: 0,
                 y: -.5 * length + initialPlayerOffset + (playeroffset * p),
                 // we need to FLIP player index if LEFT
-                playerIndex: left ? p - 1 : players - (p - 1),
+                playerIndex: !left ? p - 1 : players - (p),
                 pointIndex: i,
             });
         }

@@ -89,7 +89,20 @@ export const ScoreBoard: React.FC<{ game: GameState, vertical?: boolean }> = pro
         dot = { ...dot };
         dots.push(dot);
         if (dot.pointIndex == undefined || dot.playerIndex == undefined) continue;
-        const playerForTrack = fakedPlayers[dot.playerIndex];
+
+        // Space out dots on bigger boards when 2 players
+        let playerIndex = dot.playerIndex;
+        if(game.players.length == 2 && track.players == 3){
+            if(playerIndex == 1){
+                playerIndex = 2;
+            }
+            else if(playerIndex == 2){
+                playerIndex = 1;
+            }
+        }
+
+
+        const playerForTrack = fakedPlayers[playerIndex];
         if (playerForTrack && (dot.pointIndex == -2 || dot.pointIndex == playerForTrack.score || dot.pointIndex == playerForTrack.lastScore)) {
             dot.playerPresentAndColor = playerForTrack.color;
         }
