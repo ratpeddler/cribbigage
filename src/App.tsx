@@ -10,6 +10,7 @@ import { PlayerState } from './game/players';
 import { IScore } from './components/scoreIcon';
 import { playTapSound } from './sounds/playSound';
 import { CardBackContext } from './components/card';
+import axios from "axios";
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
@@ -29,6 +30,10 @@ const App: React.FC = () => {
     log: playLog,
     addLog,
   }), [playLog, addLog]);
+  
+  //React.useEffect(() => {
+   // axios.get("https://aiplayersonline.com/CribBIGage/GameGetJSON").then(response => console.log(response));
+  //}, []);
 
   React.useEffect(() => {
     if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {

@@ -1,37 +1,118 @@
 import React from "react";
-import { createStraightSegment, createSpacer, createTrack, create90Segment, create180Segment } from "../../components/track";
+import { createStraightSegment, createSpacer, createTrack, create90Segment, create180Segment, createContent } from "../../components/track";
 
 const straight = createStraightSegment(70, 50, 3);
-const breaker = createSpacer(10, 0, <div style={{width: 40, height: 0, border: "1px solid white", marginTop: -6, marginLeft: -18}}></div>);
-const downBreaker = createSpacer(10, 0, <div style={{width: 40, height: 0, border: "1px solid white", marginTop: 6, marginLeft: -18}}></div>);
-const verticalBreaker = createSpacer(10, 0, <div style={{width: 0, height: 40, border: "1px solid white", marginTop: -18, marginLeft: 6}}></div>);
+const breaker = createContent(10, 0, props => {
+    const { dot, dotScale, trackWidth } = props;
+    const width = .5 * trackWidth;
+    return <div style={{
+        position: "absolute",
+        zIndex: 5,
+        bottom: dot.x,
+        left: dot.y,
+        //border: `1px solid white`,
+        backgroundColor: "white",
+        width,
+        height: 1,
+        //borderRadius: diameter * 3,
+        //marginBottom: -.5 * diameter,
+        marginLeft: -.5 * width,
+    }}></div>
+});
+
+const verticalBreaker = createContent(10, 0, props => {
+    const { dot, dotScale, trackWidth } = props;
+    const width = .5 * trackWidth;
+    return <div style={{
+        position: "absolute",
+        zIndex: 5,
+        bottom: dot.x,
+        left: dot.y,
+        //border: `1px solid white`,
+        backgroundColor: "white",
+        width: 1,
+        height: width,
+        //borderRadius: diameter * 3,
+        marginBottom: -.5 * width,
+        //marginLeft: -.5 * width,
+    }}></div>
+});
 
 export const aroundTheBack = createTrack("Around the Back 60", 60, 3, 3, [
     createStraightSegment(50, 50, 3, 3),
-    breaker,
+    ...breaker,
     straight,
-    breaker,
+    ...breaker,
     straight,
-    breaker,
+    ...breaker,
     straight,
-    breaker,
+    ...breaker,
     create90Segment(70, 50, 3),
-    verticalBreaker,
+    ...verticalBreaker,
     create90Segment(70, 50, 3),
-    downBreaker,
+    //downBreaker,
     straight,
-    downBreaker,
+    //downBreaker,
     straight,
-    downBreaker,
+    //downBreaker,
     straight,
-    downBreaker,
     create180Segment(70, 50, 3),
-    breaker,
     straight,
-    breaker,
     straight,
-    breaker,
     straight,
-    breaker,
     createStraightSegment(35, 50, 1, 1),
-], "oak");
+], "darkwalnut");
+
+export const aroundTheBack120 = createTrack("Around the Back 120", 120, 3, 3, [
+    createStraightSegment(50, 50, 3, 3),
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    create90Segment(70, 50, 3),
+    ...verticalBreaker,
+    create90Segment(70, 50, 3),
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    create180Segment(75, 50, 3),
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    straight,
+    ...breaker,
+    createStraightSegment(35, 50, 1, 1),
+], "hardwood");

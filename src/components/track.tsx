@@ -2,7 +2,7 @@ import React from "react";
 import { PlayerState } from "../game/players";
 import { OldSchoolBoard } from "../boards/tracks/oldschool";
 import { TrifoldBoard } from "../boards/tracks/trifold";
-import { aroundTheBack } from "../boards/tracks/aroundTheBack";
+import { aroundTheBack, aroundTheBack120 } from "../boards/tracks/aroundTheBack";
 import { SCurve } from "../boards/tracks/sCurve";
 
 export interface TrackDefinition {
@@ -25,7 +25,7 @@ interface Dot extends Coord {
     pointIndex?: number;
     playerIndex?: number;
 
-    content?: React.ReactNode;
+    content?: (props: DotProps) => React.ReactNode;
     playerPresentAndColor?: string;
 }
 
@@ -130,12 +130,26 @@ export function createTrack(name: string, pointsToEnd: number, startOffset: numb
     };
 }
 
-export function createSpacer(length: number, angle: number = 0, content?: React.ReactNode): SegmentDefinition {
+export function createContent(length: number, angle: number = 0, content?: (props: DotProps) => React.ReactNode): SegmentDefinition[] {
+    return [{
+        decorative: true,
+        length: { x: length/2, y: 0 },
+        angle,
+        dots: [],
+    },{
+        decorative: true,
+        length: { x: length/2, y: 0 },
+        angle,
+        dots: content ? [{ x: 0, y: 0, fake: true, content }] : [],
+    }];
+}
+
+export function createSpacer(length: number, angle: number = 0): SegmentDefinition {
     return {
         decorative: true,
         length: { x: length, y: 0 },
         angle,
-        dots: content ? [{x:0, y:0, fake: true, content}] : [],
+        dots: [],
     }
 }
 
@@ -180,7 +194,6 @@ export function create90Segment(length: number, width: number, players: number, 
     let initialPlayerOffset = width / -2;
 
     // create our dots on a line, then rotate based on the player offset and then shift to the right
-
     for (let i = 0; i < 5; i++) {
         let newDots: Dot[] = [];
         // each dot is on a line, and then we rotate it
@@ -188,7 +201,8 @@ export function create90Segment(length: number, width: number, players: number, 
             newDots.push({
                 x: 0,
                 y: -1 * length + .5 * interval + initialPlayerOffset + (playeroffset * p),
-                playerIndex: p - 1,
+                // we need to FLIP player index if LEFT
+                playerIndex: !left ? p - 1 : players - (p),
                 pointIndex: i,
             });
         }
@@ -235,7 +249,8 @@ export function create180Segment(length: number, width: number, players: number,
             newDots.push({
                 x: 0,
                 y: -.5 * length + initialPlayerOffset + (playeroffset * p),
-                playerIndex: p - 1,
+                // we need to FLIP player index if LEFT
+                playerIndex: !left ? p - 1 : players - (p),
                 pointIndex: i,
             });
         }
@@ -262,18 +277,58 @@ export function create180Segment(length: number, width: number, players: number,
     }
 }
 
-export const SimpleDot: React.FC<{ dot: Dot }> = props => {
-    const {dot} = props;
-    const {fake, playerPresentAndColor} = dot;
-    let diameter = 1;
-    if(playerPresentAndColor){
+export interface DotProps {
+    dot: Dot,
+    dotScale: number,
+    trackWidth: number
+}
+
+export interface ColoredDotProps extends DotProps {
+    color: string;
+    zIndex?: number;
+    title?: string;
+}
+
+export const ColorDot: React.FC<ColoredDotProps> = props => {
+    const { dot, dotScale, trackWidth } = props;
+    const { playerPresentAndColor } = dot;
+    let diameter = 3 * dotScale;
+    if (playerPresentAndColor) {
         diameter = 6;
     }
     const radius = diameter / 2;
     return <>
         {<div style={{
             position: "absolute",
-            zIndex: playerPresentAndColor ? 10000: 10,
+            zIndex: props.zIndex || 5,
+            bottom: dot.x,
+            left: dot.y,
+            border: `2px solid ${props.color}`,
+            backgroundColor: props.color,
+            width: diameter,
+            height: diameter,
+            borderRadius: diameter * 3 + 4,
+            marginBottom: -1 * radius - 1,
+            marginLeft: -1 * radius - 1,
+        }}
+            title={props.title}
+        >
+        </div>}
+    </>
+}
+
+export const SimpleDot: React.FC<DotProps> = props => {
+    const { dot, dotScale, trackWidth } = props;
+    const { fake, playerPresentAndColor } = dot;
+    let diameter = 3 * dotScale;
+    if (playerPresentAndColor) {
+        diameter = 6;
+    }
+    const radius = diameter / 2;
+    return <>
+        {<div style={{
+            position: "absolute",
+            zIndex: playerPresentAndColor ? 10000 : 10,
             bottom: dot.x,
             left: dot.y,
             border: fake ? undefined : `2px solid ${playerPresentAndColor || "transparent"}`, // + ([dot.fake ? "red" : "black"]),
@@ -281,12 +336,11 @@ export const SimpleDot: React.FC<{ dot: Dot }> = props => {
             width: diameter,
             height: diameter,
             borderRadius: diameter * 3,
-            marginBottom: -1 * radius,
-            marginLeft: -1 * radius
+            marginBottom: -1 * radius - 1,
+            marginLeft: -1 * radius - 1,
         }}
             title={dot.pointIndex + "," + dot.playerIndex}
         >
-            {dot.content}
         </div>}
     </>
 }
@@ -303,27 +357,32 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
     bounds = getTrackBounds(dots);
     //console.log("min bounds after making positive " + track.name, bounds.min.x, bounds.min.y);
 
+    let scaleFactor = 1;
+
     // TODO: factor in width as WELL
-    if (height){
-        const scaleFactor = height / bounds.max.x;
+    if (height) {
+        scaleFactor = height / bounds.max.x;
         dots = dots.map(dot => scale(dot, scaleFactor));
         bounds = getTrackBounds(dots);
-    } 
+    }
 
     const image = getBackground(background);
-    //console.log("goal height: " + height + ". max bounds after scaling down " + track.name, bounds.max.x, bounds.max.y);
 
     return <div
-     style={{ 
-         backgroundColor: image ? undefined : background, 
-         backgroundImage: image && `url(${image})`,
+        style={{
+            backgroundColor: image ? undefined : background,
+            backgroundImage: image && `url(${image})`,
             padding: 10,
-           flex: "none", 
-           display: "inline-block" ,
-           boxShadow: "5px 5px 10px grey",
-           }}>
+            flex: "none",
+            display: "inline-block",
+            boxShadow: "5px 5px 10px grey",
+        }}>
         <div style={{ position: "relative", height: props.height || bounds.max.x, width: props.width || bounds.max.y, margin: 10, }}>
-            {dots.map((dot, i) => <SimpleDot dot={dot} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />)}
+            {dots.map((dot, i) => 
+                dot.content 
+                ? dot.content({dot, dotScale: scaleFactor, trackWidth: 50 * scaleFactor  })  // TODO: pass in the SEGMENT info as well
+                : <SimpleDot dot={dot} dotScale={scaleFactor} trackWidth={50 * scaleFactor} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />
+                )}
         </div>
     </div>;
 }
@@ -331,7 +390,8 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
 export const Boards = [
     OldSchoolBoard,
     TrifoldBoard,
-    aroundTheBack,
+    //aroundTheBack,
+    aroundTheBack120,
     SCurve,
 ];
 
