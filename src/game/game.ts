@@ -10,6 +10,8 @@ export interface GameCustomization {
 }
 
 export interface GameState {
+    gameId?: string;
+
     rules: GameRules;
 
     // List of the players (current dealer is always LAST)

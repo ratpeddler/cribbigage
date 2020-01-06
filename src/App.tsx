@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdvanceGameState } from './game/turns';
 import { Game } from './components/game';
-import { initGameState } from './game/game';
+import { initGameState, GameState } from './game/game';
 import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import _ from 'lodash';
@@ -30,10 +30,6 @@ const App: React.FC = () => {
     log: playLog,
     addLog,
   }), [playLog, addLog]);
-  
-  //React.useEffect(() => {
-   // axios.get("https://aiplayersonline.com/CribBIGage/GameGetJSON").then(response => console.log(response));
-  //}, []);
 
   React.useEffect(() => {
     if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
@@ -59,7 +55,21 @@ const App: React.FC = () => {
                 playTapSound();
               }
 
-              setGameState(_.cloneDeep(game));
+              // Look for game id in the query string
+              let params = (new URL(document.location as any)).searchParams;
+              let gameId = params.get('gameId');
+              if (gameId) {
+                // Send to the server
+                console.log("Found game id", gameId);
+                axios.post<GameState>("/CribBIGage/PlayGame/", { ...game, gameId }).then(newGameState => {
+                  if (!_.isEqual(newGameState.data, gameState)) {
+                    setGameState(newGameState.data);
+                  }
+                })
+              }
+              else {
+                setGameState(_.cloneDeep(game));
+              }
             }}
           />
           <div style={{ position: "fixed", bottom: 0, right: 0, padding: 10, fontSize: 10 }}>© 2020 aiplayersonline.com</div>
