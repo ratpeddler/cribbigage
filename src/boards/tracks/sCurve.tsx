@@ -7,7 +7,7 @@ const players = 3;
 const straight = createStraightSegment(length, width, players);
 const long = createStraightSegment(100, width, players);
 const backer = createContent(20, 0, props => {
-    return <ColorDot {...props} dotScale={props.dotScale * .25} color="tan" />
+    return <ColorDot {...props} key={props.index} dotScale={props.dotScale * .25} color="tan" />
 });
 
 export const SCurve = createTrack("S Curve", 120, 1, 3, [

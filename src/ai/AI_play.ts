@@ -1,6 +1,6 @@
 import { GameState } from "../game/game";
 import { IPlayLogContext } from "../components/playLog";
-import {  getPlayableHand, cantPlayAtAll, pass, sumCards, canPlay, playCard } from "../game/play";
+import { getPlayableHand, cantPlayAtAll, pass, sumCards, canPlay, playCard } from "../game/play";
 import { parseCard } from "../game/card";
 import _ from "lodash";
 import { ensureNextPlayer, IsYou, getCurrentPlayer } from "../game/players";
@@ -28,24 +28,24 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
 
         const currentCount = sumCards(playedCards);
         const prevCard = playedCards[playedCards.length - 1];
-   
+
         // Common cases to greedily play
         let cardPlayed = false;
-        for (let card of hand) {  
+        for (let card of hand) {
             const cp = parseCard(card);
             if (currentCount + cp.count === 15 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
-                game = playCard(game, card, logContext);
+                game = playCard(game, player, card, logContext);
                 cardPlayed = true;
                 console.log("Greedy 15 play")
                 break;
             }
             if (currentCount + cp.count === 31 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
-                game = playCard(game, card, logContext);
+                game = playCard(game, player, card, logContext);
                 cardPlayed = true;
                 console.log("Greedy 31 play")
                 break;
             }
-        } 
+        }
 
         // Common cases to avoid
         if (cardPlayed) continue;
@@ -66,7 +66,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
                 continue; // Avoid 2 card sequences
             }
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card, logContext);
+                game = playCard(game, player, card, logContext);
                 cardPlayed = true;
                 break;
             }
@@ -74,13 +74,13 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
 
         // In case you can't avoid the bad situations
         if (cardPlayed) continue;
-       console.log("fallback and play a card");
+        console.log("fallback and play a card");
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
-                game = playCard(game, card, logContext);
+                game = playCard(game, player, card, logContext);
                 break;
             }
-        } 
+        }
     }
 
     return game;

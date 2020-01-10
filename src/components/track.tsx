@@ -278,6 +278,7 @@ export function create180Segment(length: number, width: number, players: number,
 }
 
 export interface DotProps {
+    index: number,
     dot: Dot,
     dotScale: number,
     trackWidth: number
@@ -380,8 +381,8 @@ export const Track: React.FC<{ track: TrackDefinition, height?: number, width?: 
         <div style={{ position: "relative", height: props.height || bounds.max.x, width: props.width || bounds.max.y, margin: 10, }}>
             {dots.map((dot, i) => 
                 dot.content 
-                ? dot.content({dot, dotScale: scaleFactor, trackWidth: 50 * scaleFactor  })  // TODO: pass in the SEGMENT info as well
-                : <SimpleDot dot={dot} dotScale={scaleFactor} trackWidth={50 * scaleFactor} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />
+                ? dot.content({dot, dotScale: scaleFactor, trackWidth: 50 * scaleFactor, index: i  })  // TODO: pass in the SEGMENT info as well
+                : <SimpleDot index={i} dot={dot} dotScale={scaleFactor} trackWidth={50 * scaleFactor} key={i + ":" + dot.pointIndex + "," + dot.playerIndex} />
                 )}
         </div>
     </div>;

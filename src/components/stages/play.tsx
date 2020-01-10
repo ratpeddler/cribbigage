@@ -58,8 +58,8 @@ export const Play: GameComponent = props => {
             setKeepCard({});
             // only have PLAYAI if you want to auto advance!
             setGameState(AutoAdvanceToYourTurn
-                ? playAI(playCard(game, playedCard, logContext), false, logContext)
-                : playCard(game, playedCard, logContext), false);
+                ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
+                : playCard(game, user, playedCard, logContext), false);
         }
     }, [game, logContext, setGameState, setKeepCard]);
 
@@ -140,8 +140,8 @@ export const Play: GameComponent = props => {
                         setKeepCard({});
                         // only have PLAYAI if you want to auto advance!
                         setGameState(AutoAdvanceToYourTurn
-                            ? playAI(playCard(game, playedCard, logContext), false, logContext)
-                            : playCard(game, playedCard, logContext), false);
+                            ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
+                            : playCard(game, user, playedCard, logContext), false);
                     }}>
                     {disabled ? "Select a card to play" : "Play selected card"}
                 </Button>}

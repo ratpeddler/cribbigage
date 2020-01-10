@@ -68,36 +68,37 @@ export function incrementNextPlayer(game: GameState): number {
 }
 
 
-export function playCard(game: GameState, card: Card, logContext: IPlayLogContext): GameState {
+export function playCard(game: GameState, playedBy: PlayerState,  card: Card, logContext: IPlayLogContext): GameState {
     let { playedCards = [] } = game;
-    const player = getCurrentPlayer(game);
+
+    if(playedBy.hand.indexOf(card) < 0){
+        throw `${playedBy.name} can't play ${card} because it is not in their hand!`;
+    }
 
     if (!canPlay(playedCards, card)) {
         throw `Can't play that! ${card}`;
     }
 
-    game.lastToPlay = ensureNextPlayer(game);
+    game.lastToPlay = game.players.findIndex(p => p.name == playedBy.name);
 
     // SCORE
     const playScore = scorePlay(playedCards, card);
-    addPlayerScore(player, playScore.score, game);
-    
+    addPlayerScore(playedBy, playScore.score, game);
 
     // Add played cards
     playedCards = game.playedCards = [...playedCards, card];
-    player.playedCards = [...player.playedCards || [], card];
+    playedBy.playedCards = [...playedBy.playedCards || [], card];
 
     // Last Card: check if the round is over. If so you get 1 point for last card IFF the count is not 31
     if (playStageOver(game) && sumCards(playedCards) !== 31) {
-        addPlayerScore(player, SCORE_LAST_CARD, game);
+        addPlayerScore(playedBy, SCORE_LAST_CARD, game);
         playScore.lastCard = 1;
         playScore.score++;
     }
     
     playScore.score ? playScoreSound(playScore.score) : playCardSound();
     
-    logContext.addLog(player, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
-
+    logContext.addLog(playedBy, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
 
     return {
         ...game,

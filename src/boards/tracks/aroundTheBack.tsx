@@ -3,9 +3,9 @@ import { createStraightSegment, createSpacer, createTrack, create90Segment, crea
 
 const straight = createStraightSegment(70, 50, 3);
 const breaker = createContent(10, 0, props => {
-    const { dot, dotScale, trackWidth } = props;
+    const { dot, dotScale, trackWidth, index } = props;
     const width = .5 * trackWidth;
-    return <div style={{
+    return <div key={index} style={{
         position: "absolute",
         zIndex: 5,
         bottom: dot.x,
@@ -21,9 +21,9 @@ const breaker = createContent(10, 0, props => {
 });
 
 const verticalBreaker = createContent(10, 0, props => {
-    const { dot, dotScale, trackWidth } = props;
+    const { dot, dotScale, trackWidth, index } = props;
     const width = .5 * trackWidth;
-    return <div style={{
+    return <div key={index} style={{
         position: "absolute",
         zIndex: 5,
         bottom: dot.x,

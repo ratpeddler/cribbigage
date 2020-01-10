@@ -1,6 +1,7 @@
 import { Card, parseCard } from "./card";
 import { GameState } from "./game";
 import { IPlayLogContext } from "../components/playLog";
+import { IsYou } from "./players";
 
 export function RunDeal(game: GameState, logContext: IPlayLogContext): GameState {
     const { players, rules } = game;
@@ -8,7 +9,7 @@ export function RunDeal(game: GameState, logContext: IPlayLogContext): GameState
 
     return {
         ...game,
-        players: players.map((player, i) => ({ ...player, hand: hands[i] })),
+        players: players.map((player, i) => ({ ...player, hand: IsYou(player) ? hands[i].sort((a, b) => parseCard(a).rank - parseCard(b).rank) : hands[i] })),
         crib,
         cut,
     };
@@ -97,5 +98,5 @@ export function deal(players = 2, deck?: Deck, handSize = 6, dealerExtra = 0, cr
     }
 
     // Return the player hands, the initial crib and the remaining deck (This will need to be cut)
-    return { hands: hands.map(hand => hand.sort((a, b) => parseCard(a).rank - parseCard(b).rank)), crib, cut };
+    return { hands, crib, cut };
 }
