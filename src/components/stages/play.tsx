@@ -98,6 +98,7 @@ export const Play: GameComponent = props => {
     }, [game.nextToPlay, isYourTurn]);
 
     return <Layout
+        setGameState={props.setGameState} 
         onDragOverPlayedCards={onDragOverMovableArea}
         onDropOverPlayedCards={onDrop}
         game={props.game}

@@ -1,5 +1,5 @@
 import React from "react";
-import { GameState } from "../../game/game";
+import { GameState, initGameState } from "../../game/game";
 import { ScoreBoard } from "../scoreboard";
 import { getPlayableHand, sumCards, playStageOver } from "../../game/play";
 import { DeckAndCut } from "../deckAndCut";
@@ -9,10 +9,14 @@ import { HandScore } from "../handScore";
 import { PlayLog } from "../playLog";
 import { GameDragEvent } from "../card";
 import { IsYou, getCurrentDealer, getCurrentPlayer } from "../../game/players";
+import { anyPlayerHasWon } from "../../game/score";
+import { GameSummary } from "../stages/gamesummary";
+import { Button } from "../button";
 
 export type SelectedCards = { [card: number]: boolean };
 export interface LayoutProps {
     game: GameState,
+    setGameState: (gameState: GameState, advance: boolean) => void,
     userActions?: () => React.ReactNode,
     selectedCards?: SelectedCards,
     setSelectedCards?: (newValue: SelectedCards) => void,
@@ -67,6 +71,9 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
 
     const deck = <DeckAndCut game={cutGame} onDrop={props.onDropOverDeck} onDragOver={props.onDragOverDeck} />;
+
+
+    const gameOver = anyPlayerHasWon(game);
 
     return <Row fill>
         {/* LEFT Board and Deck area */}
@@ -131,7 +138,12 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
             </Row>
 
             <Column fill justified centered>
-                {props.userActions?.()}
+                {gameOver ? <><GameSummary key="game" game={game} /><Button
+            onClick={() => {
+                props.setGameState(initGameState(), false)
+            }}>
+            New Game?
+        </Button></> : props.userActions?.()}
             </Column>
 
             {userHand && userHand.length > 0 && <Row justified centered>

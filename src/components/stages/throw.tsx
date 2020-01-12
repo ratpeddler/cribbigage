@@ -37,6 +37,7 @@ export const Throw: GameComponent = props => {
 
     // TODO: This should either let you pick all hands or just your own
     return <Layout
+        setGameState={props.setGameState} 
         game={game}
         selectedCards={keepCards}
         setSelectedCards={setKeepCards}

@@ -7,8 +7,8 @@ import { Crib } from "./stages/crib";
 import { ScoreStage } from "./stages/scoreStage";
 import { GameState } from "../game/game";
 import { LayoutProps } from "./layouts/Horizontal_2Player";
-import { GameOver } from "./stages/gameover";
 import { CreateGame } from "./stages/createGame";
+import { GameSummary } from "./stages/gamesummary";
 
 export interface GameComponentProps {
     game: GameState,
@@ -20,8 +20,6 @@ export type GameComponent = React.FC<GameComponentProps>;
 
 export const Game: GameComponent = props => {
     switch (props.game.stage) {
-        case "GameOver":
-            return <GameOver {...props} />;
         case "CreateGame":
             return <CreateGame {...props} />;
         case "Deal":

@@ -31,15 +31,6 @@ const App: React.FC = () => {
     addLog,
   }), [playLog, addLog]);
 
-  React.useEffect(() => {
-    if (gameState.stage != "GameOver" && anyPlayerHasWon(gameState)) {
-      setGameState({ ...gameState, stage: "GameOver" });
-      setPlayLog([]);
-    }
-  }, [gameState, gameState.players, gameState.stage]);
-
-  //console.log(JSON.stringify(gameState));
-
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
       <CardBackContext.Provider value={gameState.customization.deckName}>

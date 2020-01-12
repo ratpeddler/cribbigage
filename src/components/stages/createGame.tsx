@@ -120,6 +120,7 @@ export const CreateGame: GameComponent = props => {
             <select value={points} onChange={ev => { ev.persist(); setPoints(parseInt(ev.target.value)) }}>
                 <option value={120}>120 points</option>
                 <option value={60}>60 points</option>
+                <option value={40}>40 points</option>
             </select>
         </label>
         <br />

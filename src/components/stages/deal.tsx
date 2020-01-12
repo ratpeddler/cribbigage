@@ -28,7 +28,7 @@ export const Deal: GameComponent = props => {
 
     // TODO: Animate dealing
 
-    return <Layout game={props.game} userActions={() =>
+    return <Layout game={props.game} setGameState={props.setGameState} userActions={() =>
         <>
             {yourCrib && <h3>It's <span style={{ color: dealer.color }}>your</span> turn to deal</h3>}
             <Button

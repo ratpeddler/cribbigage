@@ -34,6 +34,7 @@ export const ScoreStage: GameComponent = props => {
     }, []);
 
     return <Layout
+        setGameState={props.setGameState} 
         hideScores
         game={props.game}
         userActions={() =>

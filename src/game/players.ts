@@ -15,6 +15,8 @@ export interface PlayerState extends PlayerInfo {
     color: string;
 }
 
+export function WasOrWere(player: PlayerState) { return IsYou(player) ? "were" : "was"; }
+
 export function getPlayerByName(name: string, players: PlayerState[]){
     return players.find(p => p.name == name)!;
 }
