@@ -45,7 +45,6 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     let tableOrderOpponents = tableOrder.filter(p => !IsYou(p));
 
     // Opponent properties
-    //const opponents = players.filter(p => !IsYou(p));
     const opponent1 = tableOrderOpponents[0];
     const opponent2 = tableOrderOpponents.length > 1 ? tableOrderOpponents[1] : undefined;
 
@@ -54,7 +53,6 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
     const opponent1Hand = getPlayableHand(opponent1, game).map(c => showOpponentHands ? c : -1);
     const opponent2Hand = opponent2 && getPlayableHand(opponent2, game).map(c => showOpponentHands ? c : -1);
 
-    // TODO: Fix previously played cards....
     const opponent1PreviousPlayed = opponent1.hand.filter(c => playedCards.includes(c) && !opponent1.playedCards?.includes(c));
     const opponent2PreviousPlayed = opponent2 && opponent2.hand.filter(c => playedCards.includes(c) && !opponent2.playedCards?.includes(c));
 

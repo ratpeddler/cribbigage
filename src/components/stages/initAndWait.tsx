@@ -3,28 +3,23 @@ import axios from "axios";
 import _ from "lodash";
 
 import { GameComponent } from "../game";
-import { GameState, startGame } from "../../game/game";
+import { startGame } from "../../game/game";
 import { Button } from "../button";
 import { CribBIGage_2Hand, CribBIGage_3Hand, cribbage_3Hand, cribbage_2Hand } from "../../game/rules";
-import { OldSchoolBoard } from "../../boards/tracks/oldschool";
 import { PlayerInfo } from "../../game/players";
 
 export var PlayerId = 0;
 export var LocalOrMultiplayer: "local" | "online" = "local";
 
 export const InitAndWait: GameComponent = props => {
-    const { game, setGameState } = props;
+    const { setGameState } = props;
 
     const checkGame = () => {
-        axios.get("/CribBIGage/JoinGame").then(response => {
+        axios.get("JoinGame").then(response => {
             const serverGameObject = response.data;
             console.log("join game response", serverGameObject);
             let serverPlayers = serverGameObject.player;
-            let { playerCount, playerGoal, cribBIGage, length, gameId } = serverGameObject;
-            // TODO: set PlayerId!
-            // TODO: set up the game state and start the game
-            // setGameState(newGameState.data);
-            let NewPlayers: PlayerInfo[] = [];
+            let { playerCount, playerGoal, cribBIGage, length } = serverGameObject;
             let CurPlayer = serverPlayers[playerCount - 1];
             PlayerId = PlayerId || CurPlayer.number;
             console.log("I think I am player " + PlayerId);
@@ -72,7 +67,7 @@ export const InitAndWait: GameComponent = props => {
                 console.log("waiting for more players... 5 seconds till next call");
                 setTimeout(() => {
                     checkGame();
-                }, (1000));
+                }, (5000));
             }
         });
     }

@@ -1,7 +1,7 @@
 {
   "name": "cribbigage",
-  "version": "0.1.5",
-  "homepage": "https://aiplayersonline/CribBIGage/build",
+  "version": "0.1.6T",
+  "homepage": "https://aiplayersonline/CribBIGTest/build",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",

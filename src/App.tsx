@@ -14,7 +14,7 @@ import axios from "axios";
 import { LocalOrMultiplayer } from './components/stages/initAndWait';
 import { Button } from './components/button';
 
-export const LoadGameFromServer = () => axios.get<GameState>("/CribBIGage/PlayGame").then(response => response.data);
+export const LoadGameFromServer = () => axios.get<GameState>("PlayGame").then(response => response.data);
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
 
   const refreshGame = () => {
-    axios.get<GameState>("/CribBIGage/PlayGame").then(newGameState => {
+    axios.get<GameState>("PlayGame").then(newGameState => {
       setGameState(newGameState.data);
     });
   }
@@ -64,7 +64,7 @@ const App: React.FC = () => {
                 // TODO: check if it is our turn
                 // if not out turn just poll for get
 
-                axios.post<GameState>("/CribBIGage/PlayGame", game).then(newGameState => {
+                axios.post<GameState>("PlayGame", game).then(newGameState => {
                   refreshGame();
                 });
               }

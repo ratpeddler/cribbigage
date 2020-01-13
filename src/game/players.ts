@@ -15,6 +15,18 @@ export interface PlayerState extends PlayerInfo {
     color: string;
 }
 
+// find the current player who needs to play
+function GlobalCurrentPlayer(game: GameState): PlayerState | undefined {
+    switch(game.stage){
+        case "Deal":
+            return getCurrentDealer(game);
+        case "Play":
+            return getCurrentPlayer(game);
+        case "Cut":
+            return getCurrentCutter(game);
+    }
+}
+
 export function WasOrWere(player: PlayerState) { return IsYou(player) ? "were" : "was"; }
 
 export function getPlayerByName(name: string, players: PlayerState[]){
@@ -41,4 +53,8 @@ export function getCurrentPlayer(game: GameState): PlayerState {
 
 export function getCurrentDealer(game: GameState): PlayerState {
     return game.players[game.players.length - 1];
+}
+
+export function getCurrentCutter(game: GameState): PlayerState {
+    return game.players[game.players.length - 2];
 }
