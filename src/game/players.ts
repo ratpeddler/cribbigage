@@ -1,10 +1,10 @@
 import { Hand } from "./deal";
 import { GameState } from "./game";
+import { PlayerId } from "../components/stages/initAndWait";
 
 export interface PlayerInfo {
+    id?: number;
     name: string;
-
-    // Can add things like USERID etc here in the future or leave as is
 }
 
 export interface PlayerState extends PlayerInfo {
@@ -22,8 +22,9 @@ export function getPlayerByName(name: string, players: PlayerState[]){
 }
 
 // Total hack for now
+// TODO: use a better comparison
 export const IsYou = (player: PlayerInfo): boolean => {
-    return player.name == "You";
+    return player.id == PlayerId;
 }
 
 export function ensureNextPlayer(game: GameState): number {

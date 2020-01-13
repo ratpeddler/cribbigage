@@ -52,5 +52,3 @@ function allSets<T extends number | string | object>(items: T[]): T[][] {
 
     return [];
 }
-
-console.log(allSets);

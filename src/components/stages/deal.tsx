@@ -5,6 +5,7 @@ import { Button } from "../button";
 import { PlayLogContext } from "../playLog";
 import { playShuffleSound, playDealSound, Repeat } from "../../sounds/playSound";
 import { getCurrentDealer, IsYou } from "../../game/players";
+import { LocalOrMultiplayer } from "./initAndWait";
 
 export const Deal: GameComponent = props => {
     const Layout = props.layout;
@@ -16,7 +17,7 @@ export const Deal: GameComponent = props => {
     playShuffleSound();
 
     React.useEffect(() => {
-        if (!yourCrib) {
+        if (LocalOrMultiplayer == "local" && !yourCrib) {
             setTimeout(() => {
                 props.setGameState(RunDeal(props.game, logContext), true);
                 Repeat(playDealSound, 10, 250);

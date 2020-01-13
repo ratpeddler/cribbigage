@@ -73,11 +73,12 @@ export const CreateGame: GameComponent = props => {
                     mode = cribbage_3Hand
                 }
 
+                // local single player against AI
                 props.setGameState(
                     startGame([
-                        { name: "You" },
-                        { name: "AI 1" },
-                        { name: "AI 2" }],
+                        { name: "You", id: 0 },
+                        { name: "AI 1", id: 1 },
+                        { name: "AI 2", id:2 }],
                         {
                             ...mode,
                             pointsToWin: points,

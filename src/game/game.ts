@@ -3,6 +3,7 @@ import { Hand, shuffle } from "./deal";
 import { GameRules } from "./rules";
 import { PlayerState, PlayerInfo } from "./players";
 import { Back } from "../components/card";
+import { LocalOrMultiplayer } from "../components/stages/initAndWait";
 
 export interface GameCustomization {
     boardName: string;
@@ -49,7 +50,7 @@ export interface GameState {
 
 export function initGameState(): GameState {
     return {
-        stage: "CreateGame",
+        stage: "InitAndWait",
         players: [] as PlayerInfo[],
         customization: {}
     } as GameState;
@@ -57,10 +58,14 @@ export function initGameState(): GameState {
 
 const colors = ["red", "green", "blue", "gold"];
 export function startGame(players: PlayerInfo[], rules: GameRules, customization: GameCustomization): GameState {
+    if (LocalOrMultiplayer == "local") {
+        players = shuffle(players.filter((p, pi) => pi < rules.players));
+    }
+
     return {
         rules,
         turnNumber: 0,
-        players: shuffle(players.filter((p, pi) => pi < rules.players).map((player, pi) => ({ ...player, color: colors[pi], score: 0, lastScore: 0, hand: [] }))),
+        players: players.map((player, pi) => ({ ...player, color: colors[pi], score: 0, lastScore: 0, hand: [] })),
         stage: "Deal",
         crib: [],
         cut: [],

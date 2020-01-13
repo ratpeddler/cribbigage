@@ -11,6 +11,10 @@ import { IScore } from './components/scoreIcon';
 import { playTapSound } from './sounds/playSound';
 import { CardBackContext } from './components/card';
 import axios from "axios";
+import { LocalOrMultiplayer } from './components/stages/initAndWait';
+import { Button } from './components/button';
+
+export const LoadGameFromServer = () => axios.get<GameState>("/CribBIGage/PlayGame").then(response => response.data);
 
 const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(initGameState());
@@ -31,11 +35,19 @@ const App: React.FC = () => {
     addLog,
   }), [playLog, addLog]);
 
+
+  const refreshGame = () => {
+    axios.get<GameState>("/CribBIGage/PlayGame").then(newGameState => {
+      setGameState(newGameState.data);
+    });
+  }
+
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
+          <Button onClick={refreshGame}>REFRESH</Button>
           <Game
             layout={Horizontal2PlayerLayout}
             game={gameState}
@@ -46,17 +58,15 @@ const App: React.FC = () => {
                 playTapSound();
               }
 
-              // Look for game id in the query string
-              let params = (new URL(document.location as any)).searchParams;
-              let gameId = params.get('gameId');
-              if (gameId) {
-                // Send to the server
-                console.log("Found game id", gameId);
-                axios.post<GameState>("/CribBIGage/PlayGame/", { ...game, gameId }).then(newGameState => {
-                  if (!_.isEqual(newGameState.data, gameState)) {
-                    setGameState(newGameState.data);
-                  }
-                })
+              // update based on local or onlu
+              if (LocalOrMultiplayer == "online") {
+                // TODO: Send to server and update with the response
+                // TODO: check if it is our turn
+                // if not out turn just poll for get
+
+                axios.post<GameState>("/CribBIGage/PlayGame", game).then(newGameState => {
+                  refreshGame();
+                });
               }
               else {
                 setGameState(_.cloneDeep(game));

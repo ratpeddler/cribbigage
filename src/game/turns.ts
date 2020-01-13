@@ -2,7 +2,7 @@ import { GameState } from "./game";
 
 export type Stage = "Deal" | "Throw" | "Cut" | "Play" | "Score" | "Crib";
 
-export type NonGameStages = "CreateGame";
+export type NonGameStages = "CreateGame" | "InitAndWait";
 
 export const StageOrder: Readonly<Stage[]> = ["Deal", "Throw", "Cut", "Play", "Score", "Crib"];
 

@@ -9,6 +9,7 @@ import { GameState } from "../game/game";
 import { LayoutProps } from "./layouts/Horizontal_2Player";
 import { CreateGame } from "./stages/createGame";
 import { GameSummary } from "./stages/gamesummary";
+import { InitAndWait } from "./stages/initAndWait";
 
 export interface GameComponentProps {
     game: GameState,
@@ -20,6 +21,8 @@ export type GameComponent = React.FC<GameComponentProps>;
 
 export const Game: GameComponent = props => {
     switch (props.game.stage) {
+        case "InitAndWait":
+            return <InitAndWait {...props} />;
         case "CreateGame":
             return <CreateGame {...props} />;
         case "Deal":

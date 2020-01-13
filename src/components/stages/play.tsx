@@ -7,13 +7,13 @@ import { sumCards, canPlay, cantPlayAtAll, playStageOver, playCard, pass } from 
 import { PlayLogContext } from "../playLog";
 import { playAI } from "../../ai/AI_play";
 import { IsYou, ensureNextPlayer } from "../../game/players";
+import { LocalOrMultiplayer } from "./initAndWait";
+import { LoadGameFromServer } from "../../App";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
 const SlowAIDelay = 1200; // 1.2 seconds
 const fastAIDelay = 500; // 1.2 seconds
-
-const AutoAdvancePlayerDuring31 = false;
 
 export const Play: GameComponent = props => {
     const Layout = props.layout;
@@ -35,7 +35,7 @@ export const Play: GameComponent = props => {
         // Reset the current selection
         setKeepCard({});
         // always advance on pass?
-        setGameState(AutoAdvanceToYourTurn
+        setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
             ? playAI(pass(game, logContext), true, logContext)
             : pass(game, logContext), false);
     }
@@ -57,48 +57,51 @@ export const Play: GameComponent = props => {
             // Reset the current selection
             setKeepCard({});
             // only have PLAYAI if you want to auto advance!
-            setGameState(AutoAdvanceToYourTurn
+            setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
                 ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
                 : playCard(game, user, playedCard, logContext), false);
         }
     }, [game, logContext, setGameState, setKeepCard]);
 
-    // If using WHILE, add this here to auto advance to your next move. Otherwise use buttons to view AI actions
+    // Trigger any AI actions
     React.useEffect(() => {
         if (stageIsOver) {
             // you can stop now. No need to have other say "GO"
             return;
         }
 
-        // special case for "GO" OR "31"
-        if (sumCards(game.playedCards || []) == 31) {
-            if (isYourTurn) {
-                // Don't do this right now, it is kind of weird
-                //setTimeout(() => {
-                //    passYourTurn();
-                //}, SlowAIDelay);
+        if(!isYourTurn && LocalOrMultiplayer == "online"){
+            // poll for other player's move
+            setTimeout(() => {
+                LoadGameFromServer().then(g => setGameState(g, false));                
+            }, 1500);
+        }
+
+        if (LocalOrMultiplayer == "local") {
+            // special case for "GO" OR "31"
+            if (sumCards(game.playedCards || []) == 31) {
+                if (!isYourTurn) {
+                    // Add some time out here
+                    setTimeout(() => {
+                        setGameState(playAI(game, false, logContext), false);
+                    }, fastAIDelay);
+                }
             }
-            else {
+
+            else if (AutoAdvanceToYourTurn && !isYourTurn) {
+                setGameState(playAI(game, true, logContext), false);
+            }
+            else if (SlowAdvanceToYourTurn && !isYourTurn) {
                 // Add some time out here
                 setTimeout(() => {
                     setGameState(playAI(game, false, logContext), false);
-                }, fastAIDelay);
+                }, SlowAIDelay);
             }
-        }
-
-        else if (AutoAdvanceToYourTurn && !isYourTurn) {
-            setGameState(playAI(game, true, logContext), false);
-        }
-        else if (SlowAdvanceToYourTurn && !isYourTurn) {
-            // Add some time out here
-            setTimeout(() => {
-                setGameState(playAI(game, false, logContext), false);
-            }, SlowAIDelay);
         }
     }, [game.nextToPlay, isYourTurn]);
 
     return <Layout
-        setGameState={props.setGameState} 
+        setGameState={props.setGameState}
         onDragOverPlayedCards={onDragOverMovableArea}
         onDropOverPlayedCards={onDrop}
         game={props.game}
@@ -127,7 +130,7 @@ export const Play: GameComponent = props => {
             {!stageIsOver && <h3>Current count: {sumCards(game.playedCards || [])}</h3>}
             {stageIsOver || isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
-            {!isYourTurn && !SlowAdvanceToYourTurn && <Button
+            {!isYourTurn && !SlowAdvanceToYourTurn && LocalOrMultiplayer == "local" && <Button
                 onClick={() => { setGameState(playAI(game, false, logContext), false) }}>
                 AI's turn
                 </Button>}
@@ -140,7 +143,7 @@ export const Play: GameComponent = props => {
                         // Reset the current selection
                         setKeepCard({});
                         // only have PLAYAI if you want to auto advance!
-                        setGameState(AutoAdvanceToYourTurn
+                        setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
                             ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
                             : playCard(game, user, playedCard, logContext), false);
                     }}>
