@@ -47,7 +47,7 @@ const App: React.FC = () => {
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
-          <Button onClick={refreshGame}>REFRESH</Button>
+          {LocalOrMultiplayer == "online" ? <Button onClick={refreshGame}>REFRESH</Button> : null}
           <Game
             layout={Horizontal2PlayerLayout}
             game={gameState}
