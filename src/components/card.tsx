@@ -71,7 +71,7 @@ const CardFace: React.FC<{ card: number, width: number, disabled?: boolean }> = 
     return <img
         alt={`${value} of ${suit}`}
         style={disabled ? { filter: "grayscale(100%)" } : {}}
-        src={`https://aiplayersonline.com/CribBIGage/cards/${raw}_of_${suit.toLowerCase()}.svg`}
+        src={`cards/${raw}_of_${suit.toLowerCase()}.svg`}
         width={width}
     />;
 }

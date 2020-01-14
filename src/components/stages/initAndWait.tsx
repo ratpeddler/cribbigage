@@ -24,23 +24,39 @@ export const InitAndWait: GameComponent = props => {
             PlayerId = PlayerId || CurPlayer.number;
             console.log("I think I am player " + PlayerId);
             if (playerGoal > 1) { LocalOrMultiplayer = "online"; console.log("I think this is an online game!") }
-
+            console.log("cribBIGage=" + cribBIGage) ;
             let NewRules = _.cloneDeep(CribBIGage_2Hand);
-            if (cribBIGage == "true") {
-                if (playerGoal == 3) NewRules = _.cloneDeep(CribBIGage_3Hand)
-                if (playerGoal == 4) NewRules = _.cloneDeep(CribBIGage_2Hand);
+            if (cribBIGage == true) {
+                console.log("Playing by CribBIGage rules") ;
+                if (playerGoal == 3 || playerGoal == 1) NewRules = _.cloneDeep(CribBIGage_3Hand)
+                if (playerGoal == 4 || playerGoal == 0) NewRules = _.cloneDeep(CribBIGage_2Hand);
             }
             else {
-                if (playerGoal == 2) NewRules = _.cloneDeep(cribbage_2Hand)
-                if (playerGoal == 3) NewRules = _.cloneDeep(cribbage_3Hand);
+                if (playerGoal == 2 || playerGoal == 0) NewRules = _.cloneDeep(cribbage_2Hand)
+                if (playerGoal == 3 || playerGoal == 1) NewRules = _.cloneDeep(cribbage_3Hand);
             }
             NewRules.pointsToWin = length;
             let customizaton = {
                 boardName: "Old School",
                 deckName: "red"
             };
-            if (playerGoal == 1) {
+            if (playerGoal == 0) {
                 console.log("solo vs AI");
+                setGameState(
+                    startGame([
+                        { name: CurPlayer.name, id: PlayerId },
+                        { name: "AI 1", },
+                        ],
+                        NewRules,
+                        {
+                            boardName: "Old School",
+                            deckName: "red"
+                        }
+                    ),
+                    false);
+            }
+            else if (playerGoal == 1) {
+                console.log("solo vs 2 AI");
                 setGameState(
                     startGame([
                         { name: CurPlayer.name, id: PlayerId },
@@ -48,8 +64,8 @@ export const InitAndWait: GameComponent = props => {
                         { name: "AI 2", }],
                         NewRules,
                         {
-                            boardName: "Old School",
-                            deckName: "red"
+                            boardName: "Around the Back 120",
+                            deckName: "dragon"
                         }
                     ),
                     false);
