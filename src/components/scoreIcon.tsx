@@ -30,7 +30,7 @@ export function createScoreMessage(score: IScore) {
             scoreStrings.push("31 for " + score.thirtyOne);
         }
         if (score.knobs) {
-            scoreStrings.push("Knobs for " + score.knobs);
+            scoreStrings.push("Nibs for " + score.knobs);
         }
         if (score.flush) {
             scoreStrings.push("Flush for " + score.flush);
