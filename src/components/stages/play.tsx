@@ -156,9 +156,10 @@ export const Play: GameComponent = props => {
                 </Button>}
 
             {stageIsOver && <Button
-                disabled={!stageIsOver}
+                disabled={!stageIsOver || (LocalOrMultiplayer == "online" && !isYourTurn)}
                 onClick={() => {
                     // This doesn't really need to go to the SERVER. This should be a client only thing.
+                    // OR we can limit it so only 1 player can do this. Maybe the new dealer?
                     props.setGameState({
                         ...props.game,
                         previousPlayedCards: [],

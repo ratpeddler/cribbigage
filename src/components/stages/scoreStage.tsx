@@ -14,6 +14,7 @@ export const ScoreStage: GameComponent = props => {
 
     const [hasCounted, setHasCounted] = React.useState(false);
 
+    // TODO: make users click a button to score their hands!
     React.useEffect(() => {
         setTimeout(() => {
             // this is in correct order
