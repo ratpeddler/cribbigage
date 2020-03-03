@@ -85,6 +85,20 @@ export const InitAndWait: GameComponent = props => {
                     checkGame();
                 }, (5000));
             }
+        }, reason => {
+                console.log("Server call for joining a game failed. So. fall back to solo vs AI");
+                setGameState(
+                    startGame([
+                        { name: "You", id: PlayerId },
+                        { name: "AI 1", },
+                        ],
+                        cribbage_2Hand,
+                        {
+                            boardName: "Old School",
+                            deckName: "red"
+                        }
+                    ),
+                    false);
         });
     }
 

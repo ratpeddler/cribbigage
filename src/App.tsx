@@ -17,6 +17,7 @@ import { Button } from './components/button';
 export const LoadGameFromServer = () => axios.get<GameState>("PlayGame").then(response => response.data);
 
 const App: React.FC = () => {
+  const [waitingForServer, setWaitingForServer] = React.useState(false);
   const [gameState, setGameState] = React.useState(initGameState());
   const [playLog, setPlayLog] = React.useState<ILog[]>([]);
 
@@ -47,8 +48,9 @@ const App: React.FC = () => {
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
-          {LocalOrMultiplayer == "online" ? <Button onClick={refreshGame}>REFRESH</Button> : null}
+          {/* LocalOrMultiplayer == "online" ? <Button onClick={refreshGame}>REFRESH</Button> : null*/}
           <Game
+            waitingForServer={waitingForServer}
             layout={Horizontal2PlayerLayout}
             game={gameState}
             setGameState={(newGame, advance) => {
@@ -61,11 +63,13 @@ const App: React.FC = () => {
               // update based on local or onlu
               if (LocalOrMultiplayer == "online") {
                 // TODO: Send to server and update with the response
-                // TODO: check if it is our turn
-                // if not out turn just poll for get
+                // TODO: check if it is our turn, if so play a little whistle
+                setWaitingForServer(true);
+                setGameState(game);
 
                 axios.post<GameState>("PlayGame", game).then(newGameState => {
-                  refreshGame();
+                  setGameState(newGameState.data);
+                  setWaitingForServer(false);
                 });
               }
               else {

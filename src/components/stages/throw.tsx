@@ -1,27 +1,33 @@
 import React from "react";
 import { GameComponent } from "../game";
-import { onDragOverMovableArea } from "../hand";
+import { onDragOverMovableArea, KeepCard } from "../hand";
 import { Button } from "../button";
 import { scoreHand } from "../../game/score";
 import { throwAI } from "../../ai/AI_throw";
 import _ from "lodash";
 import { GameDragEvent } from "../card";
-import { IsYou, getCurrentDealer } from "../../game/players";
+import { IsYou, getCurrentDealer, ensureNextPlayer } from "../../game/players";
+import { action_throwCardsToCrib } from "../../actions/throw_actions";
+import { LocalOrMultiplayer } from "./initAndWait";
 
 export const Throw: GameComponent = props => {
     const Layout = props.layout;
     const { game, setGameState } = props;
     const { rules, players } = game;
     const { keepSize } = rules;
-    const [keepCards, setKeepCards] = React.useState<{ [card: number]: boolean }>({});
+    const [keepCards, setKeepCards] = React.useState<KeepCard>({});
 
     const user = players.filter(IsYou)[0];
     const dealer = getCurrentDealer(game);
     const yourCrib = IsYou(dealer);
 
+    const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
 
     const selectedLength = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
-    const disabled = selectedLength !== keepSize;
+    let disabled: boolean = selectedLength !== keepSize;
+    if(LocalOrMultiplayer == "online"){
+        disabled = disabled || !isYourTurn || !!props.waitingForServer;
+    }
 
     const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
 
@@ -46,7 +52,8 @@ export const Throw: GameComponent = props => {
         onDropOverDeck={onDrop}
         onReorderHand={newHand => {
             user.hand = newHand;
-            setGameState({ ...game }, false);
+            // todo move this to a separate state, like order preference or something
+            //setGameState({ ...game }, false);
         }}
         userActions={() => <div
         style={{textAlign: "center"}}
@@ -59,29 +66,7 @@ export const Throw: GameComponent = props => {
             </h3>
             <Button
                 disabled={disabled}
-                onClick={() => {
-                    // get hands and discards for each player
-                    let players = _.cloneDeep(game.players);
-                    let crib = [...game.crib || []];
-
-                    for (let player of players) {
-                        if (IsYou(player)) {
-                            crib.push(...player.hand.filter(c => !keepCards[c]));
-                            player.hand = player.hand.filter(c => keepCards[c]);
-                        }
-                        else {
-                            const { keep, discard } = throwAI(player, game);
-                            crib.push(...discard);
-                            player.hand = keep;
-                        }
-                    }
-
-                    setGameState({
-                        ...game,
-                        players,
-                        crib,
-                    }, true);
-                }}>
+                onClick={() => action_throwCardsToCrib(game, setGameState, keepCards)}>
                 {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`}
             </Button>
         </div>} />;

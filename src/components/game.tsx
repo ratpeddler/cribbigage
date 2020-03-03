@@ -11,10 +11,13 @@ import { CreateGame } from "./stages/createGame";
 import { GameSummary } from "./stages/gamesummary";
 import { InitAndWait } from "./stages/initAndWait";
 
+export type SetGameState = (gameState: GameState, advance: boolean) => void;
+
 export interface GameComponentProps {
     game: GameState,
-    setGameState: (gameState: GameState, advance: boolean) => void,
-    layout: React.FC<LayoutProps>
+    setGameState: SetGameState,
+    layout: React.FC<LayoutProps>,
+    waitingForServer?: boolean
 };
 
 export type GameComponent = React.FC<GameComponentProps>;

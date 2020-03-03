@@ -158,6 +158,7 @@ export const Play: GameComponent = props => {
             {stageIsOver && <Button
                 disabled={!stageIsOver}
                 onClick={() => {
+                    // This doesn't really need to go to the SERVER. This should be a client only thing.
                     props.setGameState({
                         ...props.game,
                         previousPlayedCards: [],

@@ -33,8 +33,6 @@ export function getPlayerByName(name: string, players: PlayerState[]){
     return players.find(p => p.name == name)!;
 }
 
-// Total hack for now
-// TODO: use a better comparison
 export const IsYou = (player: PlayerInfo): boolean => {
     return player.id == PlayerId;
 }
