@@ -39,7 +39,7 @@ const App: React.FC = () => {
   const refreshGame = (currentGame: GameState, timeout = 1) => {
     axios.get<GameState>("PlayGame").then(newGameState => {
       // this call may have timed out before the other player(s) have moved.
-      if(_.isEqual(currentGame, newGameState.data)){
+      if (currentGame != null && _.isEqual(currentGame, newGameState.data)) {
         // they are still the same. This LIKELY indicates that we should call again. But there could always be edge cases for this...
         console.warn(`game states were the same after GET to PlayGame, so lets wait ${timeout} seconds and check again`);
         setTimeout(() => {
@@ -47,16 +47,16 @@ const App: React.FC = () => {
         }, timeout * 1000);
 
       }
-      else{
-        console.log("game states were the same so I am no calling GET PlayGame again. // SHOULD This check if it is MY turn??")
+      else {
+        console.log("game states were different so I am not calling GET PlayGame again. // SHOULD This check if it is MY turn??")
         setGameState(newGameState.data);
         setWaitingForServer(false);
       }
     });
   }
 
-  const currentPlayer = getCurrentPlayer(gameState);
-  const isYourTurn = IsYou(currentPlayer);
+  const currentPlayer = !!gameState && getCurrentPlayer(gameState);
+  const isYourTurn = !!currentPlayer && IsYou(currentPlayer);
 
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
@@ -66,7 +66,7 @@ const App: React.FC = () => {
           {LocalOrMultiplayer == "online" ? <Button disabled={waitingForServer} onClick={() => {
             setWaitingForServer(true);
             refreshGame(gameState);
-            }}>
+          }}>
             {isYourTurn ? "Wait for other player" : "(BUG: Refresh)"}</Button> : null}
           <Game
             waitingForServer={waitingForServer}
