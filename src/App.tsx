@@ -40,8 +40,11 @@ const App: React.FC = () => {
   const refreshGame = () => {
     axios.get<GameState>("PlayGame").then(newGameState => {
       setGameState(newGameState.data);
+      setWaitingForServer(false);
     });
   }
+  
+  console.log("refresh game", refreshGame);
 
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
@@ -67,9 +70,8 @@ const App: React.FC = () => {
                 setWaitingForServer(true);
                 setGameState(game);
 
-                axios.post<GameState>("PlayGame", game).then(newGameState => {
-                  setGameState(newGameState.data);
-                  setWaitingForServer(false);
+                axios.post<GameState>("PlayGame", game).then(postResponse => {
+                  refreshGame();
                 });
               }
               else {
