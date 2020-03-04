@@ -41,14 +41,14 @@ const App: React.FC = () => {
       // this call may have timed out before the other player(s) have moved.
       if (currentGame != null && _.isEqual(currentGame, newGameState.data)) {
         // they are still the same. This LIKELY indicates that we should call again. But there could always be edge cases for this...
-        console.warn(`game states were the same after GET to PlayGame, so lets wait ${timeout} seconds and check again`);
+        console.warn(`still refreshing so lets wait ${timeout} seconds and check again`);
         setTimeout(() => {
-          refreshGame(currentGame, timeout * 2);
+          refreshGame(currentGame, timeout * 1.33);
         }, timeout * 1000);
 
       }
       else {
-        console.log("game states were different so I am not calling GET PlayGame again. // SHOULD This check if it is MY turn??")
+        console.log("game states changed. stopping refresh and updating state.")
         setGameState(newGameState.data);
         setWaitingForServer(false);
       }
