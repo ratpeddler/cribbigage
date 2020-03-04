@@ -37,10 +37,21 @@ const App: React.FC = () => {
   }), [playLog, addLog]);
 
 
-  const refreshGame = () => {
+  const refreshGame = (timeout = 1) => {
     axios.get<GameState>("PlayGame").then(newGameState => {
-      setGameState(newGameState.data);
-      setWaitingForServer(false);
+      // this call may have timed out before the other player(s) have moved.
+      if(_.isEqual(gameState, newGameState.data)){
+        // they are still the same. This LIKELY indicates that we should call again. But there could always be edge cases for this...
+        console.warn(`game states were the same after GET to PlayGame, so lets wait ${timeout} seconds and check again`);
+        setTimeout(() => {
+          refreshGame(timeout * 2);
+        }, timeout * 1000);
+
+      }
+      else{
+        setGameState(newGameState.data);
+        setWaitingForServer(false);
+      }
     });
   }
   
