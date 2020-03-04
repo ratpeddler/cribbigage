@@ -55,8 +55,8 @@ const App: React.FC = () => {
     });
   }
 
-  const currentPlayer = getCurrentPlayer(gameState);
-  const isYourTurn = IsYou(currentPlayer);
+  const currentPlayer = !!gameState && getCurrentPlayer(gameState);
+  const isYourTurn = !!currentPlayer && IsYou(currentPlayer);
 
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
