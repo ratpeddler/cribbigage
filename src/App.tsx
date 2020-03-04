@@ -6,7 +6,7 @@ import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import _ from 'lodash';
 import { PlayLogContext, IPlayLogContext, ILog } from './components/playLog';
-import { PlayerState } from './game/players';
+import { PlayerState, getCurrentPlayer, IsYou } from './game/players';
 import { IScore } from './components/scoreIcon';
 import { playTapSound } from './sounds/playSound';
 import { CardBackContext } from './components/card';
@@ -36,33 +36,38 @@ const App: React.FC = () => {
     addLog,
   }), [playLog, addLog]);
 
-
-  const refreshGame = (timeout = 1) => {
+  const refreshGame = (currentGame: GameState, timeout = 1) => {
     axios.get<GameState>("PlayGame").then(newGameState => {
       // this call may have timed out before the other player(s) have moved.
-      if(_.isEqual(gameState, newGameState.data)){
+      if(_.isEqual(currentGame, newGameState.data)){
         // they are still the same. This LIKELY indicates that we should call again. But there could always be edge cases for this...
         console.warn(`game states were the same after GET to PlayGame, so lets wait ${timeout} seconds and check again`);
         setTimeout(() => {
-          refreshGame(timeout * 2);
+          refreshGame(currentGame, timeout * 2);
         }, timeout * 1000);
 
       }
       else{
+        console.log("game states were the same so I am no calling GET PlayGame again. // SHOULD This check if it is MY turn??")
         setGameState(newGameState.data);
         setWaitingForServer(false);
       }
     });
   }
-  
-  console.log("refresh game", refreshGame);
+
+  const currentPlayer = getCurrentPlayer(gameState);
+  const isYourTurn = IsYou(currentPlayer);
 
   return (
     <PlayLogContext.Provider value={PlayLogContextValue}>
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
-          {/* LocalOrMultiplayer == "online" ? <Button onClick={refreshGame}>REFRESH</Button> : null*/}
+          {LocalOrMultiplayer == "online" ? <Button disabled={waitingForServer} onClick={() => {
+            setWaitingForServer(true);
+            refreshGame(gameState);
+            }}>
+            {isYourTurn ? "Wait for other player" : "(BUG: Refresh)"}</Button> : null}
           <Game
             waitingForServer={waitingForServer}
             layout={Horizontal2PlayerLayout}
@@ -82,7 +87,7 @@ const App: React.FC = () => {
                 setGameState(game);
 
                 axios.post<GameState>("PlayGame", game).then(postResponse => {
-                  refreshGame();
+                  refreshGame(game);
                 });
               }
               else {
