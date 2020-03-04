@@ -17,6 +17,9 @@ export const Throw: GameComponent = props => {
     const { keepSize } = rules;
     const [keepCards, setKeepCards] = React.useState<KeepCard>({});
 
+    // once confirmed you will auto-submit cards, and won't be able to change
+    const [hasConfirmed, setHasConfirmed] = React.useState(false);
+
     const user = players.filter(IsYou)[0];
     const dealer = getCurrentDealer(game);
     const yourCrib = IsYou(dealer);
@@ -25,9 +28,6 @@ export const Throw: GameComponent = props => {
 
     const selectedLength = Object.keys(keepCards).filter(key => !!keepCards[key as any]).length;
     let disabled: boolean = selectedLength !== keepSize;
-    if(LocalOrMultiplayer == "online"){
-        disabled = disabled || !isYourTurn || !!props.waitingForServer;
-    }
 
     const score = scoreHand(user.hand.filter(c => keepCards[c]), []);
 
@@ -38,25 +38,32 @@ export const Throw: GameComponent = props => {
         ev.stopPropagation();
         const droppedCard = parseInt(ev.dataTransfer.getData("text/plain"));
         console.log("dropped!")
-        setKeepCards({...keepCards, [droppedCard]: true});
+        setKeepCards({ ...keepCards, [droppedCard]: true });
     }, []);
+
+    // once confirmed we should send the card status as soon as we see the game has progressed
+    React.useEffect(() => {
+        if (hasConfirmed && isYourTurn && LocalOrMultiplayer == "online") {
+            action_throwCardsToCrib(game, setGameState, keepCards);
+        }
+    }, [hasConfirmed, game, setGameState]);
 
     // TODO: This should either let you pick all hands or just your own
     return <Layout
-        setGameState={props.setGameState} 
+        setGameState={props.setGameState}
         game={game}
         selectedCards={keepCards}
-        setSelectedCards={setKeepCards}
+        setSelectedCards={hasConfirmed ? undefined : setKeepCards}
         maxSelectedCards={keepSize}
         onDragOverDeck={onDragOver}
-        onDropOverDeck={onDrop}
+        onDropOverDeck={hasConfirmed ? undefined : onDrop}
         onReorderHand={newHand => {
             user.hand = newHand;
             // todo move this to a separate state, like order preference or something
             //setGameState({ ...game }, false);
         }}
         userActions={() => <div
-        style={{textAlign: "center"}}
+            style={{ textAlign: "center" }}
             onDragOver={onDragOver}
             onDrop={onDrop}
         >
@@ -65,9 +72,16 @@ export const Throw: GameComponent = props => {
             <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
             </h3>
             <Button
-                disabled={disabled}
-                onClick={() => action_throwCardsToCrib(game, setGameState, keepCards)}>
-                {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`}
+                disabled={disabled || hasConfirmed}
+                onClick={() => {
+                    if (LocalOrMultiplayer == "online" && (!isYourTurn || !!props.waitingForServer)) {
+                        setHasConfirmed(true);
+                    }
+                    else {
+                        action_throwCardsToCrib(game, setGameState, keepCards);
+                    }
+                }}>
+                {hasConfirmed ? "Waiting for other players" : (disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`)}
             </Button>
         </div>} />;
 }
