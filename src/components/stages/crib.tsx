@@ -4,22 +4,29 @@ import { HandScore } from "../handScore";
 import { Hand } from "../hand";
 import { Button } from "../button";
 import { scoreHand, addPlayerScore } from "../../game/score";
-import { getCurrentDealer } from "../../game/players";
+import { getCurrentDealer, getCurrentPlayer, IsYou } from "../../game/players";
+import { LocalOrMultiplayer } from "./initAndWait";
+import _ from "lodash";
 
 export const Crib: GameComponent = props => {
     const Layout = props.layout;
-    let game = { ...props.game };
+    let game = _.cloneDeep(props.game);
     let dealer = getCurrentDealer(game);
+    const isYourCrib = IsYou(dealer);
 
     React.useEffect(() => {
-        setTimeout(() => {
-            addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
-            props.setGameState(game, false);
-        }, 500);
+        if (LocalOrMultiplayer == "local" && !isYourCrib) {
+            setTimeout(() => {
+                addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
+                props.setGameState(game, false);
+            }, 500);
+        }
     }, []);
 
+    const [hasCounted, setHasCounted] = React.useState(LocalOrMultiplayer == "local");
+
     return <Layout
-        setGameState={props.setGameState} 
+        setGameState={props.setGameState}
         hideScores
         game={game}
         userActions={() => <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
@@ -31,11 +38,17 @@ export const Crib: GameComponent = props => {
                 </div>
             </div>
             <div style={{ textAlign: "center" }}>
-                <Button onClick={() => {
-                    props.setGameState({
-                        ...game,
-                    }, true);
-                }}>Next</Button>
+                <Button disabled={!isYourCrib} onClick={() => {
+                    if (!isYourCrib) { throw "can't score the crib if it isn't yours!" }
+                    if (!hasCounted) {
+                        setHasCounted(true);
+                        addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game)
+                        props.setGameState(game, false);
+                    }
+                    else {
+                        props.setGameState(game, true);
+                    }
+                }}>{hasCounted ? "Next" : "Count crib"}</Button>
             </div>
         </div>}
     />;
