@@ -5,6 +5,22 @@ import { PlayerState, PlayerInfo } from "./players";
 import { Back } from "../components/card";
 import { LocalOrMultiplayer } from "../components/stages/initAndWait";
 
+// interface for the "JoinGame" api response
+export interface JoinGameResponse {
+    cribBIGage: boolean
+    cribComplete: boolean
+    gameId: number
+    gameOver: boolean
+    handCount: number
+    handSubmittedCount: number
+    length: number
+    name: string
+    player: { name: string, number: number, score: number }[]
+    playerCount: number
+    playerGoal: number
+    state: "NEW" | string
+}
+
 export interface GameCustomization {
     boardName: string;
     deckName: Back;

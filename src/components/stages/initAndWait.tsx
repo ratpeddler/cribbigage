@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import _ from "lodash";
 
 import { GameComponent } from "../game";
-import { startGame, GameState } from "../../game/game";
+import { startGame, GameState, JoinGameResponse } from "../../game/game";
 import { Button } from "../button";
 import { CribBIGage_2Hand, CribBIGage_3Hand, cribbage_3Hand, cribbage_2Hand } from "../../game/rules";
 import { PlayerInfo } from "../../game/players";
@@ -17,7 +17,7 @@ export const InitAndWait: GameComponent = props => {
     console.log(axios);
 
     const checkGame = () => {
-        axios.get("JoinGame").then(response => {
+        axios.get<JoinGameResponse>("JoinGame").then(response => {
             startOnlineGame(response);
         }, reason => {
                 console.log("Server call for joining a game failed. So. fall back to solo vs AI");
@@ -36,7 +36,7 @@ export const InitAndWait: GameComponent = props => {
         });
     }
 
-    const startOnlineGame = async (response: AxiosResponse<any>) => {
+    const startOnlineGame = async (response: AxiosResponse<JoinGameResponse>) => {
         const serverGameObject = response.data;
         console.log("join game response", serverGameObject);
         let serverPlayers = serverGameObject.player;
