@@ -39,14 +39,19 @@ export const ScoreStage: GameComponent = props => {
         hideScores
         game={props.game}
         userActions={() =>
-            <Button disabled={!isYourTurn} onClick={() => {
-                if (!isYourTurn) { throw "can't score when it isn't your turn!"; }
-                const score = scoreHand(currentPlayer.hand, props.game.cut!);
-                addPlayerScore(currentPlayer, score.score, game);
-                game.nextToPlay = incrementNextPlayer(game);
+            <Button disabled={!isYourTurn && LocalOrMultiplayer == "online"} onClick={() => {
+                if (LocalOrMultiplayer == "online") {
+                    if (!isYourTurn) { throw "can't score when it isn't your turn!"; }
+                    const score = scoreHand(currentPlayer.hand, props.game.cut!);
+                    addPlayerScore(currentPlayer, score.score, game);
+                    game.nextToPlay = incrementNextPlayer(game);
 
-                // 0 indicates we have gone around the table fully, so we should advance
-                props.setGameState(game, game.nextToPlay == 0);
+                    // 0 indicates we have gone around the table fully, so we should advance
+                    props.setGameState(game, game.nextToPlay == 0);
+                }
+                else {
+                    props.setGameState(game, true);
+                }
             }}>
                 Score your hand
             </Button>
