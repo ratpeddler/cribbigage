@@ -38,12 +38,17 @@ export const Crib: GameComponent = props => {
                 </div>
             </div>
             <div style={{ textAlign: "center" }}>
-                <Button disabled={!isYourCrib} onClick={() => {
-                    if (!isYourCrib) { throw "can't score the crib if it isn't yours!" }
-                    if (!hasCounted) {
-                        setHasCounted(true);
-                        addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game)
-                        props.setGameState(game, false);
+                <Button disabled={!isYourCrib && LocalOrMultiplayer == "online"} onClick={() => {
+                    if(LocalOrMultiplayer == "online"){
+                        if (!isYourCrib) { throw "can't score the crib if it isn't yours!" }
+                        if (!hasCounted) {
+                            setHasCounted(true);
+                            addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game)
+                            props.setGameState(game, false);
+                        }
+                        else {
+                            props.setGameState(game, true);
+                        }
                     }
                     else {
                         props.setGameState(game, true);
