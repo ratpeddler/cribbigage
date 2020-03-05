@@ -4,6 +4,7 @@ import { GameRules } from "./rules";
 import { PlayerState, PlayerInfo } from "./players";
 import { Back } from "../components/card";
 import { LocalOrMultiplayer } from "../components/stages/initAndWait";
+import { ILog } from "../components/playLog";
 
 // interface for the "JoinGame" api response
 export interface JoinGameResponse {
@@ -62,6 +63,8 @@ export interface GameState {
     previousPlayedCards?: Hand;
 
     customization: GameCustomization;
+
+    playLog?: ILog[];
 }
 
 export function initGameState(): GameState {
