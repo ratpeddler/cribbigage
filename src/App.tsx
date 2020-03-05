@@ -50,6 +50,7 @@ const App: React.FC = () => {
       else {
         console.log("game states changed. stopping refresh and updating state.")
         setGameState(newGameState.data);
+        setPlayLog([]);
         setWaitingForServer(false);
       }
     });
@@ -86,7 +87,8 @@ const App: React.FC = () => {
                 setWaitingForServer(true);
                 setGameState(game);
 
-                axios.post<GameState>("PlayGame", game).then(postResponse => {
+                // Send the "new" play log to the server.
+                axios.post<GameState>("PlayGame", { ...game, playLog: [...(game.playLog || []), ...playLog] }).then(postResponse => {
                   refreshGame(game);
                 });
               }

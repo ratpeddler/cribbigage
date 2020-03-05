@@ -82,7 +82,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
                 <ScoreBoard game={game} vertical />
             </Row>
             {yourCrib && deck}
-            <PlayLog />
+            <PlayLog game={game} />
         </Column>
 
         {/* RIGHT Hand and play area (From to: Op hand, Op played, SCORE, Your played, Your Hand) */}
@@ -137,10 +137,10 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 
             <Column fill justified centered>
                 {gameOver ? <><GameSummary key="game" game={game} /><Button
-            onClick={() => {
-                props.setGameState(initGameState(), false)
-            }}>
-            New Game?
+                    onClick={() => {
+                        props.setGameState(initGameState(), false)
+                    }}>
+                    New Game?
         </Button></> : props.userActions?.()}
             </Column>
 
