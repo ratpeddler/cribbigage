@@ -84,11 +84,13 @@ const App: React.FC = () => {
               if (LocalOrMultiplayer == "online") {
                 // TODO: Send to server and update with the response
                 // TODO: check if it is our turn, if so play a little whistle
+                game.playLog =  [...(game.playLog || []), ...playLog];
                 setWaitingForServer(true);
                 setGameState(game);
+                setPlayLog([]);
 
                 // Send the "new" play log to the server.
-                axios.post<GameState>("PlayGame", { ...game, playLog: [...(game.playLog || []), ...playLog] }).then(postResponse => {
+                axios.post<GameState>("PlayGame", game).then(postResponse => {
                   refreshGame(game);
                 });
               }
