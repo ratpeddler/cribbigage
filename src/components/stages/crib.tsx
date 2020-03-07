@@ -17,7 +17,7 @@ export const Crib: GameComponent = props => {
     React.useEffect(() => {
         if (LocalOrMultiplayer == "local" && !isYourCrib) {
             setTimeout(() => {
-                addPlayerScore(getCurrentDealer(game), scoreHand(game.crib!, game.cut!).score, game)
+                addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game)
                 props.setGameState(game, false);
             }, 500);
         }
@@ -51,6 +51,7 @@ export const Crib: GameComponent = props => {
                         }
                     }
                     else {
+                        addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game)
                         props.setGameState(game, true);
                     }
                 }}>{hasCounted ? "Next" : "Count crib"}</Button>
