@@ -23,11 +23,11 @@ export const GameSummary: React.FC<{ game: GameState }> = props => {
         <ColoredDiv player={winner}>{winner?.name} scored {winner?.score} points</ColoredDiv>
         {players.map(player => {
             if (player == winner) { return null; }
-            if (player.score < .5 * pointsToWin) {
+            if (player.score <= Math.floor(.5 * pointsToWin)) {
                 // double skunk
                 return <h2 style={{ color: player.color }}>{player.name} {WasOrWere(player)} <b>DOUBLE</b> skunked  with only {player.score} points!</h2>
             }
-            if (player.score < .75 * pointsToWin) {
+            if (player.score <= Math.floor(.75 * pointsToWin)) {
                 // double skunk
                 return <h3 style={{ color: player.color }}>{player.name} {WasOrWere(player)} skunked with {player.score} points!</h3>
             }
