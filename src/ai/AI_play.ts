@@ -36,13 +36,13 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
             if (currentCount + cp.count === 15 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
                 game = playCard(game, player, card, logContext);
                 cardPlayed = true;
-                console.log("Greedy 15 play")
+                //console.log("Greedy 15 play")
                 break;
             }
             if (currentCount + cp.count === 31 && canPlay(playedCards, card)) { // Going for a greedy 15 peg
                 game = playCard(game, player, card, logContext);
                 cardPlayed = true;
-                console.log("Greedy 31 play")
+                //console.log("Greedy 31 play")
                 break;
             }
         }
@@ -54,15 +54,15 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
             const pcp = prevCard != undefined && parseCard(prevCard);
 
             if (currentCount + cp.count === 5) {
-                console.log("Avoid 5 count");
+                //console.log("Avoid 5 count");
                 continue; // Avoid 5 Count
             }
             if (currentCount + cp.count === 21) {
-                console.log("Avoid 21 count");
+                //console.log("Avoid 21 count");
                 continue; // Avoid 21
             }
             if (pcp && (pcp.rank === cp.rank - 1 || pcp.rank === cp.rank + 1)) {
-                console.log("Avoid 2 card sequence")
+                //console.log("Avoid 2 card sequence")
                 continue; // Avoid 2 card sequences
             }
             if (canPlay(playedCards, card)) {
@@ -74,7 +74,7 @@ export function playAI(game: GameState, autoAdvanceUntilPlayer = false, logConte
 
         // In case you can't avoid the bad situations
         if (cardPlayed) continue;
-        console.log("fallback and play a card");
+        //console.log("fallback and play a card");
         for (let card of hand) {
             if (canPlay(playedCards, card)) {
                 game = playCard(game, player, card, logContext);

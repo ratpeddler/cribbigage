@@ -53,7 +53,6 @@ export const Play: GameComponent = props => {
         }
 
         if (canPlay(playedCards, playedCard)) {
-            console.log("played", playedCard);
             // Reset the current selection
             setKeepCard({});
             // only have PLAYAI if you want to auto advance!
