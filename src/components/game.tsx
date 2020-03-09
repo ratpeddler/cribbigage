@@ -17,7 +17,8 @@ export interface GameComponentProps {
     game: GameState,
     setGameState: SetGameState,
     layout: React.FC<LayoutProps>,
-    waitingForServer?: boolean
+    waitingForServer?: boolean,
+    refreshFromServer?: () => void,
 };
 
 export type GameComponent = React.FC<GameComponentProps>;

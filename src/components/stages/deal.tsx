@@ -8,8 +8,10 @@ import { getCurrentDealer, IsYou } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 
 export const Deal: GameComponent = props => {
+    const { refreshFromServer} = props;
     const Layout = props.layout;
     const logContext = React.useContext(PlayLogContext);
+    logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
 
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
@@ -17,14 +19,19 @@ export const Deal: GameComponent = props => {
     playShuffleSound();
 
     React.useEffect(() => {
-        if (LocalOrMultiplayer == "local" && !yourCrib) {
-            setTimeout(() => {
-                props.setGameState(RunDeal(props.game, logContext), true);
-                Repeat(playDealSound, 10, 250);
-            }, 1000);
+        if(!yourCrib){
+            if (LocalOrMultiplayer == "local") {
+                setTimeout(() => {
+                    props.setGameState(RunDeal(props.game, logContext), true);
+                    Repeat(playDealSound, 10, 250);
+                }, 1000);
+            }
+            else {
+                // multiplayer we should refresh here.
+                console.log("refreshing from server, since it is not your turn to DEAL.")
+                refreshFromServer?.();
+            }
         }
-
-        logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
     }, []);
 
     // TODO: Animate dealing

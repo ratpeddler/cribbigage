@@ -70,6 +70,7 @@ const App: React.FC = () => {
           }}>
             {isYourTurn ? "Wait for other player" : "(BUG: Refresh)"}</Button> : null}
           <Game
+            refreshFromServer={() => refreshGame(gameState)}
             waitingForServer={waitingForServer}
             layout={Horizontal2PlayerLayout}
             game={gameState}

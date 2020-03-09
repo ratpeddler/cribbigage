@@ -66,7 +66,7 @@ export const Horizontal2PlayerLayout: React.FC<LayoutProps> = props => {
 
     // Stage specifics
     const currentCount = game.stage == "Play" ? sumCards(game.playedCards || []) : undefined;
-    const cutGame = game.stage !== "Throw" && game.stage !== "Deal" ? game : undefined;
+    const cutGame = game.stage !== "Throw" && game.stage !== "Deal" && game.stage !== "Cut" ? game : undefined;
 
     const deck = <DeckAndCut game={cutGame} onDrop={props.onDropOverDeck} onDragOver={props.onDragOverDeck} />;
 
