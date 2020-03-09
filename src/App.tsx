@@ -43,7 +43,7 @@ const App: React.FC = () => {
         // they are still the same. This LIKELY indicates that we should call again. But there could always be edge cases for this...
         console.warn(`still refreshing so lets wait ${timeout} seconds and check again`);
         setTimeout(() => {
-          refreshGame(currentGame, timeout * 1.33);
+          refreshGame(currentGame, timeout * 1);
         }, timeout * 1000);
 
       }
