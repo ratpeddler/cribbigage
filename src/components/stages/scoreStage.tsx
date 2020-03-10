@@ -32,6 +32,11 @@ export const ScoreStage: GameComponent = props => {
                 props.setGameState(game, false);
             }, 500);
         }
+        else if (!isYourTurn) {
+            // multiplayer we should refresh here.
+            console.log("refreshing from server, since it is not your turn to SCORE YOUR HAND.")
+            props.refreshFromServer?.();
+        }
     }, []);
 
     return <Layout
@@ -39,7 +44,7 @@ export const ScoreStage: GameComponent = props => {
         hideScores
         game={props.game}
         userActions={() =>
-            <Button disabled={!isYourTurn && LocalOrMultiplayer == "online"} onClick={() => {
+            <Button disabled={LocalOrMultiplayer == "online" && !isYourTurn} onClick={() => {
                 if (LocalOrMultiplayer == "online") {
                     if (!isYourTurn) { throw "can't score when it isn't your turn!"; }
                     const score = scoreHand(currentPlayer.hand, props.game.cut!);

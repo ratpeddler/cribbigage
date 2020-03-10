@@ -8,7 +8,6 @@ import { getCurrentDealer, IsYou } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 
 export const Deal: GameComponent = props => {
-    const { refreshFromServer} = props;
     const Layout = props.layout;
     const logContext = React.useContext(PlayLogContext);
 
@@ -29,7 +28,7 @@ export const Deal: GameComponent = props => {
             else {
                 // multiplayer we should refresh here.
                 console.log("refreshing from server, since it is not your turn to DEAL.")
-                refreshFromServer?.();
+                props.refreshFromServer?.();
             }
         }
     }, []);
