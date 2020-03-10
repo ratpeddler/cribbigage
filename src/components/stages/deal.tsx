@@ -11,10 +11,10 @@ export const Deal: GameComponent = props => {
     const { refreshFromServer} = props;
     const Layout = props.layout;
     const logContext = React.useContext(PlayLogContext);
-    logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
 
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
+    logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
 
     playShuffleSound();
 
