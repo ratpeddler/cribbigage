@@ -27,12 +27,14 @@ export const Crib: GameComponent = props => {
         props.setGameState(game, true);
     }
 
+    const [hasRefreshed, setRefreshed] = React.useState(false);
     React.useEffect(() => {
         if (!isYourCrib) {
             if (LocalOrMultiplayer == "local") {
                 setTimeout(Action_ScoreCrib, 500);
             }
-            else {
+            else if (!hasRefreshed) {
+                setRefreshed(true);
                 // multiplayer we should refresh here.
                 console.log("refreshing from server, since it is not your turn to COUNT THE CRIB.")
                 props.refreshFromServer?.();

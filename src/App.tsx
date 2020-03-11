@@ -50,7 +50,7 @@ const App: React.FC = () => {
       else {
         console.log("game states changed. stopping refresh and updating state.")
         setGameState(newGameState.data);
-        setPlayLog([]);
+        setPlayLog(newGameState.data.playLog || []);
         setWaitingForServer(false);
       }
     });
@@ -85,10 +85,9 @@ const App: React.FC = () => {
               if (LocalOrMultiplayer == "online") {
                 // TODO: Send to server and update with the response
                 // TODO: check if it is our turn, if so play a little whistle
-                game.playLog =  [...(game.playLog || []), ...playLog];
+                game.playLog =  playLog;
                 setWaitingForServer(true);
                 setGameState(game);
-                setPlayLog([]);
 
                 // Send the "new" play log to the server.
                 axios.post<GameState>("PlayGame", game).then(postResponse => {

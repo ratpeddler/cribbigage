@@ -27,6 +27,8 @@ export const Cut: GameComponent = props => {
         props.setGameState(props.game, true);
     }, [game, props.setGameState]);
 
+    const [hasRefreshed, setRefreshed] = React.useState(false);
+
     React.useEffect(() => {
         if (!IsYou(currentCutter)) {
             // for local game for now just always cut instantly.
@@ -35,13 +37,14 @@ export const Cut: GameComponent = props => {
                     cut();
                 }, 500);
             }
-            else {
+            else if (!hasRefreshed) {
+                setRefreshed(true);
                 // multiplayer we should refresh here.
                 console.log("refreshing from server, since it is not your turn to CUT.")
                 props.refreshFromServer?.();
             }
         }
-    }, []);
+    }, [hasRefreshed]);
 
     return <Layout
         setGameState={props.setGameState}

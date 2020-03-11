@@ -8,30 +8,41 @@ import { getCurrentDealer, IsYou } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 
 export const Deal: GameComponent = props => {
-    const Layout = props.layout;
     const logContext = React.useContext(PlayLogContext);
+    const [hasRefreshed, setRefreshed] = React.useState(false);
+
+    console.log(props, hasRefreshed);
+
+    const Layout = props.layout;
 
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
-    logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
 
     playShuffleSound();
 
+    React.useEffect(()=>{
+        // WARNING: This will cause a re-render. so like don't call it everytime, this should always be treated as an effect?
+        // Should we add a HOOK for this to prevent un-intentional re-renders?
+        console.log("adding dealer to log context");
+        logContext.addLog(dealer, `${IsYou(dealer) ? "are" : "is"} dealer`);
+    }, []);
+
     React.useEffect(() => {
-        if(!yourCrib){
+        if (!yourCrib) {
             if (LocalOrMultiplayer == "local") {
                 setTimeout(() => {
                     props.setGameState(RunDeal(props.game, logContext), true);
                     Repeat(playDealSound, 10, 250);
                 }, 1000);
             }
-            else {
-                // multiplayer we should refresh here.
+            else if (!hasRefreshed) {
                 console.log("refreshing from server, since it is not your turn to DEAL.")
+                setRefreshed(true);
+                // multiplayer we should refresh here.
                 props.refreshFromServer?.();
             }
         }
-    }, []);
+    }, [hasRefreshed]);
 
     // TODO: Animate dealing
 

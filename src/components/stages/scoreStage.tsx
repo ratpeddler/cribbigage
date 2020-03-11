@@ -14,6 +14,7 @@ export const ScoreStage: GameComponent = props => {
     const isYourTurn = IsYou(currentPlayer);
 
     // TODO: make users click a button to score their hands!
+    const [hasRefreshed, setRefreshed] = React.useState(false);
     React.useEffect(() => {
         if (LocalOrMultiplayer == "local") {
             setTimeout(() => {
@@ -32,7 +33,8 @@ export const ScoreStage: GameComponent = props => {
                 props.setGameState(game, false);
             }, 500);
         }
-        else if (!isYourTurn) {
+        else if (!isYourTurn && !hasRefreshed) {
+            setRefreshed(true);
             // multiplayer we should refresh here.
             console.log("refreshing from server, since it is not your turn to SCORE YOUR HAND.")
             props.refreshFromServer?.();
