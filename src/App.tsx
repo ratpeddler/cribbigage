@@ -16,25 +16,26 @@ import { Button } from './components/button';
 
 export const LoadGameFromServer = () => axios.get<GameState>("PlayGame").then(response => response.data);
 
+const logBuffer: ILog[]  = []; 
+
+export const addLog = (player: PlayerState | null, message: string, score?: IScore) => {
+  logBuffer.push({
+    time: Date.now(),
+    playerName: player?.name || "GAME",
+    message,
+    score,
+  });
+}
+
 const App: React.FC = () => {
   const [waitingForServer, setWaitingForServer] = React.useState(false);
   const [gameState, setGameState] = React.useState(initGameState());
-  const [playLog, setPlayLog] = React.useState<ILog[]>([]);
-
-  const addLog = React.useCallback((player: PlayerState | null, message: string, score?: IScore) => {
-    setPlayLog([{
-      time: Date.now(),
-      playerName: player?.name || "GAME",
-      message,
-      score,
-    },
-    ...playLog])
-  }, [playLog, setPlayLog]);
+  //const [playLog, setPlayLog] = React.useState<ILog[]>([]);
 
   const PlayLogContextValue = React.useMemo<IPlayLogContext>(() => ({
-    log: playLog,
+    log: gameState.playLog || [],
     addLog,
-  }), [playLog, addLog]);
+  }), [gameState.playLog]);
 
   const refreshGame = (currentGame: GameState, timeout = 1) => {
     axios.get<GameState>("PlayGame").then(newGameState => {
@@ -50,7 +51,7 @@ const App: React.FC = () => {
       else {
         console.log("game states changed. stopping refresh and updating state.")
         setGameState(newGameState.data);
-        setPlayLog(newGameState.data.playLog || []);
+        //setPlayLog(newGameState.data.playLog || []);
         setWaitingForServer(false);
       }
     });
@@ -85,7 +86,7 @@ const App: React.FC = () => {
               if (LocalOrMultiplayer == "online") {
                 // TODO: Send to server and update with the response
                 // TODO: check if it is our turn, if so play a little whistle
-                game.playLog =  playLog;
+                //game.playLog =  playLog;
                 setWaitingForServer(true);
                 setGameState(game);
 
