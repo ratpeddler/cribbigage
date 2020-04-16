@@ -21,7 +21,7 @@ export const Cut: GameComponent = props => {
         let jackCutScore = 0;
         props.game.cut?.filter(c => parseCard(c).value == "Jack").forEach(() => jackCutScore += SCORE_PER_JACK_CUT);
         addPlayerScore(dealer, jackCutScore, props.game);
-        if (jackCutScore > 0) addLog(props.game, dealer, WasOrWere(dealer) + " cut a Jack", { score: jackCutScore, knobs: jackCutScore });
+        if (jackCutScore > 0) addLog(props.game, dealer, WasOrWere(dealer) + " cut a Jack", "Check", { score: jackCutScore, knobs: jackCutScore });
 
         props.setGameState(props.game, true);
     }, [game, props.setGameState]);

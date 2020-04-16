@@ -4,7 +4,6 @@ import { GameState } from "./game";
 import { addPlayerScore } from "./score";
 import { PlayerState, ensureNextPlayer, getCurrentPlayer } from "./players";
 import { IScore } from "./../components/scoreIcon";
-import { playCardSound, playScoreSound, playCheckSound, playKnockSound } from "../sounds/playSound";
 import { addLog } from "../App";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
@@ -96,9 +95,7 @@ export function playCard(game: GameState, playedBy: PlayerState,  card: Card): G
         playScore.score++;
     }
     
-    playScore.score ? playScoreSound(playScore.score) : playCardSound();
-    
-    addLog(game, playedBy, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
+    addLog(game, playedBy, "played " + parseCard(card).value + " of " + parseCard(card).suit, "playCard", playScore);
 
     return {
         ...game,
@@ -115,9 +112,8 @@ export function pass(game: GameState): GameState {
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            addLog(game, player, "scored for go", { score: SCORE_GO, go: SCORE_GO });
+            addLog(game, player, "scored for go", "Check", { score: SCORE_GO, go: SCORE_GO });
             addPlayerScore(player, SCORE_GO, game);
-            playScoreSound(SCORE_GO);
         }
 
         let newPrevious = [...previousPlayedCards, ...playedCards];
@@ -126,8 +122,7 @@ export function pass(game: GameState): GameState {
         game.players.forEach(player => player.playedCards = []);
     }
     else {
-        addLog(game, player, "said GO", { score: 0, go: 0 });
-        playKnockSound();
+        addLog(game, player, "said GO", "Knock", { score: 0, go: 0 });
     }
 
     // Go is called when we reach the last player who played a card. Next person to play is the one after this person. 

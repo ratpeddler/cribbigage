@@ -7,7 +7,7 @@ import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player
 import _ from 'lodash';
 import { PlayerState, getCurrentPlayer, IsYou } from './game/players';
 import { IScore } from './components/scoreIcon';
-import { playTapSound } from './sounds/playSound';
+import { playTapSound, Sound } from './sounds/playSound';
 import { CardBackContext } from './components/card';
 import axios from "axios";
 import { LocalOrMultiplayer } from './components/stages/initAndWait';
@@ -15,11 +15,12 @@ import { Button } from './components/button';
 
 export const LoadGameFromServer = () => axios.get<GameState>("PlayGame").then(response => response.data);
 
-export const addLog = (gameState: GameState, player: PlayerState | null, message: string, score?: IScore) => {
+export const addLog = (gameState: GameState, player: PlayerState | null, message: string, sound?: Sound, score?: IScore) => {
   var log = {
     time: Date.now(),
     playerName: player?.name || "GAME",
     message,
+    sound,
     score,
   };
 

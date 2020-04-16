@@ -2,10 +2,10 @@ import React from "react";
 import { GameComponent } from "../game";
 import { RunDeal } from "../../game/deal";
 import { Button } from "../button";
-import { playShuffleSound, playDealSound, Repeat } from "../../sounds/playSound";
 import { getCurrentDealer, IsYou } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 import { addLog } from "../../App";
+import { playShuffleSound } from "../../sounds/playSound";
 
 export const Deal: GameComponent = props => {
     const [hasRefreshed, setRefreshed] = React.useState(false);
@@ -17,15 +17,15 @@ export const Deal: GameComponent = props => {
     let dealer = getCurrentDealer(props.game);
     let yourCrib = IsYou(dealer);
 
-    playShuffleSound();
+    React.useEffect(playShuffleSound, []);
 
     React.useEffect(() => {
         if (!yourCrib) {
             if (LocalOrMultiplayer == "local") {
                 setTimeout(() => {
-                    addLog(props.game, dealer, "is dealer");
+                    console.log("local not your crib deal");
+                    addLog(props.game, dealer, "is dealer", "Deal");
                     props.setGameState(RunDeal(props.game), true);
-                    Repeat(playDealSound, 10, 250);
                 }, 1000);
             }
             else if (!hasRefreshed) {
@@ -47,9 +47,9 @@ export const Deal: GameComponent = props => {
                 loading={!yourCrib}
                 big={true}
                 onClick={() => {
-                    addLog(props.game, dealer, "is dealer");
+                    console.log("you clicked deal");
+                    addLog(props.game, dealer, "is dealer", "Deal");
                     props.setGameState(RunDeal(props.game), true);
-                    Repeat(playDealSound, 10, 250);
                 }}
             >
                 {yourCrib ? "Deal" : `${dealer.name} is dealing...`}

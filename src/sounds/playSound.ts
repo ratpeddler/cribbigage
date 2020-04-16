@@ -2,24 +2,55 @@ const shuffle_cards = require("./cards/shuffle_cards.mp3");
 const deal_card = require("./cards/deal_card.mp3");
 const play_card = require("./cards/play_card.mp3");
 
+export type Sound = "Shuffle" | "Deal" | "playCard" | "Check"| "Knock" | "Tap" | "Whistle";
+export function playSound(sound?: Sound, score?: number) {
+    switch (sound) {
+        case "Shuffle":
+            playShuffleSound();
+            break;
+        case "Deal":
+            Repeat(playDealSound, 10, 250);
+            break;
+        case "playCard":
+            playCardSound();
+            break;
+        case "Knock":
+            playKnockSound();
+            break;
+        case "Tap":
+            playTapSound();
+            break;
+        case "Whistle":
+            playWhistleSound();
+            break;
+            case "Check":
+                playCheckSound();
+                break;
+    }
+
+    if (score) {
+        playScoreSound(score);
+    }
+}
+
 export const playShuffleSound = () => {
     var audio = new Audio(shuffle_cards);
     audio.volume = .25;
     audio.play();
 }
 
-export const playDealSound = () => {
+const playDealSound = () => {
     var audio = new Audio(deal_card);
     audio.volume = .25;
     audio.play();
 }
 
-export const playCardSound = () => {
+const playCardSound = () => {
     var audio = new Audio(play_card);
     audio.play();
 }
 
-export const Repeat = (action: () => void, count: number, interval: number) => {
+const Repeat = (action: () => void, count: number, interval: number) => {
     if (count > 0) {
         action();
         setTimeout(() => {
@@ -34,7 +65,7 @@ const score_3 = require("./scores/Score3.wav");
 const score_4 = require("./scores/Score4.wav");
 const score_5 = require("./scores/Score5.wav");
 
-export const playScoreSound = (score: number) => {
+const playScoreSound = (score: number) => {
     var audio = null;
     switch (score) {
         case 1:
@@ -59,13 +90,13 @@ export const playScoreSound = (score: number) => {
 }
 
 const knock = require("./misc/knock.wav");
-export const playKnockSound = () => {
+const playKnockSound = () => {
     var audio = new Audio(knock);
     audio.play();
 }
 
 const check = require("./misc/check.wav");
-export const playCheckSound = () => {
+const playCheckSound = () => {
     var audio = new Audio(check);
     audio.play();
 }
@@ -73,6 +104,13 @@ export const playCheckSound = () => {
 const tap = require("./misc/tap.wav");
 export const playTapSound = () => {
     var audio = new Audio(tap);
+    audio.volume = .5;
+    audio.play();
+}
+
+const whistle = require("./misc/whistle.mp3");
+const playWhistleSound = () => {
+    var audio = new Audio(whistle);
     audio.volume = .5;
     audio.play();
 }

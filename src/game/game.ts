@@ -4,7 +4,7 @@ import { GameRules } from "./rules";
 import { PlayerState, PlayerInfo } from "./players";
 import { Back } from "../components/card";
 import { LocalOrMultiplayer } from "../components/stages/initAndWait";
-import { ILog } from "../components/playLog";
+import { ILog, ResetLogs } from "../components/playLog";
 
 // interface for the "JoinGame" api response
 export interface JoinGameResponse {
@@ -77,6 +77,7 @@ export function initGameState(): GameState {
 
 const colors = ["red", "green", "blue", "gold"];
 export function startGame(players: PlayerInfo[], rules: GameRules, customization: GameCustomization): GameState {
+    ResetLogs();
     if (LocalOrMultiplayer == "local") {
         players = shuffle(players.filter((p, pi) => pi < rules.players));
     }

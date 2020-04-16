@@ -8,6 +8,7 @@ import { playAI } from "../../ai/AI_play";
 import { IsYou, ensureNextPlayer } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 import { LoadGameFromServer } from "../../App";
+import { playSound } from "../../sounds/playSound";
 
 const AutoAdvanceToYourTurn = false;
 const SlowAdvanceToYourTurn = true;
@@ -28,6 +29,13 @@ export const Play: GameComponent = props => {
 
     const cantPlay = cantPlayAtAll(user, playedCards, previousPlayedCards);
     const isYourTurn = IsYou(players[ensureNextPlayer(game)]);
+
+    React.useEffect(()=>{
+        if(isYourTurn){
+            // TODO: Only play this if it has been some time? like say a second without any action?
+            playSound("Whistle");
+        }
+    }, [isYourTurn]);
 
     const passYourTurn = () => {
         // Reset the current selection
