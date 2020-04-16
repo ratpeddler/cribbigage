@@ -4,8 +4,8 @@ import { GameState } from "./game";
 import { addPlayerScore } from "./score";
 import { PlayerState, ensureNextPlayer, getCurrentPlayer } from "./players";
 import { IScore } from "./../components/scoreIcon";
-import { IPlayLogContext } from "../components/playLog";
 import { playCardSound, playScoreSound, playCheckSound, playKnockSound } from "../sounds/playSound";
+import { addLog } from "../App";
 
 /** Max play count. A single play cannot exceed this value e.g. 31 */
 const MAX_PLAY_COUNT = 31;
@@ -68,7 +68,7 @@ export function incrementNextPlayer(game: GameState): number {
 }
 
 
-export function playCard(game: GameState, playedBy: PlayerState,  card: Card, logContext: IPlayLogContext): GameState {
+export function playCard(game: GameState, playedBy: PlayerState,  card: Card): GameState {
     let { playedCards = [] } = game;
 
     if(playedBy.hand.indexOf(card) < 0){
@@ -98,7 +98,7 @@ export function playCard(game: GameState, playedBy: PlayerState,  card: Card, lo
     
     playScore.score ? playScoreSound(playScore.score) : playCardSound();
     
-    logContext.addLog(playedBy, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
+    addLog(game, playedBy, "played " + parseCard(card).value + " of " + parseCard(card).suit, playScore);
 
     return {
         ...game,
@@ -106,7 +106,7 @@ export function playCard(game: GameState, playedBy: PlayerState,  card: Card, lo
     }
 }
 
-export function pass(game: GameState, logContext: IPlayLogContext): GameState {
+export function pass(game: GameState): GameState {
     const player = getCurrentPlayer(game);
 
     // pass to the next player and check if there has been a GO
@@ -115,7 +115,7 @@ export function pass(game: GameState, logContext: IPlayLogContext): GameState {
 
         // GO: check for 31 since you do not get a go for 31
         if (sumCards(playedCards) !== 31) {
-            logContext.addLog(player, "scored for go", { score: SCORE_GO, go: SCORE_GO });
+            addLog(game, player, "scored for go", { score: SCORE_GO, go: SCORE_GO });
             addPlayerScore(player, SCORE_GO, game);
             playScoreSound(SCORE_GO);
         }
@@ -126,7 +126,7 @@ export function pass(game: GameState, logContext: IPlayLogContext): GameState {
         game.players.forEach(player => player.playedCards = []);
     }
     else {
-        logContext.addLog(player, "said GO", { score: 0, go: 0 });
+        addLog(game, player, "said GO", { score: 0, go: 0 });
         playKnockSound();
     }
 

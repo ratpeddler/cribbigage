@@ -1,6 +1,6 @@
 import React from "react";
 import { PlayerState } from "../game/players";
-import { PlayLogContext } from "./playLog";
+import { GameState } from "../game/game";
 
 export interface IScore {
     score: number,
@@ -49,16 +49,14 @@ export function createScoreMessage(score: IScore) {
     return scoreStrings.join(", ");
 }
 
-export const ScoreIcon: React.FC<{ player: PlayerState }> = props => {
-    const logContext = React.useContext(PlayLogContext);
-
+export const ScoreIcon: React.FC<{ game: GameState, player: PlayerState }> = props => {
     // get all logs for the player and check their times!
-    let userLogs = React.useMemo(() => logContext.log
+    let userLogs = React.useMemo(() => (props.game.playLog || [])
         .filter(l => l.score
             && l.playerName == props.player.name
             && l.time > (Date.now() - 2000))
         .slice(0, 4),
-        [logContext.log]);
+        [props.game.playLog]);
 
     let style = React.useMemo<React.CSSProperties>(() => ({
         fontWeight: 700,

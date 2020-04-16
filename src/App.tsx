@@ -5,7 +5,6 @@ import { initGameState, GameState } from './game/game';
 import { anyPlayerHasWon } from './game/score';
 import { Horizontal2PlayerLayout } from './components/layouts/Horizontal_2Player';
 import _ from 'lodash';
-import { PlayLogContext, IPlayLogContext, ILog } from './components/playLog';
 import { PlayerState, getCurrentPlayer, IsYou } from './game/players';
 import { IScore } from './components/scoreIcon';
 import { playTapSound } from './sounds/playSound';
@@ -16,26 +15,20 @@ import { Button } from './components/button';
 
 export const LoadGameFromServer = () => axios.get<GameState>("PlayGame").then(response => response.data);
 
-const logBuffer: ILog[]  = []; 
-
-export const addLog = (player: PlayerState | null, message: string, score?: IScore) => {
-  logBuffer.push({
+export const addLog = (gameState: GameState, player: PlayerState | null, message: string, score?: IScore) => {
+  var log = {
     time: Date.now(),
     playerName: player?.name || "GAME",
     message,
     score,
-  });
+  };
+
+  gameState.playLog = [...(gameState.playLog || []), log];
 }
 
 const App: React.FC = () => {
   const [waitingForServer, setWaitingForServer] = React.useState(false);
   const [gameState, setGameState] = React.useState(initGameState());
-  //const [playLog, setPlayLog] = React.useState<ILog[]>([]);
-
-  const PlayLogContextValue = React.useMemo<IPlayLogContext>(() => ({
-    log: gameState.playLog || [],
-    addLog,
-  }), [gameState.playLog]);
 
   const refreshGame = (currentGame: GameState, timeout = 1) => {
     axios.get<GameState>("PlayGame").then(newGameState => {
@@ -61,7 +54,6 @@ const App: React.FC = () => {
   const isYourTurn = !!currentPlayer && IsYou(currentPlayer);
 
   return (
-    <PlayLogContext.Provider value={PlayLogContextValue}>
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
@@ -103,7 +95,6 @@ const App: React.FC = () => {
           <div style={{ position: "fixed", bottom: 0, right: 0, padding: 10, fontSize: 10 }}>© 2020 aiplayersonline.com</div>
         </div>
       </CardBackContext.Provider>
-    </PlayLogContext.Provider>
   );
 }
 

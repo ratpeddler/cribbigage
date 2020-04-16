@@ -64,7 +64,7 @@ export interface GameState {
 
     customization: GameCustomization;
 
-    playLog?: ILog[];
+    playLog: ILog[];
 }
 
 export function initGameState(): GameState {
@@ -90,5 +90,6 @@ export function startGame(players: PlayerInfo[], rules: GameRules, customization
         cut: [],
         playedCards: [],
         customization,
+        playLog: [],
     }
 }

@@ -4,7 +4,6 @@ import { GameComponent } from "../game";
 import { KeepCard, ExtractKeptCard, onDragOverMovableArea } from "../hand";
 import { Button } from "../button";
 import { sumCards, canPlay, cantPlayAtAll, playStageOver, playCard, pass } from "../../game/play";
-import { PlayLogContext } from "../playLog";
 import { playAI } from "../../ai/AI_play";
 import { IsYou, ensureNextPlayer } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
@@ -17,7 +16,6 @@ const fastAIDelay = 500; // 1.2 seconds
 
 export const Play: GameComponent = props => {
     const Layout = props.layout;
-    const logContext = React.useContext(PlayLogContext);
     const [keepCard, setKeepCard] = React.useState<KeepCard>({});
     const disabled = Object.keys(keepCard).filter(c => !!keepCard[c as any]).length != 1;
 
@@ -36,11 +34,9 @@ export const Play: GameComponent = props => {
         setKeepCard({});
         // always advance on pass?
         setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
-            ? playAI(pass(game, logContext), true, logContext)
-            : pass(game, logContext), false);
+            ? playAI(pass(game), true)
+            : pass(game), false);
     }
-
-    React.useEffect(() => logContext.addLog(players[0], "starts"), []);
 
     const onDrop = React.useCallback((ev: React.DragEvent<HTMLDivElement>) => {
         ev.persist();
@@ -57,10 +53,10 @@ export const Play: GameComponent = props => {
             setKeepCard({});
             // only have PLAYAI if you want to auto advance!
             setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
-                ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
-                : playCard(game, user, playedCard, logContext), false);
+                ? playAI(playCard(game, user, playedCard), false)
+                : playCard(game, user, playedCard), false);
         }
-    }, [game, logContext, setGameState, setKeepCard]);
+    }, [game, setGameState, setKeepCard]);
 
     // Trigger any AI actions
     React.useEffect(() => {
@@ -82,18 +78,18 @@ export const Play: GameComponent = props => {
                 if (!isYourTurn) {
                     // Add some time out here
                     setTimeout(() => {
-                        setGameState(playAI(game, false, logContext), false);
+                        setGameState(playAI(game, false), false);
                     }, fastAIDelay);
                 }
             }
 
             else if (AutoAdvanceToYourTurn && !isYourTurn) {
-                setGameState(playAI(game, true, logContext), false);
+                setGameState(playAI(game, true), false);
             }
             else if (SlowAdvanceToYourTurn && !isYourTurn) {
                 // Add some time out here
                 setTimeout(() => {
-                    setGameState(playAI(game, false, logContext), false);
+                    setGameState(playAI(game, false), false);
                 }, SlowAIDelay);
             }
         }
@@ -130,7 +126,7 @@ export const Play: GameComponent = props => {
             {stageIsOver || isYourTurn ? null : <Button onClick={() => { }} loading disabled>{players[ensureNextPlayer(game)].name} is playing...</Button>}
 
             {!isYourTurn && !SlowAdvanceToYourTurn && LocalOrMultiplayer == "local" && <Button
-                onClick={() => { setGameState(playAI(game, false, logContext), false) }}>
+                onClick={() => { setGameState(playAI(game, false), false) }}>
                 AI's turn
                 </Button>}
 
@@ -143,8 +139,8 @@ export const Play: GameComponent = props => {
                         setKeepCard({});
                         // only have PLAYAI if you want to auto advance!
                         setGameState(AutoAdvanceToYourTurn && LocalOrMultiplayer == "local"
-                            ? playAI(playCard(game, user, playedCard, logContext), false, logContext)
-                            : playCard(game, user, playedCard, logContext), false);
+                            ? playAI(playCard(game, user, playedCard), false)
+                            : playCard(game, user, playedCard), false);
                     }}>
                     {disabled ? "Select a card to play" : "Play selected card"}
                 </Button>}

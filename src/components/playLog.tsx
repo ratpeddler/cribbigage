@@ -5,8 +5,6 @@ import { IScore, createScoreMessage } from "./scoreIcon";
 import { GameState } from "../game/game";
 import _ from "lodash";
 
-export const PlayLogContext = React.createContext<IPlayLogContext>({ log: [], addLog: () => { } });
-
 export interface ILog {
     playerName: string,
     time: number,
@@ -14,14 +12,8 @@ export interface ILog {
     score?: IScore,
 }
 
-export interface IPlayLogContext {
-    log: ILog[];
-    addLog: (player: PlayerState | null, message: string, score?: IScore) => void;
-}
-
 export const PlayLog: React.FC<{game?: GameState}> = props => {
-    const context = React.useContext(PlayLogContext);
-    let logs = props.game?.playLog || context.log;
+    let logs = props.game?.playLog || [];
 
     const [oldLogs, setOldLogs] = React.useState<ILog[]>([]);
 
