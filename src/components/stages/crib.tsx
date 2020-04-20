@@ -55,6 +55,7 @@ export const Crib: GameComponent = props => {
                 </div>
             </div>
             <div style={{ textAlign: "center" }}>
+                {hasRefreshed && props.refreshFromServer && <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Next</Button>}
                 <Button disabled={!isYourCrib || hasCounted} onClick={Action_ScoreCrib}>Count crib</Button>
                 <Button disabled={!hasCounted} onClick={Action_GoToNextDeal}>Go to next deal</Button>
             </div>

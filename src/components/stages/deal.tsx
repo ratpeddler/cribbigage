@@ -42,6 +42,7 @@ export const Deal: GameComponent = props => {
     return <Layout game={props.game} setGameState={props.setGameState} userActions={() =>
         <>
             {yourCrib && <h3>It's <span style={{ color: dealer.color }}>your</span> turn to deal</h3>}
+            {hasRefreshed && props.refreshFromServer && <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Next</Button>}
             <Button
                 disabled={!yourCrib}
                 loading={!yourCrib}

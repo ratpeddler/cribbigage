@@ -49,6 +49,7 @@ export const Cut: GameComponent = props => {
         setGameState={props.setGameState}
         game={props.game}
         userActions={() => <div>
+            {hasRefreshed && props.refreshFromServer && <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Next</Button>}
             {IsYou(currentCutter) ? <Button big onClick={cut}>Cut</Button> : "waiting for the cut"}
         </div>}
     />;
