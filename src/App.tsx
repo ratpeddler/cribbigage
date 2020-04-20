@@ -58,11 +58,11 @@ const App: React.FC = () => {
       <CardBackContext.Provider value={gameState.customization.deckName}>
 
         <div style={{ position: "absolute", height: "100%", width: "100%", display: "flex" }}>
-          {LocalOrMultiplayer == "online" ? <Button disabled={waitingForServer} onClick={() => {
+          {LocalOrMultiplayer == "online" ? <button style={{position: "absolute", top:0, right:0}} disabled={waitingForServer} onClick={() => {
             setWaitingForServer(true);
             refreshGame(gameState);
           }}>
-            {isYourTurn ? "Wait for other player" : "(BUG: Refresh)"}</Button> : null}
+            {isYourTurn ? "Wait for other player" : "Next"}</button> : null}
           <Game
             refreshFromServer={() => refreshGame(gameState)}
             waitingForServer={waitingForServer}
