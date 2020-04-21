@@ -6,6 +6,7 @@ import _ from "lodash";
 import { IsYou, getCurrentPlayer } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 import { incrementNextPlayer } from "../../game/play";
+import { addLog } from "../../App";
 
 export const ScoreStage: GameComponent = props => {
     const Layout = props.layout;
@@ -23,6 +24,7 @@ export const ScoreStage: GameComponent = props => {
                     const score = scoreHand(p.hand, props.game.cut!);
                     const newScore = p.score + score.score;
                     addPlayerScore(p, score.score, game);
+                    addLog(game, p, `hand score ${score.score}pts`, "Check", score);
 
                     if (newScore > game.rules.pointsToWin) {
                         // a player has won, stop counting and update the game
@@ -52,6 +54,7 @@ export const ScoreStage: GameComponent = props => {
                     const score = scoreHand(currentPlayer.hand, props.game.cut!);
                     addPlayerScore(currentPlayer, score.score, game);
                     game.nextToPlay = incrementNextPlayer(game);
+                    addLog(game, currentPlayer, `hand score ${score.score}pts`, "Check", score);
 
                     // 0 indicates we have gone around the table fully, so we should advance
                     props.setGameState(game, game.nextToPlay == 0);

@@ -7,6 +7,7 @@ import { scoreHand, addPlayerScore } from "../../game/score";
 import { getCurrentDealer, IsYou } from "../../game/players";
 import { LocalOrMultiplayer } from "./initAndWait";
 import _ from "lodash";
+import { addLog } from "../../App";
 
 export const Crib: GameComponent = props => {
     const [hasCounted, setHasCounted] = React.useState(false);
@@ -17,7 +18,9 @@ export const Crib: GameComponent = props => {
 
     const Action_ScoreCrib = () => {
         if (hasCounted) { throw "You already counted the crib!"; }
-        addPlayerScore(dealer, scoreHand(game.crib!, game.cut!).score, game);
+        const score = scoreHand(game.crib!, game.cut!);
+        addPlayerScore(dealer, score.score, game);
+        addLog(game, dealer, `crib score ${score.score}pts`, "Check", score);
         props.setGameState(game, false);
         setHasCounted(true);
     }
