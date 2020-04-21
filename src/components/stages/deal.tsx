@@ -8,9 +8,8 @@ import { addLog } from "../../App";
 import { playShuffleSound } from "../../sounds/playSound";
 
 export const Deal: GameComponent = props => {
-    const [hasRefreshed, setRefreshed] = React.useState(false);
-
-    console.log(props, hasRefreshed);
+    //const [hasRefreshed, setRefreshed] = React.useState(false);
+    //console.log(props, hasRefreshed);
 
     const Layout = props.layout;
 
@@ -28,14 +27,14 @@ export const Deal: GameComponent = props => {
                     props.setGameState(RunDeal(props.game), true);
                 }, 1000);
             }
-            else if (!hasRefreshed) {
-                console.log("refreshing from server, since it is not your turn to DEAL.")
-                setRefreshed(true);
-                // multiplayer we should refresh here.
-                props.refreshFromServer?.();
+            else {
+                setTimeout(() => {
+                    // multiplayer we should refresh here.
+                    props.refreshFromServer?.();
+                }, 1000);
             }
         }
-    }, [hasRefreshed]);
+    }, []);
 
     // TODO: Animate dealing
 
