@@ -81,7 +81,7 @@ export const Throw: GameComponent = props => {
                         action_throwCardsToCrib(game, setGameState, keepCards);
                     }
                 }}>
-                {hasConfirmed ? "Waiting for other players" : (disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`)}
+                {hasConfirmed ? <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Wait for other player</Button> : (disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`)}
             </Button>
         </div>} />;
 }
