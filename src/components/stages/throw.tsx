@@ -48,6 +48,8 @@ export const Throw: GameComponent = props => {
         }
     }, [hasConfirmed, game, setGameState]);
 
+    console.log("hand stuff", hasConfirmed, disabled, props.waitingForServer);
+
     // TODO: This should either let you pick all hands or just your own
     return <Layout
         setGameState={props.setGameState}
@@ -71,17 +73,21 @@ export const Throw: GameComponent = props => {
                 Select which cards you will keep and which you will discard to <span style={{ color: dealer.color }}>{yourCrib ? "your" : dealer.name + "'s"} crib</span>.
             <div>(<span style={{ color: user.color }}>You</span> must keep {keepSize} cards)</div>
             </h3>
-            <Button
-                disabled={disabled || hasConfirmed}
-                onClick={() => {
-                    if (LocalOrMultiplayer == "online" && (!isYourTurn || !!props.waitingForServer)) {
-                        setHasConfirmed(true);
-                    }
-                    else {
-                        action_throwCardsToCrib(game, setGameState, keepCards);
-                    }
-                }}>
-                {hasConfirmed ? <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Wait for other player</Button> : (disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`)}
-            </Button>
+            {hasConfirmed
+                ? <Button disabled={props.waitingForServer} onClick={props.refreshFromServer}>Wait for other player</Button>
+                : <Button
+                    disabled={disabled || hasConfirmed}
+                    onClick={() => {
+                        if (LocalOrMultiplayer == "online" && (!isYourTurn || !!props.waitingForServer)) {
+                            console.log("confirming the cards you threw!");
+                            setHasConfirmed(true);
+                        }
+                        else {
+                            console.log("actually throwing your cards to the server");
+                            action_throwCardsToCrib(game, setGameState, keepCards);
+                        }
+                    }}>
+                    {disabled ? `Select ${keepSize - selectedLength} more cards` : `Keep selected cards (${score.score} pts)`)}
+            </Button>}
         </div>} />;
 }
