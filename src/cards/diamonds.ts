@@ -6,6 +6,7 @@ import diamonds_6 from "./fronts/6_of_diamonds.svg";
 import diamonds_7 from "./fronts/7_of_diamonds.svg";
 import diamonds_8 from "./fronts/8_of_diamonds.svg";
 import diamonds_9 from "./fronts/9_of_diamonds.svg";
+import diamonds_10 from "./fronts/10_of_diamonds.svg";
 import diamonds_jack from "./fronts/jack_of_diamonds.svg";
 import diamonds_queen from "./fronts/queen_of_diamonds.svg";
 import diamonds_king from "./fronts/king_of_diamonds.svg";
@@ -22,6 +23,7 @@ export const diamonds: ReadonlyArray<string> = [
   diamonds_7,
   diamonds_8,
   diamonds_9,
+  diamonds_10,
   diamonds_jack,
   diamonds_queen,
   diamonds_king,

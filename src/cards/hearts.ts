@@ -6,6 +6,7 @@ import hearts_6 from "./fronts/6_of_hearts.svg";
 import hearts_7 from "./fronts/7_of_hearts.svg";
 import hearts_8 from "./fronts/8_of_hearts.svg";
 import hearts_9 from "./fronts/9_of_hearts.svg";
+import hearts_10 from "./fronts/10_of_hearts.svg";
 import hearts_jack from "./fronts/jack_of_hearts.svg";
 import hearts_queen from "./fronts/queen_of_hearts.svg";
 import hearts_king from "./fronts/king_of_hearts.svg";
@@ -22,6 +23,7 @@ export const hearts: ReadonlyArray<string> = [
   hearts_7,
   hearts_8,
   hearts_9,
+  hearts_10,
   hearts_jack,
   hearts_queen,
   hearts_king,

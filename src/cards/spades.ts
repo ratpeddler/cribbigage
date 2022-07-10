@@ -6,6 +6,7 @@ import spades_6 from "./fronts/6_of_spades.svg";
 import spades_7 from "./fronts/7_of_spades.svg";
 import spades_8 from "./fronts/8_of_spades.svg";
 import spades_9 from "./fronts/9_of_spades.svg";
+import spades_10 from "./fronts/10_of_spades.svg";
 import spades_jack from "./fronts/jack_of_spades.svg";
 import spades_queen from "./fronts/queen_of_spades.svg";
 import spades_king from "./fronts/king_of_spades.svg";
@@ -22,6 +23,7 @@ export const spades: ReadonlyArray<string> = [
   spades_7,
   spades_8,
   spades_9,
+  spades_10,
   spades_jack,
   spades_queen,
   spades_king,
